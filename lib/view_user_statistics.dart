@@ -86,7 +86,7 @@ class _ViewUserStatisticsStatefulState extends State<_ViewUserStatisticsStateful
 
   void fetchUserAnimesList() async{
     var res = await dio.get(
-      '$malApiUrl/users/@me/animelist?offset=${userAnimeStatistics.total}limit=5&$fetchAllAnimeFieldsStr',
+      '$malApiUrl/users/@me/animelist?offset=${userAnimeStatistics.total}limit=$statsFetchLimit&$fetchAllAnimeFieldsStr',
       options: Options(
         headers: {
           'Authorization': await generateAuthHeader()
@@ -210,7 +210,7 @@ class _ViewUserStatisticsStatefulState extends State<_ViewUserStatisticsStateful
 
   void fetchUserMangasList() async{
     var res = await dio.get(
-      '$malApiUrl/users/@me/mangalist?offset=${userMangaStatistics.total}limit=5&$fetchAllMangaFieldsStr',
+      '$malApiUrl/users/@me/mangalist?offset=${userMangaStatistics.total}limit=$statsFetchLimit&$fetchAllMangaFieldsStr',
       options: Options(
         headers: {
           'Authorization': await generateAuthHeader()

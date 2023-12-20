@@ -48,3 +48,5 @@ int detailImgWidgetMaxAmount = 25;
 int skeletonLoadingDefaultLimit = 10;
 
 String iconImageUrl = 'assets/images/icon.png';
+
+int statsFetchLimit = 1000;

@@ -44,7 +44,7 @@ class CustomBasicVoiceDisplayState extends State<CustomBasicVoiceDisplay>{
             children: [
               Column(
                 children: [
-                  Container(
+                  SizedBox(
                     width: animeGridDisplayCoverSize.width,
                     height: animeGridDisplayCoverSize.height,
                     child: Image.network(voiceData.personCover.large, fit: BoxFit.cover)

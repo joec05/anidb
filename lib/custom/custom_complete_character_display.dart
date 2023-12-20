@@ -74,7 +74,7 @@ class CustomRowCharacterDisplayState extends State<CustomRowCharacterDisplay>{
                       width: getScreenWidth() * 0.025
                     ),
                     Flexible(
-                      child: Container(
+                      child: SizedBox(
                         width: getScreenWidth() - animeDisplayCoverSize.width - defaultHorizontalPadding * 2,
                         height: animeDisplayCoverSize.height,
                         child: Column(

@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:math';
 import 'package:anime_list_app/view_anime_details.dart';
 import 'package:anime_list_app/appdata/global_enums.dart';

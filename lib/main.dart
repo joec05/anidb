@@ -1,14 +1,14 @@
 import 'dart:io';
 import 'dart:math';
-import 'package:anime_list_app/MainPage.dart';
-import 'package:anime_list_app/appdata/GlobalFunctions.dart';
-import 'package:anime_list_app/appdata/GlobalVariables.dart';
+import 'package:anime_list_app/main_page.dart';
+import 'package:anime_list_app/appdata/global_functions.dart';
+import 'package:anime_list_app/appdata/global_variables.dart';
 import 'package:anime_list_app/appdata/private_data.dart';
-import 'package:anime_list_app/class/UserTokenClass.dart';
+import 'package:anime_list_app/class/user_token_class.dart';
 import 'package:anime_list_app/connect_account.dart';
 import 'package:anime_list_app/state/main.dart';
-import 'package:anime_list_app/styles/AppStyles.dart';
-import 'package:anime_list_app/transition/RightToLeftTransition.dart';
+import 'package:anime_list_app/styles/app_styles.dart';
+import 'package:anime_list_app/transition/navigation_transition.dart';
 import 'package:flutter/material.dart';
 import 'package:timezone/data/latest.dart' as tz;
 
@@ -92,7 +92,7 @@ class _MyHomePageState extends State<MyHomePage> {
         appStateClass.userTokenData = UserTokenClass.fromMapRetrieve(userTokenMap);
         runDelay(() => Navigator.pushAndRemoveUntil(
           context,
-          SliderRightToLeftRoute(
+          NavigationTransition(
             page: const MainPageWidget()
           ),
           (Route<dynamic> route) => false
@@ -114,7 +114,7 @@ class _MyHomePageState extends State<MyHomePage> {
     runDelay(() async{
       Navigator.pushAndRemoveUntil(
         context,
-        SliderRightToLeftRoute(
+        NavigationTransition(
           page: ConnectAccountPage(
             url: 'https://myanimelist.net/v1/oauth2/authorize?response_type=code&client_id=$clientID&code_challenge=$codeVerifier&state=RequestIDABC',
             codeVerifier: codeVerifier

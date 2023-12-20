@@ -1,9 +1,9 @@
-import 'package:anime_list_app/class/AnimeDataNotifier.dart';
-import 'package:anime_list_app/class/CharacterDataNotifier.dart';
-import 'package:anime_list_app/class/MangaDataNotifier.dart';
-import 'package:anime_list_app/class/AppStorageClass.dart';
-import 'package:anime_list_app/class/UserDataNotifier.dart';
-import 'package:anime_list_app/class/UserTokenClass.dart';
+import 'package:anime_list_app/class/anime_data_notifier.dart';
+import 'package:anime_list_app/class/character_data_notifier.dart';
+import 'package:anime_list_app/class/manga_data_notifier.dart';
+import 'package:anime_list_app/class/app_storage_class.dart';
+import 'package:anime_list_app/class/user_data_notifier.dart';
+import 'package:anime_list_app/class/user_token_class.dart';
 
 class AppStateClass{
   UserTokenClass userTokenData;

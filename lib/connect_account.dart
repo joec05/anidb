@@ -1,12 +1,12 @@
 // ignore_for_file: library_private_types_in_public_api
-import 'package:anime_list_app/MainPage.dart';
-import 'package:anime_list_app/appdata/GlobalFunctions.dart';
-import 'package:anime_list_app/appdata/GlobalVariables.dart';
+import 'package:anime_list_app/main_page.dart';
+import 'package:anime_list_app/appdata/global_functions.dart';
+import 'package:anime_list_app/appdata/global_variables.dart';
 import 'package:anime_list_app/appdata/private_data.dart';
-import 'package:anime_list_app/class/UserTokenClass.dart';
+import 'package:anime_list_app/class/user_token_class.dart';
 import 'package:anime_list_app/state/main.dart';
-import 'package:anime_list_app/styles/AppStyles.dart';
-import 'package:anime_list_app/transition/RightToLeftTransition.dart';
+import 'package:anime_list_app/styles/app_styles.dart';
+import 'package:anime_list_app/transition/navigation_transition.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -60,7 +60,7 @@ class _ConnectAccountPageState extends State<ConnectAccountPage> {
       appStateClass.appStorage.updateUserToken();
       runDelay(() => Navigator.pushAndRemoveUntil(
         context,
-        SliderRightToLeftRoute(
+        NavigationTransition(
           page: const MainPageWidget()
         ),
         (Route<dynamic> route) => false

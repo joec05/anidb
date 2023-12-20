@@ -10,17 +10,13 @@ import 'package:anime_list_app/state/main.dart';
 import 'package:anime_list_app/styles/app_styles.dart';
 import 'package:anime_list_app/transition/navigation_transition.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:timezone/data/latest.dart' as tz;
 
-class MyHttpOverrides extends HttpOverrides{
-  @override
-  HttpClient createHttpClient(SecurityContext? context){
-    return super.createHttpClient(context)
-      ..badCertificateCallback = (X509Certificate cert, String host, int port)=> true;
-  }
-}
-void main() {
-  HttpOverrides.global = MyHttpOverrides();
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  ByteData data = await PlatformAssetBundle().load('assets/certificate/ca.pem');
+  SecurityContext.defaultContext.setTrustedCertificatesBytes(data.buffer.asUint8List());
   tz.initializeTimeZones();
   runApp(const MyApp());
 }

@@ -1,4 +1,4 @@
-# Hawk Anime List
+# AniDB
 
 An unofficial MAL client made with Flutter.
 
@@ -30,20 +30,14 @@ After that, create a new file in `appdata` folder named `private_data.dart`. The
 
 Currently on pending
 
-## Hawk Anime List in display
+## AniDB in display
 
-![Hawk anime list app](https://github.com/joec05/files/blob/main/hawk_anime_list/demo_1.png?raw=true "Hawk anime list app demo image 1")
+![AniDB demo 1](https://github.com/joec05/files/blob/main/mal_client/demo_1.png?raw=true "AniDB demo 1")
 
-![Hawk anime list app](https://github.com/joec05/files/blob/main/hawk_anime_list/demo_2.png?raw=true "Hawk anime list app demo image 2")
+![AniDB demo 2](https://github.com/joec05/files/blob/main/mal_client/demo_2.png?raw=true "AniDB demo 2")
 
-![Hawk anime list app](https://github.com/joec05/files/blob/main/hawk_anime_list/demo_4.png?raw=true "Hawk anime list app demo image 4")
+![AniDB demo 3](https://github.com/joec05/files/blob/main/mal_client/demo_3.png?raw=true "AniDB demo 3")
 
-![Hawk anime list app](https://github.com/joec05/files/blob/main/hawk_anime_list/demo_5.png?raw=true "Hawk anime list app demo image 5")
+![AniDB demo 4](https://github.com/joec05/files/blob/main/mal_client/demo_4.png?raw=true "AniDB demo 4")
 
-![Hawk anime list app](https://github.com/joec05/files/blob/main/hawk_anime_list/demo_6.png?raw=true "Hawk anime list app demo image 6")
-
-![Hawk anime list app](https://github.com/joec05/files/blob/main/hawk_anime_list/demo_7.png?raw=true "Hawk anime list app demo image 7")
-
-![Hawk anime list app](https://github.com/joec05/files/blob/main/hawk_anime_list/demo_8.png?raw=true "Hawk anime list app demo image 8")
-
-![Hawk anime list app](https://github.com/joec05/files/blob/main/hawk_anime_list/demo_9.png?raw=true "Hawk anime list app demo image 9")
+![AniDB demo 5](https://github.com/joec05/files/blob/main/mal_client/demo_5.png?raw=true "AniDB demo 5")

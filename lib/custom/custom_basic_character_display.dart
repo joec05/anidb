@@ -64,7 +64,7 @@ class CustomBasicCharacterDisplayState extends State<CustomBasicCharacterDisplay
                     SizedBox(
                       width: animeGridDisplayCoverSize.width,
                       height: animeGridDisplayCoverSize.height,
-                      child: characterData.cover.large != null ? Image.network(characterData.cover.large!, fit: BoxFit.cover) : Image.asset("assets/images/anime-no-image.png", fit: BoxFit.cover)
+                      child: generateCachedImage(characterData.cover)
                     ),
                     widget.showStats ?
                       Container(

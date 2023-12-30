@@ -168,7 +168,7 @@ class CustomCharacterDetailsState extends State<CustomCharacterDetails>{
                   SizedBox(
                     width: animeDetailDisplayCoverSize.width,
                     height: animeDetailDisplayCoverSize.height,
-                    child: characterData.cover.large != null ? Image.network(characterData.cover.large!, fit: BoxFit.cover) : Image.asset("assets/images/anime-no-image.png", fit: BoxFit.cover)
+                    child: generateCachedImage(characterData.cover)
                   ),
                   SizedBox(
                     width: getScreenWidth() * 0.03

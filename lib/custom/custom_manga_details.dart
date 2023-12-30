@@ -208,10 +208,19 @@ class CustomMangaDetailsState extends State<CustomMangaDetails>{
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Flexible(
-                                  child: Text(mangaData.title, style: TextStyle(
-                                    fontSize: defaultTextFontSize * 0.9,
-                                    fontWeight: FontWeight.w600
-                                  ))
+                                  child: Padding(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: getScreenWidth() * 0.015,
+                                    ),
+                                    child: Text(
+                                      mangaData.title, 
+                                      style: TextStyle(
+                                        fontSize: defaultTextFontSize * 0.95,
+                                        fontWeight: FontWeight.w600
+                                      ),
+                                      textAlign: TextAlign.center
+                                    ),
+                                  )
                                 )
                               ]
                             )
@@ -600,7 +609,7 @@ class CustomMangaDetailsState extends State<CustomMangaDetails>{
                   SizedBox(
                     width: animeDetailDisplayCoverSize.width,
                     height: animeDetailDisplayCoverSize.height,
-                    child: mangaData.cover != null ? Image.network(mangaData.cover!.large, fit: BoxFit.cover) : Image.asset("assets/images/anime-no-image.png", fit: BoxFit.cover)
+                    child: generateCachedImage(mangaData.cover)
                   ),
                   SizedBox(
                     width: getScreenWidth() * 0.03
@@ -1190,7 +1199,7 @@ class CustomMangaDetailsState extends State<CustomMangaDetails>{
                               child: SizedBox(
                                 width: animeGridDisplayCoverSize.width,
                                 height: animeGridDisplayCoverSize.height,
-                                child: Image.network(mangaData.pictures[i].large, fit: BoxFit.cover)
+                                child: generateCachedImage(mangaData.pictures[i])
                               ),
                             )
                           ]

@@ -64,7 +64,7 @@ class CustomBasicMangaDisplayState extends State<CustomBasicMangaDisplay>{
                     SizedBox(
                       width: animeGridDisplayCoverSize.width,
                       height: animeGridDisplayCoverSize.height,
-                      child: mangaData.cover != null ? Image.network(mangaData.cover!.large, fit: BoxFit.cover) : Image.asset("assets/images/anime-no-image.png", fit: BoxFit.cover)
+                      child: generateCachedImage(mangaData.cover)
                     ),
                     widget.showStats ?
                       Container(

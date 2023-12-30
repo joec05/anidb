@@ -206,10 +206,19 @@ class CustomUserListMangaDisplayState extends State<CustomUserListMangaDisplay>{
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Flexible(
-                                  child: Text(mangaData.title, style: TextStyle(
-                                    fontSize: defaultTextFontSize * 0.9,
-                                    fontWeight: FontWeight.w600
-                                  ))
+                                  child: Padding(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: getScreenWidth() * 0.015,
+                                    ),
+                                    child: Text(
+                                      mangaData.title, 
+                                      style: TextStyle(
+                                        fontSize: defaultTextFontSize * 0.95,
+                                        fontWeight: FontWeight.w600
+                                      ),
+                                      textAlign: TextAlign.center
+                                    ),
+                                  )
                                 )
                               ]
                             )
@@ -498,7 +507,7 @@ class CustomUserListMangaDisplayState extends State<CustomUserListMangaDisplay>{
                           color: Colors.grey.withOpacity(0.6)
                         ),
                       ),
-                      child: mangaData.cover != null ? Image.network(mangaData.cover!.large, fit: BoxFit.cover) : Image.asset("assets/images/anime-no-image.png", fit: BoxFit.cover)
+                      child: generateCachedImage(mangaData.cover)
                     ),
                     SizedBox(
                       width: getScreenWidth() * 0.025

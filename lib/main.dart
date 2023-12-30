@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 import 'package:anime_list_app/main_page.dart';
@@ -28,23 +29,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Hawk Anime List',
+      title: 'AniDB',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a blue toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
         colorScheme: const ColorScheme.dark(),
         useMaterial3: true,
       ),
@@ -56,23 +42,18 @@ class MyApp extends StatelessWidget {
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  AssetImage assetImage = const AssetImage('assets/images/icon.png');
 
   @override void initState(){
     super.initState();
-    initializeApp();
+    Timer(const Duration(milliseconds: 1500), (){
+      initializeApp();
+    });  
   }
 
   @override void dispose(){
@@ -80,21 +61,19 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void initializeApp() async{
-    Future.delayed(const Duration(milliseconds: 3000), () async{
-      Map userTokenMap = await appStateClass.appStorage.fetchUserToken();
-      if(userTokenMap['token_type'].isEmpty){
-        callLogin();
-      }else{
-        appStateClass.userTokenData = UserTokenClass.fromMapRetrieve(userTokenMap);
-        runDelay(() => Navigator.pushAndRemoveUntil(
-          context,
-          NavigationTransition(
-            page: const MainPageWidget()
-          ),
-          (Route<dynamic> route) => false
-        ), navigatorDelayTime);
-      }
-    });
+    Map userTokenMap = await appStateClass.appStorage.fetchUserToken();
+    if(userTokenMap['token_type'].isEmpty){
+      callLogin();
+    }else{
+      appStateClass.userTokenData = UserTokenClass.fromMapRetrieve(userTokenMap);
+      runDelay(() => Navigator.pushAndRemoveUntil(
+        context,
+        NavigationTransition(
+          page: const MainPageWidget()
+        ),
+        (Route<dynamic> route) => false
+      ), navigatorDelayTime);
+    }
   }
 
   void callLogin() async{
@@ -123,11 +102,22 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    precacheImage(assetImage, context);
     return Scaffold(
       body: Container(
+        width: double.infinity,
+        height: double.infinity,
         decoration: defaultAppBarDecoration,
-        child: Center(
-          child: Image.asset(iconImageUrl, width: getScreenWidth() * 0.3, height: getScreenWidth() * 0.3)
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Image(
+              image: assetImage,
+              width: getScreenWidth() * 0.4, 
+              height: getScreenWidth() * 0.4
+            ),
+          ],
         )
       )
     );

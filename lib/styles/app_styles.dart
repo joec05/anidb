@@ -1,4 +1,5 @@
 import 'package:anime_list_app/appdata/global_library.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:vertical_barchart/vertical-barchart.dart';
@@ -73,5 +74,24 @@ Widget shimmerSkeletonWidget(Widget child){
     baseColor: Colors.grey.withOpacity(0.5),
     highlightColor: const Color.fromARGB(179, 167, 155, 155),
     child: child
+  );
+}
+
+Widget generateCachedImage(dynamic imageClass){
+  if(imageClass == null){
+    return Image.asset(
+      'assets/images/unknown-item.png',
+      fit: BoxFit.cover
+    );
+  }
+
+  return CachedNetworkImage(
+    imageUrl: imageClass.large, 
+    fit: BoxFit.cover,
+    errorWidget: (context, error, stackTrace) => Image.asset(
+      'assets/images/unknown-item.png',
+      fit: BoxFit.cover
+    ),
+    fadeInDuration: const Duration(milliseconds: 250)
   );
 }

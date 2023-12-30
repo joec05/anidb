@@ -74,7 +74,7 @@ class CustomProfileDisplayState extends State<CustomProfileDisplay>{
                   ),
                   CustomButton(
                     width: getScreenWidth() * 0.25, height: getScreenHeight() * 0.06, 
-                    buttonColor: Colors.deepOrangeAccent, buttonText: 'No', 
+                    buttonColor: Colors.orange, buttonText: 'No', 
                     onTapped: (){
                       Navigator.of(dialogContext).pop();
                     }, 
@@ -113,7 +113,7 @@ class CustomProfileDisplayState extends State<CustomProfileDisplay>{
                       image: userData.profilePic != null ? 
                         DecorationImage(image: NetworkImage(userData.profilePic!), fit: BoxFit.fill)
                         : 
-                        const DecorationImage(image: AssetImage("assets/images/default-user-picture.jpg"), fit: BoxFit.fill)
+                        const DecorationImage(image: AssetImage("assets/images/unknown-item.png"), fit: BoxFit.fill)
                     ),
                   ),
                   SizedBox(
@@ -148,7 +148,7 @@ class CustomProfileDisplayState extends State<CustomProfileDisplay>{
                       child: const Icon(FontAwesomeIcons.venusMars, size: 17.5)
                     ),
                     Text(
-                      userData.gender ?? 'Unspecified',
+                      userData.gender ?? '?',
                       style: const TextStyle(
                         fontWeight: FontWeight.w500
                       )
@@ -174,7 +174,7 @@ class CustomProfileDisplayState extends State<CustomProfileDisplay>{
                       child: const Icon(Icons.person_pin_circle_outlined, size: 25),
                     ),
                     Text(
-                      userData.location != null ? userData.location!.isNotEmpty ? userData.location! : 'Unspecified' : 'Unspecified',
+                      userData.location != null ? userData.location!.isNotEmpty ? userData.location! : '?' : '?',
                       style: const TextStyle(
                         fontWeight: FontWeight.w500
                       )
@@ -200,7 +200,7 @@ class CustomProfileDisplayState extends State<CustomProfileDisplay>{
                       child: const Icon(Icons.cake, size: 20),
                     ),
                     Text(
-                      userData.birthday != null ? convertDateTimeDisplay(userData.birthday!) : 'Unspecified',
+                      userData.birthday != null ? convertDateTimeDisplay(userData.birthday!) : '?',
                       style: const TextStyle(
                         fontWeight: FontWeight.w500
                       )
@@ -242,7 +242,7 @@ class CustomProfileDisplayState extends State<CustomProfileDisplay>{
               SizedBox(height: getScreenHeight() * 0.025),
               CustomButton(
                 width: getScreenWidth() * 0.6, height: getScreenHeight() * 0.07, 
-                buttonColor: Colors.deepOrangeAccent, buttonText: 'Statistics', 
+                buttonColor: Colors.orange, buttonText: 'Statistics', 
                 onTapped: (){
                   runDelay(() => Navigator.push(
                     context,
@@ -256,7 +256,7 @@ class CustomProfileDisplayState extends State<CustomProfileDisplay>{
               SizedBox(height: getScreenHeight() * 0.02),
               CustomButton(
                 width: getScreenWidth() * 0.6, height: getScreenHeight() * 0.07, 
-                buttonColor: Colors.deepOrangeAccent, buttonText: 'Anime list', 
+                buttonColor: Colors.orange, buttonText: 'Anime list', 
                 onTapped: (){
                   runDelay(() => Navigator.push(
                     context,
@@ -270,7 +270,7 @@ class CustomProfileDisplayState extends State<CustomProfileDisplay>{
               SizedBox(height: getScreenHeight() * 0.02),
               CustomButton(
                 width: getScreenWidth() * 0.6, height: getScreenHeight() * 0.07, 
-                buttonColor: Colors.deepOrangeAccent, buttonText: 'Manga list', 
+                buttonColor: Colors.orange, buttonText: 'Manga list', 
                 onTapped: (){
                   runDelay(() => Navigator.push(
                     context,

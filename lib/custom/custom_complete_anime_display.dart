@@ -213,10 +213,19 @@ class CustomUserListAnimeDisplayState extends State<CustomUserListAnimeDisplay>{
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Flexible(
-                                  child: Text(animeData.title, style: TextStyle(
-                                    fontSize: defaultTextFontSize * 0.9,
-                                    fontWeight: FontWeight.w600
-                                  ))
+                                  child: Padding(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: getScreenWidth() * 0.015,
+                                    ),
+                                    child: Text(
+                                      animeData.title, 
+                                      style: TextStyle(
+                                        fontSize: defaultTextFontSize * 0.95,
+                                        fontWeight: FontWeight.w600
+                                      ),
+                                      textAlign: TextAlign.center
+                                    ),
+                                  )
                                 )
                               ]
                             )
@@ -449,7 +458,7 @@ class CustomUserListAnimeDisplayState extends State<CustomUserListAnimeDisplay>{
                           color: Colors.grey.withOpacity(0.6)
                         ),
                       ),
-                      child: animeData.cover != null ? Image.network(animeData.cover!.large, fit: BoxFit.cover) : Image.asset("assets/images/anime-no-image.png", fit: BoxFit.cover)
+                      child: generateCachedImage(animeData.cover)
                     ),
                     SizedBox(
                       width: getScreenWidth() * 0.025

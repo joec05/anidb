@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:anime_list_app/class/anime_data_class.dart';
+import 'package:anime_list_app/global_files.dart';
 
 class UserAnimeListStreamControllerClass{
   final AnimeDataClass animeData;

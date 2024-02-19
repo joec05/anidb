@@ -1,4 +1,4 @@
-import 'package:anime_list_app/appdata/global_library.dart';
+import 'package:anime_list_app/global_files.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';

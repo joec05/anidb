@@ -1,10 +1,6 @@
 import 'dart:math';
 import 'dart:ui';
-import 'package:anime_list_app/appdata/global_variables.dart';
-import 'package:anime_list_app/appdata/private_data.dart';
-import 'package:anime_list_app/class/user_token_class.dart';
-import 'package:anime_list_app/state/main.dart';
-import 'package:anime_list_app/styles/app_styles.dart';
+import 'package:anime_list_app/global_files.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' as intl;

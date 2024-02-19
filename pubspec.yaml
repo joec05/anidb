@@ -46,6 +46,7 @@ dependencies:
   timezone: ^0.9.2
   vertical_barchart: ^2.0.0+2
   cached_network_image: ^3.3.0
+  index_generator: ^3.4.1
 
 dev_dependencies:
   flutter_test:
@@ -65,6 +66,13 @@ flutter_launcher_icons:
   image_path: "assets/images/icon.png"
   android: true
   ios: true
+
+index_generator:
+  exclude:
+    - '**.g.dart'
+  indexes:
+    - path: lib
+      name: global_files
 
 # The following section is specific to Flutter packages.
 flutter:

@@ -1,10 +1,4 @@
-import 'package:anime_list_app/class/anime_data_class.dart';
-import 'package:anime_list_app/class/anime_data_notifier.dart';
-import 'package:anime_list_app/class/character_data_class.dart';
-import 'package:anime_list_app/class/character_data_notifier.dart';
-import 'package:anime_list_app/class/manga_data_class.dart';
-import 'package:anime_list_app/class/manga_data_notifier.dart';
-import 'package:anime_list_app/state/main.dart';
+import 'package:anime_list_app/global_files.dart';
 import 'package:flutter/material.dart';
 
 void updateAnimeData(Map animeDataMap){

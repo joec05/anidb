@@ -1,6 +1,4 @@
-import 'dart:async';
 import 'package:anime_list_app/global_files.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 class ViewAnimeBasicDisplay extends StatelessWidget {
@@ -36,62 +34,19 @@ class _ViewAnimeBasicDisplayStateful extends StatefulWidget {
 }
 
 class _ViewAnimeBasicDisplayStatefulState extends State<_ViewAnimeBasicDisplayStateful>{
-  List<int> animesList = [];
-  bool isLoading = true;
+  late AnimeBasicController controller;
 
   @override void initState(){
     super.initState();
-    fetchAnimesList();
+    controller = AnimeBasicController(context, widget.displayType);
+    controller.initializeController();
   }
 
   @override void dispose(){
     super.dispose();
+    controller.dispose();
   }
 
-  String generateAPIRequestPath(){
-    AnimeBasicDisplayType type = widget.displayType;
-    if(type == AnimeBasicDisplayType.season){
-      return '$malApiUrl/anime/season/${DateTime.now().year}/${getCurrentSeason()}?$fetchAllAnimeFieldsStr&limit=${getAnimeBasicDisplayTotalFetchCount()}';
-    }else if(type == AnimeBasicDisplayType.top){
-      return '$malApiUrl/anime/ranking?$fetchAllAnimeFieldsStr&ranking_type=all&limit=${getAnimeBasicDisplayTotalFetchCount()}';
-    }else if(type == AnimeBasicDisplayType.airing){
-      return '$malApiUrl/anime/ranking?$fetchAllAnimeFieldsStr&ranking_type=airing&limit=${getAnimeBasicDisplayTotalFetchCount()}';
-    }else if(type == AnimeBasicDisplayType.upcoming){
-      return '$malApiUrl/anime/ranking?$fetchAllAnimeFieldsStr&ranking_type=upcoming&limit=${getAnimeBasicDisplayTotalFetchCount()}';
-    }else if(type == AnimeBasicDisplayType.mostPopular){
-      return '$malApiUrl/anime/ranking?$fetchAllAnimeFieldsStr&ranking_type=bypopularity&limit=${getAnimeBasicDisplayTotalFetchCount()}';
-    }else if(type == AnimeBasicDisplayType.favourites){
-      return '$malApiUrl/anime/ranking?$fetchAllAnimeFieldsStr&ranking_type=favorite&limit=${getAnimeBasicDisplayTotalFetchCount()}';
-    }
-    return '';
-  }
-
-  Future<void> fetchAnimesList() async{
-    try {
-      if(mounted){
-        var res = await dio.get(
-          generateAPIRequestPath(),
-          options: Options(
-            headers: {
-              'Authorization': await generateAuthHeader()
-            },
-          )
-        );
-        var data = res.data['data'];
-        for(int i = 0; i < data.length; i++){
-          updateAnimeData(data[i]['node']);
-          animesList.add(data[i]['node']['id']);
-        }
-        isLoading = false;
-        if(mounted){
-          setState((){});
-        }
-      }
-    } on Exception catch (e) {
-      debugPrint(e.toString());
-    }
-  }
-  
   @override
   Widget build(BuildContext context){
     return Scaffold(
@@ -102,45 +57,57 @@ class _ViewAnimeBasicDisplayStatefulState extends State<_ViewAnimeBasicDisplaySt
         ),
         title: Text(widget.label), titleSpacing: defaultAppBarTitleSpacing,
       ),
-      body: !isLoading ?
-        GridView.builder(
-          itemCount: animesList.length,
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: getAnimeBasicDisplayCrossAxis(),    
-            childAspectRatio: 0.675
-          ),
-          itemBuilder: (context, index){
-            return ValueListenableBuilder(
-              valueListenable: appStateClass.globalAnimeData[animesList[index]]!.notifier, 
-              builder: (context, animeData, child){
-                return CustomBasicAnimeDisplay(
-                  showStats: true,
-                  animeData: animeData,
-                  skeletonMode: false, 
-                  key: UniqueKey()
+      body: ListenableBuilder(
+        listenable: Listenable.merge([
+          controller.isLoading,
+          controller.animesList
+        ]),
+        builder: (context, child) {
+          bool isLoading = controller.isLoading.value;
+          List<int> animesList = controller.animesList.value;
+          
+          if(isLoading) {
+            return GridView.builder(
+              itemCount: getAnimeBasicDisplayTotalFetchCount(),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: getAnimeBasicDisplayCrossAxis(),    
+                childAspectRatio: 0.675
+              ),
+              itemBuilder: (context, index){
+                return shimmerSkeletonWidget(
+                  CustomBasicAnimeDisplay(
+                    animeData: AnimeDataClass.fetchNewInstance(-1), 
+                    skeletonMode: true,
+                    showStats: false,
+                    key: UniqueKey()
+                  )
                 );
               }
             );
-          },
-        )
-      :
-        GridView.builder(
-          itemCount: getAnimeBasicDisplayTotalFetchCount(),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: getAnimeBasicDisplayCrossAxis(),    
-            childAspectRatio: 0.675
-          ),
-          itemBuilder: (context, index){
-            return shimmerSkeletonWidget(
-              CustomBasicAnimeDisplay(
-                animeData: AnimeDataClass.fetchNewInstance(-1), 
-                skeletonMode: true,
-                showStats: false,
-                key: UniqueKey()
-              )
-            );
           }
-        )
+
+          return GridView.builder(
+            itemCount: animesList.length,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: getAnimeBasicDisplayCrossAxis(),    
+              childAspectRatio: 0.675
+            ),
+            itemBuilder: (context, index){
+              return ValueListenableBuilder(
+                valueListenable: appStateRepo.globalAnimeData[animesList[index]]!.notifier, 
+                builder: (context, animeData, child){
+                  return CustomBasicAnimeDisplay(
+                    showStats: true,
+                    animeData: animeData,
+                    skeletonMode: false, 
+                    key: UniqueKey()
+                  );
+                }
+              );
+            },
+          );
+        }
+      )
     );
   }
 }

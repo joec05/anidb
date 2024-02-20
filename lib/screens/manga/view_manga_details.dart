@@ -1,5 +1,4 @@
 import 'package:anime_list_app/global_files.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 class ViewMangaDetails extends StatelessWidget {
@@ -30,69 +29,17 @@ class _ViewMangaDetailsStateful extends StatefulWidget {
 }
 
 class _ViewMangaDetailsStatefulState extends State<_ViewMangaDetailsStateful>{
-  bool isLoading = true;
+  late MangaDetailsController controller;
 
   @override void initState(){
     super.initState();
-    fetchMangaDetails();
-    fetchMangaStatistics();
-    fetchMangaCharacters();
+    controller = MangaDetailsController(context, widget.mangaID);
+    controller.initializeController();
   }
 
   @override void dispose(){
     super.dispose();
-  }
-
-  void fetchMangaDetails() async{
-    var res = await dio.get(
-      '$malApiUrl/manga/${widget.mangaID}?$fetchAllMangaFieldsStr',
-      options: Options(
-        headers: {
-          'Authorization': await generateAuthHeader()
-        },
-      )
-    );
-    updateMangaData(res.data);
-  }
-
-  void fetchMangaStatistics() async{
-    var res = await dio.get(
-      '$jikanApiUrl/manga/${widget.mangaID}/statistics'
-    );
-    var data = res.data['data'];
-    MangaDataClass mangaData = appStateClass.globalMangaData[widget.mangaID]!.notifier.value;
-    MangaDataClass newMangaData = MangaDataClass.generateNewCopy(mangaData);
-    newMangaData.statistics = MangaStatisticsClass(
-      data['reading'], 
-      data['completed'], 
-      data['on_hold'], 
-      data['dropped'], 
-      data['plan_to_read']
-    );
-    appStateClass.globalMangaData[widget.mangaID]!.notifier.value = newMangaData;
-    isLoading = false;
-    if(mounted){
-      setState((){});
-    }
-  }
-  
-  void fetchMangaCharacters() async{
-    var res = await dio.get(
-      '$jikanApiUrl/manga/${widget.mangaID}/characters'
-    );
-    var data = res.data['data'];
-    MangaDataClass mangaData = appStateClass.globalMangaData[widget.mangaID]!.notifier.value;
-    MangaDataClass newMangaData = MangaDataClass.generateNewCopy(mangaData);
-    newMangaData.characters = List.generate(data.length, (i){
-      CharacterDataClass newCharacterData = CharacterDataClass.fetchNewInstance(data[i]['character']['mal_id']);
-      newCharacterData.name = data[i]['character']['name'];
-      newCharacterData.cover = CharacterImageClass(
-        data[i]['character']['images']['jpg']['small_image_url'],
-        data[i]['character']['images']['jpg']['image_url']
-      );
-      return newCharacterData;
-    });
-    appStateClass.globalMangaData[widget.mangaID]!.notifier.value = newMangaData;
+    controller.dispose();
   }
 
   @override
@@ -105,34 +52,31 @@ class _ViewMangaDetailsStatefulState extends State<_ViewMangaDetailsStateful>{
         leading: defaultLeadingWidget(context),
         title: const Text('Manga Details'), titleSpacing: defaultAppBarTitleSpacing,
       ),
-      body: !isLoading ? appStateClass.globalMangaData[widget.mangaID] != null ?
-        ValueListenableBuilder(
-          valueListenable: appStateClass.globalMangaData[widget.mangaID]!.notifier, 
-          builder: (context, mangaData, child){
-            return CustomMangaDetails(
-              mangaData: mangaData,
-              skeletonMode: false,
-              key: UniqueKey()
+      body: ValueListenableBuilder(
+        valueListenable: controller.isLoading,
+        builder: (context, isLoadingValue, child) {
+          if(isLoadingValue || appStateRepo.globalMangaData[widget.mangaID] == null) {
+            return shimmerSkeletonWidget(
+              CustomMangaDetails(
+                mangaData: MangaDataClass.fetchNewInstance(-1),
+                skeletonMode: true,
+                key: UniqueKey()
+              )
             );
           }
-        )
-      :
-        shimmerSkeletonWidget(
-          CustomMangaDetails(
-            mangaData: MangaDataClass.fetchNewInstance(-1),
-            skeletonMode: true,
-            key: UniqueKey()
-          )
-        )
-      :
-        shimmerSkeletonWidget(
-          CustomMangaDetails(
-            mangaData: MangaDataClass.fetchNewInstance(-1),
-            skeletonMode: true,
-            key: UniqueKey()
-          )
-        )
+          
+          return ValueListenableBuilder(
+            valueListenable: appStateRepo.globalMangaData[widget.mangaID]!.notifier, 
+            builder: (context, mangaData, child){
+              return CustomMangaDetails(
+                mangaData: mangaData,
+                skeletonMode: false,
+                key: UniqueKey()
+              );
+            }
+          );
+        }
+      )
     );
   }
-
 }

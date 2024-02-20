@@ -29,26 +29,17 @@ class _ViewCharacterDetailsStateful extends StatefulWidget {
 }
 
 class _ViewCharacterDetailsStatefulState extends State<_ViewCharacterDetailsStateful>{
-  bool isLoading = true;
+  late CharacterDetailsController controller;
 
   @override void initState(){
     super.initState();
-    fetchCharacterDetails();
+    controller = CharacterDetailsController(context, widget.characterID);
+    controller.initializeController();
   }
 
   @override void dispose(){
     super.dispose();
-  }
-
-  void fetchCharacterDetails() async{
-    var res = await dio.get(
-      '$jikanApiUrl/characters/${widget.characterID}/full'
-    );
-    updateCharacterData(res.data['data']);
-    isLoading = false;
-    if(mounted){
-      setState(() {});
-    }
+    controller.dispose();
   }
   
   @override
@@ -61,33 +52,30 @@ class _ViewCharacterDetailsStatefulState extends State<_ViewCharacterDetailsStat
         ),
         title: const Text('Character Details'), titleSpacing: defaultAppBarTitleSpacing,
       ),
-      body: !isLoading? appStateClass.globalCharacterData[widget.characterID] != null ?
-        ValueListenableBuilder(
-          valueListenable: appStateClass.globalCharacterData[widget.characterID]!.notifier, 
-          builder: (context, characterData, child){
-            return CustomCharacterDetails(
-              characterData: characterData,
-              skeletonMode: false,
-              key: UniqueKey()
+      body: ValueListenableBuilder(
+        valueListenable: controller.isLoading,
+        builder: (context, isLoadingValue, child) {
+          if(isLoadingValue || appStateRepo.globalCharacterData[widget.characterID] == null) {
+            return shimmerSkeletonWidget(
+              CustomCharacterDetails(
+                characterData: CharacterDataClass.fetchNewInstance(-1),
+                skeletonMode: true,
+                key: UniqueKey()
+              )
             );
           }
-        )
-      : 
-        shimmerSkeletonWidget(
-          CustomCharacterDetails(
-            characterData: CharacterDataClass.fetchNewInstance(-1),
-            skeletonMode: true,
-            key: UniqueKey()
-          )
-        )
-      : 
-        shimmerSkeletonWidget(
-          CustomCharacterDetails(
-            characterData: CharacterDataClass.fetchNewInstance(-1),
-            skeletonMode: true,
-            key: UniqueKey()
-          )
-        )
+          return ValueListenableBuilder(
+            valueListenable: appStateRepo.globalCharacterData[widget.characterID]!.notifier, 
+            builder: (context, characterData, child){
+              return CustomCharacterDetails(
+                characterData: characterData,
+                skeletonMode: false,
+                key: UniqueKey()
+              );
+            }
+          );
+        }
+      )
     );
   }
 

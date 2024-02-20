@@ -32,4 +32,12 @@ class UserAnimeStatisticsClass{
       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     );
   }
+
+  UserAnimeStatisticsClass copy() {
+    return UserAnimeStatisticsClass(
+      watching, completed, onHold, dropped, planToWatch, total, 
+      daysWatched, totalEpisodes, rewatched, totalScore, ratedCount, 
+      meanScore
+    );
+  }
 }

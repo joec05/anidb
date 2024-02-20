@@ -61,31 +61,10 @@ class __SearchPageWidgetStatefulState extends State<_SearchPageWidgetStateful> w
                 suffixIcon: TextButton(
                   onPressed: (){
                     if(searchController.text.length < 4){
-                      showDialog(
-                        context: context,
-                        builder: (dialogContext) {
-                          return AlertDialog(
-                            title: const Text('Alert', textAlign: TextAlign.center,),
-                            titlePadding: EdgeInsets.only(top: getScreenHeight() * 0.025),
-                            content: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text('Minimum 4 characters needed!!!', style: TextStyle(fontSize: defaultTextFontSize)),
-                                SizedBox(
-                                  height: getScreenHeight() * 0.02,
-                                ),
-                                CustomButton(
-                                  width: getScreenWidth() * 0.5, 
-                                  height: getScreenHeight() * 0.06, 
-                                  buttonColor: Colors.orange, 
-                                  buttonText: 'OK', 
-                                  onTapped: () => Navigator.of(dialogContext).pop(), 
-                                  setBorderRadius: true
-                                )
-                              ]
-                            )
-                          );
-                        }
+                      handler.displaySnackbar(
+                        context,
+                        SnackbarType.error,
+                        tErr.searchTextMin
                       );
                     }else{
                       searchedText.value = searchController.text;

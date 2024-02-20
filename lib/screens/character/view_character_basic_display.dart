@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:anime_list_app/global_files.dart';
 import 'package:flutter/material.dart';
 
@@ -35,47 +34,19 @@ class _ViewCharacterBasicDisplayStateful extends StatefulWidget {
 }
 
 class _ViewCharacterBasicDisplayStatefulState extends State<_ViewCharacterBasicDisplayStateful>{
-  List<int> charactersList = [];
-  bool isLoading = true;
+  late CharacterBasicController controller;
 
   @override void initState(){
     super.initState();
-    fetchCharactersList();
+    controller = CharacterBasicController(context, widget.displayType);
+    controller.initializeController();
   }
 
   @override void dispose(){
     super.dispose();
+    controller.dispose();
   }
 
-  String generateAPIRequestPath(){
-    CharacterBasicDisplayType type = widget.displayType;
-    if(type == CharacterBasicDisplayType.top){
-      return '$jikanApiUrl/top/characters?limit=24';
-    }
-    return '';
-  }
-
-  Future<void> fetchCharactersList() async{
-    try {
-      if(mounted){
-        var res = await dio.get(
-          generateAPIRequestPath()
-        );
-        var data = res.data['data'];
-        for(int i = 0; i < data.length; i++){
-          updateBasicCharacterData(data[i]);
-          charactersList.add(data[i]['mal_id']);
-        }
-        isLoading = false;
-        if(mounted){
-          setState((){});
-        }
-      }
-    } on Exception catch (e) {
-      debugPrint(e.toString());
-    }
-  }
-  
   @override
   Widget build(BuildContext context){
     return Scaffold(
@@ -86,45 +57,57 @@ class _ViewCharacterBasicDisplayStatefulState extends State<_ViewCharacterBasicD
         ),
         title: Text(widget.label), titleSpacing: defaultAppBarTitleSpacing,
       ),
-      body: !isLoading ?
-        GridView.builder(
-          itemCount: charactersList.length,
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: getAnimeBasicDisplayCrossAxis(),    
-            childAspectRatio: 0.675
-          ),
-          itemBuilder: (context, index){
-            return ValueListenableBuilder(
-              valueListenable: appStateClass.globalCharacterData[charactersList[index]]!.notifier, 
-              builder: (context, characterData, child){
-                return CustomBasicCharacterDisplay(
-                  showStats: true,
-                  characterData: characterData, 
-                  skeletonMode: false,
-                  key: UniqueKey()
+      body: ListenableBuilder(
+        listenable: Listenable.merge([
+          controller.isLoading,
+          controller.charactersList
+        ]),
+        builder: (context, child) {
+          bool isLoading = controller.isLoading.value;
+          List<int> charactersList = controller.charactersList.value;
+
+          if(isLoading) {
+            return GridView.builder(
+              itemCount: getAnimeBasicDisplayTotalFetchCount(),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: getAnimeBasicDisplayCrossAxis(),    
+                childAspectRatio: 0.675
+              ),
+              itemBuilder: (context, index){
+                return shimmerSkeletonWidget(
+                  CustomBasicCharacterDisplay(
+                    showStats: false,
+                    characterData: CharacterDataClass.fetchNewInstance(-1), 
+                    skeletonMode: true,
+                    key: UniqueKey()
+                  )
                 );
               }
             );
-          },
-        )
-      :
-        GridView.builder(
-          itemCount: getAnimeBasicDisplayTotalFetchCount(),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: getAnimeBasicDisplayCrossAxis(),    
-            childAspectRatio: 0.675
-          ),
-          itemBuilder: (context, index){
-            return shimmerSkeletonWidget(
-              CustomBasicCharacterDisplay(
-                showStats: false,
-                characterData: CharacterDataClass.fetchNewInstance(-1), 
-                skeletonMode: true,
-                key: UniqueKey()
-              )
-            );
           }
-        )
+
+          return GridView.builder(
+            itemCount: charactersList.length,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: getAnimeBasicDisplayCrossAxis(),    
+              childAspectRatio: 0.675
+            ),
+            itemBuilder: (context, index){
+              return ValueListenableBuilder(
+                valueListenable: appStateRepo.globalCharacterData[charactersList[index]]!.notifier, 
+                builder: (context, characterData, child){
+                  return CustomBasicCharacterDisplay(
+                    showStats: true,
+                    characterData: characterData, 
+                    skeletonMode: false,
+                    key: UniqueKey()
+                  );
+                }
+              );
+            },
+          );
+        }
+      )
     );
   }
 }

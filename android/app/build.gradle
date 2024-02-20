@@ -24,7 +24,7 @@ if (flutterVersionName == null) {
 
 android {
     namespace "com.example.anime_list_app"
-    compileSdkVersion flutter.compileSdkVersion
+    compileSdkVersion 34
     ndkVersion flutter.ndkVersion
 
     compileOptions {
@@ -45,19 +45,39 @@ android {
         applicationId "com.example.anime_list_app"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
-        minSdkVersion flutter.minSdkVersion
-        targetSdkVersion flutter.targetSdkVersion
+        minSdkVersion 21
+        targetSdkVersion 34
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+        multiDexEnabled true
+    }
+
+    signingConfigs {
+        debug {
+            keyAlias 'debug-keystore'
+            keyPassword 'anime-list-app-debug'
+            storeFile file('debug-keystore.jks')
+            storePassword 'anime-list-app-debug'
+        }
+        release {
+            keyAlias 'release-keystore'
+            keyPassword 'anime-list-app-release'
+            storeFile file('release-keystore.jks')
+            storePassword 'anime-list-app-release'
+        }
     }
 
     buildTypes {
-        release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
+        debug {
+            minifyEnabled true
+            multiDexEnabled true
             signingConfig signingConfigs.debug
-            shrinkResources false
-            minifyEnabled false
+        }
+        
+        release {
+            minifyEnabled true
+            multiDexEnabled true
+            signingConfig signingConfigs.release
         }
     }
 }

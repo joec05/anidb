@@ -1,4 +1,4 @@
-import 'package:anime_list_app/global_files.dart';
+import 'package:anime_list_app/global_files.dart'; 
 import 'package:flutter/material.dart';
 
 class SearchedCharactersWidget extends StatelessWidget {
@@ -35,36 +35,17 @@ class _SearchedCharactersWidgetStateful extends StatefulWidget {
 
 
 class _SearchedCharactersWidgetStatefulState extends State<_SearchedCharactersWidgetStateful> with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin{
-  List<int> charactersList = [];
-  bool isLoading = false;
+  late SearchedCharactersController controller;
 
-  @override void initState(){
+  @override void initState() {
     super.initState();
-    if(mounted){
-      fetchSearchedCharactersList();
-    }
+    controller = SearchedCharactersController(context, widget.searchedText);
+    controller.initializeController();
   }
 
-  void fetchSearchedCharactersList() async{
-    if(widget.searchedText.isNotEmpty){
-      isLoading = true;
-      String searchedText = widget.searchedText;
-      var res = await dio.get(
-        '$jikanApiUrl/characters?q=$searchedText'
-      );
-      var data = res.data['data'];
-      for(int i = 0; i < data.length; i++){
-        updateBasicCharacterData(data[i]);
-        int id = data[i]['mal_id'];
-        if(appStateClass.globalCharacterData[id] != null){
-          charactersList.add(id);
-        }
-      }
-      isLoading = false;
-      if(mounted){
-        setState((){}); 
-      }
-    }
+  @override void dispose() {
+    super.dispose();
+    controller.dispose();
   }
 
   @override
@@ -76,38 +57,53 @@ class _SearchedCharactersWidgetStatefulState extends State<_SearchedCharactersWi
         SliverOverlapInjector(
           handle: NestedScrollView.sliverOverlapAbsorberHandleFor(widget.absorberContext)
         ),
-        isLoading == true ?
-          SliverList(delegate: SliverChildBuilderDelegate(
-            childCount: skeletonLoadingDefaultLimit, 
-            (c, i) {
-              return shimmerSkeletonWidget(
-                CustomRowCharacterDisplay(
-                  characterData: CharacterDataClass.fetchNewInstance(-1),
-                  skeletonMode: true,
-                  key: UniqueKey()
+        ValueListenableBuilder(
+          valueListenable: controller.isLoading,
+          builder: (context, isLoadingValue, child) {
+            if(isLoadingValue == true) {
+              return SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  childCount: skeletonLoadingDefaultLimit, 
+                  (c, i) {
+                    return shimmerSkeletonWidget(
+                      CustomRowCharacterDisplay(
+                        characterData: CharacterDataClass.fetchNewInstance(-1),
+                        skeletonMode: true,
+                        key: UniqueKey()
+                      )
+                    );
+                  }
                 )
               );
             }
-          ))
-        :
-          SliverList(delegate: SliverChildBuilderDelegate(
-            childCount: charactersList.length, 
-            (c, i) {
-              if(appStateClass.globalCharacterData[charactersList[i]] != null){
-                return ValueListenableBuilder(
-                  valueListenable: appStateClass.globalCharacterData[charactersList[i]]!.notifier, 
-                  builder: (context, characterData, child){
-                    return CustomRowCharacterDisplay(
-                      characterData: characterData,
-                      skeletonMode: false,
-                      key: UniqueKey()
-                    );
-                  }
+
+            return ValueListenableBuilder(
+              valueListenable: controller.charactersList,
+              builder: (context, charactersList, child) {
+                return SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    childCount: charactersList.length, 
+                    (c, i) {
+                      if(appStateRepo.globalCharacterData[charactersList[i]] != null){
+                        return ValueListenableBuilder(
+                          valueListenable: appStateRepo.globalCharacterData[charactersList[i]]!.notifier, 
+                          builder: (context, characterData, child){
+                            return CustomRowCharacterDisplay(
+                              characterData: characterData,
+                              skeletonMode: false,
+                              key: UniqueKey()
+                            );
+                          }
+                        );
+                      }
+                      return Container();
+                    }
+                  )
                 );
               }
-              return Container();
-            }
-          ))
+            );
+          }
+        )
       ]
     );
   }

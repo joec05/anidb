@@ -12,4 +12,22 @@ class UserMangaListStatusClass{
     this.canPaginate,
     this.paginationStatus
   );
+
+  UserMangaListStatusClass updatePaginationStatus(PaginationStatus paginationStatus) {
+    return UserMangaListStatusClass(
+      mangasList, 
+      status, 
+      canPaginate, 
+      paginationStatus
+    );
+  }
+
+  UserMangaListStatusClass updateCanPaginate(bool canPaginate) {
+    return UserMangaListStatusClass(
+      mangasList, 
+      status, 
+      canPaginate, 
+      paginationStatus
+    );
+  }
 }

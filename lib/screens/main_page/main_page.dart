@@ -20,15 +20,10 @@ class _MainPageWidgetStateful extends StatefulWidget {
 
 class __MainPageWidgetStatefulState extends State<_MainPageWidgetStateful>{
   ValueNotifier<int> selectedIndexValue = ValueNotifier(0);
-  final PageController _pageController = PageController(initialPage: 0, keepPage: true, );
-  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+  final PageController _pageController = PageController(initialPage: 0, keepPage: true);
 
   @override void initState(){
     super.initState();
-  }
-
-  void resetBottomNavIndex(){
-    _pageController.jumpToPage(0);
   }
 
   @override void dispose(){
@@ -99,12 +94,6 @@ class __MainPageWidgetStatefulState extends State<_MainPageWidgetStateful>{
       valueListenable: selectedIndexValue,
       builder: (BuildContext context, int selectedIndexValue, Widget? child) {
         return Scaffold(
-          key: scaffoldKey,
-          drawerEdgeDragWidth: 0.85 * getScreenWidth(),
-          onDrawerChanged: (isOpened) {
-            if(isOpened){
-            }
-          },
           appBar: setAppBar(selectedIndexValue),
           body: PageView(
             controller: _pageController,

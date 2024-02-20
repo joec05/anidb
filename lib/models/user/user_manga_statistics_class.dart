@@ -34,4 +34,12 @@ class UserMangaStatisticsClass{
       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     );
   }
+
+  UserMangaStatisticsClass copy() {
+    return UserMangaStatisticsClass(
+      reading, completed, onHold, dropped, planToRead, total, 
+      daysRead, totalVolumes, totalChapters, reread, totalScore,
+      ratedCount, meanScore
+    );
+  }
 }

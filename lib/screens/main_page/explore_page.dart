@@ -1,6 +1,4 @@
-import 'dart:async';
 import 'package:anime_list_app/global_files.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 class ExplorePage extends StatelessWidget {
@@ -20,81 +18,73 @@ class _ExplorePageStateful extends StatefulWidget {
 }
 
 class _ExplorePageStatefulState extends State<_ExplorePageStateful> with AutomaticKeepAliveClientMixin{
-  List<int> animesList = [];
-  bool isLoading = true;
+  late ExploreController controller;
 
   @override void initState(){
     super.initState();
-    fetchAnimesList();
+    controller = ExploreController(context);
+    controller.initializeController();
   }
 
   @override void dispose(){
     super.dispose();
-  }
-
-  Future<void> fetchAnimesList() async{
-    var res = await dio.get(
-      '$malApiUrl/anime/suggestions?$fetchAllAnimeFieldsStr&limit=${getAnimeBasicDisplayTotalFetchCount()}',
-      options: Options(
-        headers: {
-          'Authorization': await generateAuthHeader()
-        },
-      )
-    );
-    var data = res.data['data'];
-    for(int i = 0; i < data.length; i++){
-      updateAnimeData(data[i]['node']);
-      animesList.add(data[i]['node']['id']);
-    }
-    isLoading = false;
-    if(mounted){
-      setState((){});
-    }
+    controller.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    if(!isLoading){
-      return GridView.builder(
-        itemCount: animesList.length,
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: getAnimeBasicDisplayCrossAxis(),    
-          childAspectRatio: 0.675
-        ),
-        itemBuilder: (context, index){
-          return ValueListenableBuilder(
-            valueListenable: appStateClass.globalAnimeData[animesList[index]]!.notifier, 
-            builder: (context, animeData, child){
-              return CustomBasicAnimeDisplay(
-                animeData: animeData, 
-                showStats: true,
-                skeletonMode: false,
-                key: UniqueKey()
+    return ListenableBuilder(
+      listenable: Listenable.merge([
+        controller.isLoading,
+        controller.animesList
+      ]),
+      builder: (context, child) {
+        bool isLoading = controller.isLoading.value;
+        List<int> animesList = controller.animesList.value;
+
+        if(isLoading) {
+          return GridView.builder(
+            itemCount: getAnimeBasicDisplayTotalFetchCount(),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: getAnimeBasicDisplayCrossAxis(),    
+              childAspectRatio: 0.675
+            ),
+            itemBuilder: (context, index){
+              return shimmerSkeletonWidget(
+                CustomBasicAnimeDisplay(
+                  animeData: AnimeDataClass.fetchNewInstance(-1), 
+                  skeletonMode: true,
+                  showStats: false,
+                  key: UniqueKey()
+                )
               );
             }
           );
         }
-      );
-    }else{
-      return GridView.builder(
-        itemCount: getAnimeBasicDisplayTotalFetchCount(),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: getAnimeBasicDisplayCrossAxis(),    
-          childAspectRatio: 0.675
-        ),
-        itemBuilder: (context, index){
-          return shimmerSkeletonWidget(
-            CustomBasicAnimeDisplay(
-              animeData: AnimeDataClass.fetchNewInstance(-1), 
-              skeletonMode: true,
-              showStats: false,
-              key: UniqueKey()
-            )
-          );
-        }
-      );
-    }
+        
+        return GridView.builder(
+          itemCount: animesList.length,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: getAnimeBasicDisplayCrossAxis(),    
+            childAspectRatio: 0.675
+          ),
+          itemBuilder: (context, index){
+            return ValueListenableBuilder(
+              valueListenable: appStateRepo.globalAnimeData[animesList[index]]!.notifier, 
+              builder: (context, animeData, child){
+                return CustomBasicAnimeDisplay(
+                  animeData: animeData, 
+                  showStats: true,
+                  skeletonMode: false,
+                  key: UniqueKey()
+                );
+              }
+            );
+          }
+        );
+      }
+    );
   }
   
   @override

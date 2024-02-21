@@ -66,9 +66,6 @@ class APICallRepository {
       
       return res.data;
     } catch (e) {
-      for(int i = 0; i < 50; i++){
-        print(e.toString());
-      }
       if(context.mounted) {
         handler.displaySnackbar(
           context, 

@@ -24,6 +24,7 @@ export 'constants/pagination/enums.dart';
 export 'constants/private_data.dart';
 export 'constants/time/functions.dart';
 export 'constants/title/enums.dart';
+export 'constants/ui/grid/grid.dart';
 export 'constants/ui/screen_size/screen_size.dart';
 export 'controllers/anime/anime_basic_controller.dart';
 export 'controllers/anime/anime_details_controller.dart';

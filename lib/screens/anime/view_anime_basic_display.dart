@@ -71,7 +71,7 @@ class _ViewAnimeBasicDisplayStatefulState extends State<_ViewAnimeBasicDisplaySt
               itemCount: getAnimeBasicDisplayTotalFetchCount(),
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: getAnimeBasicDisplayCrossAxis(),    
-                childAspectRatio: 0.675
+                childAspectRatio: gridChildRatio
               ),
               itemBuilder: (context, index){
                 return shimmerSkeletonWidget(
@@ -90,7 +90,7 @@ class _ViewAnimeBasicDisplayStatefulState extends State<_ViewAnimeBasicDisplaySt
             itemCount: animesList.length,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: getAnimeBasicDisplayCrossAxis(),    
-              childAspectRatio: 0.675
+              childAspectRatio: gridChildRatio,
             ),
             itemBuilder: (context, index){
               return ValueListenableBuilder(

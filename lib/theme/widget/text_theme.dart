@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class TextDisplayTheme {
-  static TextTheme lightTextTheme = TextTheme(
+  static TextTheme lightTextTheme = const TextTheme(
     displayLarge: TextStyle(fontFamily: 'SourceSans3', fontStyle: FontStyle.normal, fontSize: 20.0, fontWeight: FontWeight.bold, color: Colors.black),
     displayMedium: TextStyle(fontFamily: 'SourceSans3', fontStyle: FontStyle.normal, fontSize: 17.0, fontWeight: FontWeight.w700, color: Colors.black),
     displaySmall: TextStyle(fontFamily: 'SourceSans3', fontStyle: FontStyle.normal, fontSize: 15.5, fontWeight: FontWeight.normal, color: Colors.black),
@@ -12,7 +12,7 @@ class TextDisplayTheme {
     bodyMedium: TextStyle(fontFamily: 'SourceSans3', fontStyle: FontStyle.normal, fontSize: 15.5, color: Colors.black),
   );
 
-  static TextTheme darkTextTheme = TextTheme(
+  static TextTheme darkTextTheme = const TextTheme(
     displayLarge: TextStyle(fontFamily: 'SourceSans3', fontStyle: FontStyle.normal, fontSize: 20.0, fontWeight: FontWeight.bold, color: Colors.white),
     displayMedium: TextStyle(fontFamily: 'SourceSans3', fontStyle: FontStyle.normal, fontSize: 17.0, fontWeight: FontWeight.w700, color: Colors.white),
     displaySmall: TextStyle(fontFamily: 'SourceSans3', fontStyle: FontStyle.normal, fontSize: 15.5, fontWeight: FontWeight.normal, color: Colors.white),

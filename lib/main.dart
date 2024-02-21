@@ -4,10 +4,12 @@ import 'dart:math';
 import 'package:anime_list_app/global_files.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:timezone/data/latest.dart' as tz;
 
 void main() async{
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   ByteData data = await PlatformAssetBundle().load('assets/certificate/ca.pem');
   SecurityContext.defaultContext.setTrustedCertificatesBytes(data.buffer.asUint8List());
   tz.initializeTimeZones();
@@ -53,8 +55,10 @@ class _MyHomePageState extends State<MyHomePage> {
     Map userTokenMap = await secureStorageController.fetchUserToken();
     if(userTokenMap['token_type'].isEmpty){
       callLogin();
+      FlutterNativeSplash.remove();
     }else{
       authRepo.userTokenData = UserTokenClass.fromMapRetrieve(userTokenMap);
+      FlutterNativeSplash.remove();
       runDelay(() => Navigator.pushAndRemoveUntil(
         context,
         NavigationTransition(

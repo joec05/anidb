@@ -32,12 +32,6 @@ Currently on pending
 
 ## AniDB in display
 
-![AniDB demo 1](https://github.com/joec05/files/blob/main/mal_client/demo_1.png?raw=true "AniDB demo 1")
+![AniDB demo 1](https://github.com/joec05/files/blob/main/mal_client/demo_image_1.png?raw=true "AniDB demo 1")
 
-![AniDB demo 2](https://github.com/joec05/files/blob/main/mal_client/demo_2.png?raw=true "AniDB demo 2")
-
-![AniDB demo 3](https://github.com/joec05/files/blob/main/mal_client/demo_3.png?raw=true "AniDB demo 3")
-
-![AniDB demo 4](https://github.com/joec05/files/blob/main/mal_client/demo_4.png?raw=true "AniDB demo 4")
-
-![AniDB demo 5](https://github.com/joec05/files/blob/main/mal_client/demo_5.png?raw=true "AniDB demo 5")
+![AniDB demo 2](https://github.com/joec05/files/blob/main/mal_client/demo_image_2.png?raw=true "AniDB demo 2")

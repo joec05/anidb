@@ -68,11 +68,11 @@ class UserMangaController {
             onHold.value.mangasList.insert(0, id);
           }
 
-          reading.value.mangasList = [...reading.value.mangasList];
-          planning.value.mangasList = [...planning.value.mangasList];
-          completed.value.mangasList = [...completed.value.mangasList];
-          onHold.value.mangasList = [...onHold.value.mangasList];
-          dropped.value.mangasList = [...dropped.value.mangasList];
+          reading.value = reading.value.copy();
+          planning.value = planning.value.copy();
+          completed.value = completed.value.copy();
+          onHold.value = onHold.value.copy();
+          dropped.value = dropped.value.copy();
         }
       }
     });
@@ -126,11 +126,11 @@ class UserMangaController {
           }
         }
         
-        reading.value.mangasList = [...reading.value.mangasList];
-        planning.value.mangasList = [...planning.value.mangasList];
-        completed.value.mangasList = [...completed.value.mangasList];
-        onHold.value.mangasList = [...onHold.value.mangasList];
-        dropped.value.mangasList = [...dropped.value.mangasList];
+        reading.value = reading.value.copy();
+        planning.value = planning.value.copy();
+        completed.value = completed.value.copy();
+        onHold.value = onHold.value.copy();
+        dropped.value = dropped.value.copy();
 
         if(isLoading.value){
           isLoading.value = false;

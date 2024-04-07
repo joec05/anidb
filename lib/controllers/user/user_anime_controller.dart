@@ -69,11 +69,11 @@ class UserAnimeController {
             onHold.value.animesList.insert(0, id);
           }
 
-          watching.value.animesList = [...watching.value.animesList];
-          planning.value.animesList = [...planning.value.animesList];
-          completed.value.animesList = [...completed.value.animesList];
-          onHold.value.animesList = [...onHold.value.animesList];
-          dropped.value.animesList = [...dropped.value.animesList];
+          watching.value = watching.value.copy();
+          planning.value = planning.value.copy();
+          completed.value = completed.value.copy();
+          onHold.value = onHold.value.copy();
+          dropped.value = dropped.value.copy();
         }
       }
     });
@@ -126,11 +126,11 @@ class UserAnimeController {
             }
           }
         }
-        watching.value.animesList = [...watching.value.animesList];
-        planning.value.animesList = [...planning.value.animesList];
-        completed.value.animesList = [...completed.value.animesList];
-        onHold.value.animesList = [...onHold.value.animesList];
-        dropped.value.animesList = [...dropped.value.animesList];
+        watching.value = watching.value.copy();
+        planning.value = planning.value.copy();
+        completed.value = completed.value.copy();
+        onHold.value = onHold.value.copy();
+        dropped.value = dropped.value.copy();
         if(isLoading.value){
           isLoading.value = false;
         }else{

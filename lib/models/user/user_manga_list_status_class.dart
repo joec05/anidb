@@ -13,6 +13,15 @@ class UserMangaListStatusClass{
     this.paginationStatus
   );
 
+  UserMangaListStatusClass copy() {
+    return UserMangaListStatusClass(
+      mangasList,
+      status,
+      canPaginate,
+      paginationStatus
+    );
+  }
+
   UserMangaListStatusClass updatePaginationStatus(PaginationStatus paginationStatus) {
     return UserMangaListStatusClass(
       mangasList, 

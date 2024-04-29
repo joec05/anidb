@@ -1,5 +1,7 @@
+import 'package:anime_list_app/constants/manga/functions.dart';
 import 'package:anime_list_app/global_files.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class CustomUserListMangaDisplay extends StatefulWidget {
   final MangaDataClass mangaData;
@@ -38,16 +40,7 @@ class CustomUserListMangaDisplayState extends State<CustomUserListMangaDisplay>{
         return Container();
       }
       return GestureDetector(
-        onTap: (){
-          runDelay(() => Navigator.push(
-            context,
-            NavigationTransition(
-              page: ViewMangaDetails(
-                mangaID: mangaData.id
-              )
-            )
-          ), navigatorDelayTime);
-        },
+        onTap: () => context.pushNamed('view-manga-details', pathParameters: {'mangaID': '${mangaData.id}'}),
         child: Center(
           child: Container(
             padding: EdgeInsets.symmetric(
@@ -60,26 +53,23 @@ class CustomUserListMangaDisplayState extends State<CustomUserListMangaDisplay>{
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
+                    SizedBox(
                       width: animeDisplayCoverSize.width,
                       height: animeDisplayCoverSize.height,
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          width: 2,
-                          color: Colors.grey.withOpacity(0.6)
-                        ),
-                      ),
                       child: generateCachedImage(mangaData.cover)
                     ),
                     SizedBox(
                       width: getScreenWidth() * 0.025
                     ),
                     Flexible(
-                      child: SizedBox(
+                      child: Container(
                         width: getScreenWidth() - animeDisplayCoverSize.width - defaultHorizontalPadding * 2,
                         height: animeDisplayCoverSize.height,
+                        padding: EdgeInsets.symmetric(
+                          vertical: defaultVerticalPadding * 2.5
+                        ),
                         child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Column(
                               mainAxisAlignment: MainAxisAlignment.start,
@@ -101,102 +91,19 @@ class CustomUserListMangaDisplayState extends State<CustomUserListMangaDisplay>{
                                   ]
                                 ),
                                 SizedBox(
-                                  height: getScreenHeight() * 0.005
+                                  height: getScreenHeight() * 0.01
                                 ),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
-                                    Row(
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      children: [
-                                        const Icon(Icons.star, color: Colors.white, size: 20),
-                                        Padding(
-                                          padding: EdgeInsets.fromLTRB(getScreenWidth() * 0.003, getScreenHeight() * 0.004, 0, 0),
-                                          child: Text('${mangaData.mean ?? '-'}', style: TextStyle(
-                                            fontSize: defaultTextFontSize * 0.9,
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.w600
-                                          ))
-                                        )
-                                      ],
-                                    ),
-                                    SizedBox(
-                                      width: getScreenWidth() * 0.025
-                                    ),
-                                    Row(
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      children: [
-                                        const Icon(Icons.table_chart, color: Colors.white, size: 18),
-                                        Padding(
-                                          padding: EdgeInsets.fromLTRB(getScreenWidth() * 0.003, getScreenHeight() * 0.004, 0, 0),
-                                          child: Text('#${mangaData.rank ?? '-'}', style: TextStyle(
-                                            fontSize: defaultTextFontSize * 0.9,
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.w500
-                                          ))
-                                        )
-                                      ],
-                                    ),
-                                    SizedBox(
-                                      width: getScreenWidth() * 0.025
-                                    ),
-                                    Row(
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      children: [
-                                        const Icon(Icons.person_pin_rounded, color: Colors.white, size: 18.5),
-                                        Padding(
-                                          padding: EdgeInsets.fromLTRB(getScreenWidth() * 0.003, getScreenHeight() * 0.004, 0, 0),
-                                          child: Text('#${mangaData.popularity ?? '-'}', style: TextStyle(
-                                            fontSize: defaultTextFontSize * 0.9,
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.w500
-                                          ))
-                                        )
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(
-                                  height: getScreenHeight() * 0.005
-                                ),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text(getFormattedMangaMediaType(mangaData.mediaType), style: TextStyle(
-                                      fontSize: defaultTextFontSize * 0.9,
-                                      color: Colors.white,
+                                    Text(getFormattedAnimeMediaType(mangaData.mediaType), style: TextStyle(
+                                      fontSize: defaultTextFontSize * 0.8,
                                       fontWeight: FontWeight.w500
                                     )),
-                                    SizedBox(
-                                      width: getScreenWidth() * 0.0075
-                                    ),
-                                    const Text('-'),
-                                    SizedBox(
-                                      width: getScreenWidth() * 0.0075
-                                    ),
-                                    mangaData.startDate != null ? parseDateToShortText(mangaData.startDate!) != null?
-                                      Row(
-                                        children: [
-                                          Text(parseDateToShortText(mangaData.startDate!)!, style: TextStyle(
-                                            fontSize: defaultTextFontSize * 0.9,
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.w500
-                                          )),
-                                          SizedBox(
-                                            width: getScreenWidth() * 0.0075
-                                          ),
-                                          const Text('-'),
-                                          SizedBox(
-                                            width: getScreenWidth() * 0.0075
-                                          ),
-                                        ]
-                                      )
-                                    : Container() : Container(),
+                                    const Text(' • '),
                                     Text(getMangaStatus(mangaData.status), style: TextStyle(
-                                      fontSize: defaultTextFontSize * 0.9,
-                                      color: Colors.white,
+                                      fontSize: defaultTextFontSize * 0.8,
                                       fontWeight: FontWeight.w500
                                     )),
                                   ],
@@ -204,42 +111,27 @@ class CustomUserListMangaDisplayState extends State<CustomUserListMangaDisplay>{
                                 SizedBox(
                                   height: getScreenHeight() * 0.01
                                 ),
-                                mangaData.myListStatus != null ?
-                                  CustomButton(
-                                    width: getScreenWidth() - animeDisplayCoverSize.width - defaultHorizontalPadding * 2, 
-                                    height: getScreenHeight() * 0.05, 
-                                    buttonColor: Colors.brown.withOpacity(0.4), 
-                                    buttonText: 'Edit in list', 
-                                    onTapped: () => progressController.openActionDrawer(), 
-                                    setBorderRadius: true
-                                  )
-                                : 
-                                  CustomButton(
-                                    width: getScreenWidth() - animeDisplayCoverSize.width - defaultHorizontalPadding * 2, 
-                                    height: getScreenHeight() * 0.05, 
-                                    buttonColor: Colors.brown.withOpacity(0.4), 
-                                    buttonText: 'Add to list', 
-                                    onTapped: () => progressController.openActionDrawer(), 
-                                    setBorderRadius: true
-                                  )
+                                
                               ]
                             ),
-                            Row(
-                              children: [
-                                Flexible(
-                                  child: Text(
-                                    StringEllipsis.convertToEllipsis(mangaData.genres.map((e) => e.name).toList().join(', ')), 
-                                    style: TextStyle(
-                                      fontSize: defaultTextFontSize * 0.85,
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.grey
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis
-                                  )
-                                )
-                              ]
-                            ),
+                            mangaData.myListStatus != null ?
+                              CustomButton(
+                                width: getScreenWidth() - animeDisplayCoverSize.width - defaultHorizontalPadding * 2, 
+                                height: getScreenHeight() * 0.06, 
+                                buttonColor: Colors.brown.withOpacity(0.4), 
+                                buttonText: 'Edit in list', 
+                                onTapped: () => progressController.openActionDrawer(), 
+                                setBorderRadius: true
+                              )
+                            : 
+                              CustomButton(
+                                width: getScreenWidth() - animeDisplayCoverSize.width - defaultHorizontalPadding * 2, 
+                                height: getScreenHeight() * 0.06, 
+                                buttonColor: Colors.brown.withOpacity(0.4), 
+                                buttonText: 'Add to list', 
+                                onTapped: () => progressController.openActionDrawer(), 
+                                setBorderRadius: true
+                              )
                           ]
                         )
                       )

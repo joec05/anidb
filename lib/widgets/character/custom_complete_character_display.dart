@@ -1,5 +1,6 @@
 import 'package:anime_list_app/global_files.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class CustomRowCharacterDisplay extends StatefulWidget {
   final CharacterDataClass characterData;
@@ -31,16 +32,7 @@ class CustomRowCharacterDisplayState extends State<CustomRowCharacterDisplay>{
   Widget build(BuildContext context) {
     if(!widget.skeletonMode){
       return GestureDetector(
-        onTap: (){
-          runDelay(() => Navigator.push(
-            context,
-            NavigationTransition(
-              page: ViewCharacterDetails(
-                characterID: characterData.id
-              )
-            )
-          ), navigatorDelayTime);
-        },
+        onTap: () => context.pushNamed('view-character-details', pathParameters: {'characterID': '${characterData.id}'}),
         child: Center(
           child: Container(
             padding: EdgeInsets.symmetric(
@@ -53,15 +45,9 @@ class CustomRowCharacterDisplayState extends State<CustomRowCharacterDisplay>{
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
+                    SizedBox(
                       width: animeDisplayCoverSize.width,
                       height: animeDisplayCoverSize.height,
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          width: 2,
-                          color: Colors.grey.withOpacity(0.6)
-                        ),
-                      ),
                       child: generateCachedImage(characterData.cover)
                     ),
                     SizedBox(
@@ -99,7 +85,7 @@ class CustomRowCharacterDisplayState extends State<CustomRowCharacterDisplay>{
                                 Row(
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
-                                    const Icon(Icons.favorite, color: Colors.white, size: 18),
+                                    const Icon(Icons.favorite, size: 18),
                                     SizedBox(
                                       width: getScreenWidth() * 0.004,
                                     ),
@@ -107,7 +93,6 @@ class CustomRowCharacterDisplayState extends State<CustomRowCharacterDisplay>{
                                       padding: EdgeInsets.fromLTRB(getScreenWidth() * 0.003, 0, 0, 0),
                                       child: Text(getShortenedNumbers(characterData.favouritedCount), style: TextStyle(
                                         fontSize: defaultTextFontSize * 0.9,
-                                        color: Colors.white,
                                         fontWeight: FontWeight.w600
                                       ))
                                     )
@@ -124,7 +109,6 @@ class CustomRowCharacterDisplayState extends State<CustomRowCharacterDisplay>{
                                         characterData.kanjiName ?? 'Unspecified kanji name', 
                                         style: TextStyle(
                                           fontSize: defaultTextFontSize * 0.9,
-                                          color: Colors.white,
                                           fontWeight: FontWeight.w500
                                         ),
                                         maxLines: 1,

@@ -48,6 +48,9 @@ dependencies:
   cached_network_image: ^3.3.0
   index_generator: ^3.4.1
   flutter_native_splash: ^2.3.10
+  shared_preferences: ^2.2.3
+  flutter_riverpod: ^2.5.1
+  go_router: ^14.0.1
 
 dev_dependencies:
   flutter_test:

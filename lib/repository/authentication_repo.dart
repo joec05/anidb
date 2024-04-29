@@ -1,5 +1,6 @@
 import 'package:anime_list_app/global_files.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class AuthenticationRepository {
   UserTokenClass userTokenData = UserTokenClass('', '', '', '');
@@ -26,13 +27,12 @@ class AuthenticationRepository {
     if(res != null) {
       authRepo.userTokenData = UserTokenClass.fromMapUpdate(res);
       secureStorageController.updateUserToken();
-      runDelay(() => Navigator.pushAndRemoveUntil(
-        context,
-        NavigationTransition(
-          page: const MainPageWidget()
-        ),
-        (Route<dynamic> route) => false
-      ), navigatorDelayTime);
+      if(context.mounted) {
+        while(context.canPop()) {
+          context.pop();
+        }
+        context.push('/main-page');
+      }
     }
   }
 

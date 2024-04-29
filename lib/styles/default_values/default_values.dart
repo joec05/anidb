@@ -8,17 +8,17 @@ double defaultHorizontalPadding = getScreenWidth() * 0.02;
 double defaultVerticalPadding = getScreenHeight() * 0.01;
 
 Size animeGridDisplayWidgetSize = Size(
-  getScreenWidth() * 0.425,
-  getScreenHeight() * 0.4,
+  getScreenWidth() * 0.3,
+  getScreenHeight() * 0.35,
 );
 
 Size animeGridDisplayCoverSize = Size(
-  getScreenWidth() * 0.425,
-  getScreenHeight() * 0.3,
+  getScreenWidth() * 0.35,
+  getScreenHeight() * 0.25,
 );
 
 Size animeDisplayCoverSize = Size(
-  getScreenWidth() * 0.325,
+  getScreenWidth() * 0.35,
   getScreenHeight() * 0.25,
 );
 

@@ -1,11 +1,12 @@
 import 'package:anime_list_app/global_files.dart';
+import 'package:anime_list_app/widgets/display/custom_complete_character_display.dart';
 import 'package:flutter/material.dart';
 
-class ViewCharacterBasicDisplay extends StatelessWidget {
+class ViewMoreCharacters extends StatelessWidget {
   final String label;
   final CharacterBasicDisplayType displayType;
 
-  const ViewCharacterBasicDisplay({
+  const ViewMoreCharacters({
     super.key,
     required this.label,
     required this.displayType
@@ -13,27 +14,27 @@ class ViewCharacterBasicDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _ViewCharacterBasicDisplayStateful(
+    return _ViewMoreCharactersStateful(
       label: label,
       displayType: displayType
     );
   }
 }
 
-class _ViewCharacterBasicDisplayStateful extends StatefulWidget {
+class _ViewMoreCharactersStateful extends StatefulWidget {
   final String label;
   final CharacterBasicDisplayType displayType;
 
-  const _ViewCharacterBasicDisplayStateful({
+  const _ViewMoreCharactersStateful({
     required this.label,
     required this.displayType
   });
 
   @override
-  State<_ViewCharacterBasicDisplayStateful> createState() => _ViewCharacterBasicDisplayStatefulState();
+  State<_ViewMoreCharactersStateful> createState() => _ViewMoreCharactersStatefulState();
 }
 
-class _ViewCharacterBasicDisplayStatefulState extends State<_ViewCharacterBasicDisplayStateful>{
+class _ViewMoreCharactersStatefulState extends State<_ViewMoreCharactersStateful>{
   late CharacterBasicController controller;
 
   @override void initState(){
@@ -67,16 +68,11 @@ class _ViewCharacterBasicDisplayStatefulState extends State<_ViewCharacterBasicD
           List<int> charactersList = controller.charactersList.value;
 
           if(isLoading) {
-            return GridView.builder(
+            return ListView.builder(
               itemCount: getAnimeBasicDisplayTotalFetchCount(),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: getAnimeBasicDisplayCrossAxis(),    
-                childAspectRatio: gridChildRatio
-              ),
               itemBuilder: (context, index){
                 return shimmerSkeletonWidget(
-                  CustomBasicCharacterDisplay(
-                    showStats: false,
+                  CustomCompleteCharacterDisplay(
                     characterData: CharacterDataClass.fetchNewInstance(-1), 
                     skeletonMode: true,
                     key: UniqueKey()
@@ -86,18 +82,13 @@ class _ViewCharacterBasicDisplayStatefulState extends State<_ViewCharacterBasicD
             );
           }
 
-          return GridView.builder(
+          return ListView.builder(
             itemCount: charactersList.length,
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: getAnimeBasicDisplayCrossAxis(),    
-              childAspectRatio: gridChildRatio
-            ),
             itemBuilder: (context, index){
               return ValueListenableBuilder(
                 valueListenable: appStateRepo.globalCharacterData[charactersList[index]]!.notifier, 
                 builder: (context, characterData, child){
-                  return CustomBasicCharacterDisplay(
-                    showStats: true,
+                  return CustomCompleteCharacterDisplay(
                     characterData: characterData, 
                     skeletonMode: false,
                     key: UniqueKey()

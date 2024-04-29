@@ -85,7 +85,6 @@ class CustomUserAnimeStatsWidgetState extends State<CustomUserAnimeStatsWidget> 
                                   ),
                                   Text('${userAnimeStats.total}', style: TextStyle(
                                     fontSize: defaultTextFontSize * 0.925,
-                                    color: Colors.white,
                                     fontWeight: FontWeight.w600
                                   ))
                                 ],
@@ -114,7 +113,6 @@ class CustomUserAnimeStatsWidgetState extends State<CustomUserAnimeStatsWidget> 
                                   ),
                                   Text('${userAnimeStats.totalEpisodes}', style: TextStyle(
                                     fontSize: defaultTextFontSize * 0.925,
-                                    color: Colors.white,
                                     fontWeight: FontWeight.w600
                                   ))
                                 ],
@@ -158,7 +156,6 @@ class CustomUserAnimeStatsWidgetState extends State<CustomUserAnimeStatsWidget> 
                                   ),
                                   Text(userAnimeStats.meanScore.toStringAsFixed(1), style: TextStyle(
                                     fontSize: defaultTextFontSize * 0.925,
-                                    color: Colors.white,
                                     fontWeight: FontWeight.w600
                                   ))
                                 ],
@@ -187,7 +184,6 @@ class CustomUserAnimeStatsWidgetState extends State<CustomUserAnimeStatsWidget> 
                                   ),
                                   Text('${userAnimeStats.watching}', style: TextStyle(
                                     fontSize: defaultTextFontSize * 0.925,
-                                    color: Colors.white,
                                     fontWeight: FontWeight.w600
                                   ))
                                 ],
@@ -231,7 +227,6 @@ class CustomUserAnimeStatsWidgetState extends State<CustomUserAnimeStatsWidget> 
                                   ),
                                   Text('${userAnimeStats.planToWatch}', style: TextStyle(
                                     fontSize: defaultTextFontSize * 0.925,
-                                    color: Colors.white,
                                     fontWeight: FontWeight.w600
                                   ))
                                 ],
@@ -260,7 +255,6 @@ class CustomUserAnimeStatsWidgetState extends State<CustomUserAnimeStatsWidget> 
                                   ),
                                   Text('${userAnimeStats.completed}', style: TextStyle(
                                     fontSize: defaultTextFontSize * 0.925,
-                                    color: Colors.white,
                                     fontWeight: FontWeight.w600
                                   ))
                                 ],
@@ -304,7 +298,6 @@ class CustomUserAnimeStatsWidgetState extends State<CustomUserAnimeStatsWidget> 
                                   ),
                                   Text('${userAnimeStats.onHold}', style: TextStyle(
                                     fontSize: defaultTextFontSize * 0.925,
-                                    color: Colors.white,
                                     fontWeight: FontWeight.w600
                                   ))
                                 ],
@@ -333,7 +326,6 @@ class CustomUserAnimeStatsWidgetState extends State<CustomUserAnimeStatsWidget> 
                                   ),
                                   Text('${userAnimeStats.dropped}', style: TextStyle(
                                     fontSize: defaultTextFontSize * 0.925,
-                                    color: Colors.white,
                                     fontWeight: FontWeight.w600
                                   ))
                                 ],
@@ -360,7 +352,7 @@ class CustomUserAnimeStatsWidgetState extends State<CustomUserAnimeStatsWidget> 
                         height: getScreenHeight() * 0.015
                       ),
                       Container(
-                        child: generateBarChart(
+                        child: generateBarChart(context, 
                           barChartData[i].model,
                           barChartData[i].legend,
                           barChartData[i].totalValue

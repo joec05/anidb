@@ -1,5 +1,6 @@
 import 'package:anime_list_app/global_files.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class CustomHomeFrontDisplay extends StatefulWidget {
   final String label;
@@ -35,50 +36,39 @@ class CustomHomeFrontDisplayState extends State<CustomHomeFrontDisplay>{
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: EdgeInsets.fromLTRB(
-            defaultHorizontalPadding * 1.75,
-            defaultVerticalPadding * 3,
-            defaultHorizontalPadding * 2.5,
-            defaultVerticalPadding * 2
+        Container(
+          margin: EdgeInsets.symmetric(
+            horizontal: defaultHorizontalPadding * 0.75,
+            vertical: defaultVerticalPadding,
           ),
-          child: GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: (){
-              runDelay(() => Navigator.push(
-                context,
-                NavigationTransition(
-                  page: widget.displayType is AnimeBasicDisplayType ?
-                    ViewAnimeBasicDisplay(
-                      label: widget.label, 
-                      displayType: widget.displayType
+          child: InkWell(
+            splashFactory: InkSplash.splashFactory,
+            onTap: () => context.pushNamed(
+              widget.displayType is AnimeBasicDisplayType ? 'view-more-anime'
+              : widget.displayType is MangaBasicDisplayType ? 'view-more-manga'
+              : 'view-more-characters',
+              pathParameters: {'label': widget.label},
+              extra: widget.displayType
+            ),
+            child: Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: defaultHorizontalPadding * 1.5,
+                vertical: defaultVerticalPadding 
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    widget.label,
+                    style: TextStyle(
+                      fontSize: defaultTextFontSize * 1.25,
+                      fontWeight: FontWeight.bold
                     )
-                  : widget.displayType is MangaBasicDisplayType ?
-                    ViewMangaBasicDisplay(
-                      label: widget.label, 
-                      displayType: widget.displayType
-                    )
-                  :
-                    ViewCharacterBasicDisplay(
-                      label: widget.label, 
-                      displayType: widget.displayType
-                    )
-                )
-              ), navigatorDelayTime);
-            },
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(
-                  widget.label,
-                  style: TextStyle(
-                    fontSize: defaultTextFontSize * 1.25,
-                    fontWeight: FontWeight.bold
-                  )
-                ),
-                const Icon(Icons.keyboard_arrow_right, size: 25)
-              ],
+                  ),
+                  const Icon(Icons.keyboard_arrow_right, size: 25)
+                ],
+              )
             )
           )
         ),
@@ -131,7 +121,7 @@ class CustomHomeFrontDisplayState extends State<CustomHomeFrontDisplay>{
                     builder: (context, animeData, child){
                       return CustomBasicAnimeDisplay(
                         animeData: animeData,
-                        showStats: true,
+                        showStats: false,
                         skeletonMode: false,
                         key: UniqueKey()
                       );
@@ -146,7 +136,7 @@ class CustomHomeFrontDisplayState extends State<CustomHomeFrontDisplay>{
                     builder: (context, mangaData, child){
                       return CustomBasicMangaDisplay(
                         mangaData: mangaData,
-                        showStats: true,
+                        showStats: false,
                         skeletonMode: false,
                         key: UniqueKey()
                       );
@@ -161,7 +151,7 @@ class CustomHomeFrontDisplayState extends State<CustomHomeFrontDisplay>{
                     builder: (context, characterData, child){
                       return CustomBasicCharacterDisplay(
                         characterData: characterData,
-                        showStats: true,
+                        showStats: false,
                         skeletonMode: false,
                         key: UniqueKey()
                       );

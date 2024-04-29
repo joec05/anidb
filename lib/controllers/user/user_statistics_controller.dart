@@ -25,7 +25,6 @@ class UserStatisticsController {
     9: 0,
     10: 0
   });
-  ValueNotifier<Map<String, int>> animeGenreCount = ValueNotifier({});
   ValueNotifier<Map<int, int>> mangaScoreCount = ValueNotifier({
     0: 0,
     1: 0,
@@ -39,7 +38,6 @@ class UserStatisticsController {
     9: 0,
     10: 0
   });
-  ValueNotifier<Map<String, int>> mangaGenreCount = ValueNotifier({});
 
   UserStatisticsController(
     this.context
@@ -60,9 +58,7 @@ class UserStatisticsController {
     isLoading.dispose();
     isLoading2.dispose();
     animeScoreCount.dispose();
-    animeGenreCount.dispose();
     mangaScoreCount.dispose();
-    mangaGenreCount.dispose();
   }
 
   void fetchUserAnimesList() async{
@@ -81,11 +77,6 @@ class UserStatisticsController {
           updateAnimeData(data[i]['node']);
           animeDataList.add(appStateRepo.globalAnimeData[data[i]['node']['id']]!.notifier.value);
           animeScoreCount.value[animeDataList[i].myListStatus!.score] = animeScoreCount.value[animeDataList[i].myListStatus!.score]! + 1;
-          List<String> animeGenresList = animeDataList[i].genres.map((e) => e.name).toList();
-          for(int g = 0; g < animeGenresList.length; g++){
-            animeGenreCount.value[animeGenresList[g]] = animeGenreCount.value[animeGenresList[g]] ?? 0;
-            animeGenreCount.value[animeGenresList[g]] = animeGenreCount.value[animeGenresList[g]]! + 1;
-          }
         }
         
         userAnimeStatistics.value = UserAnimeStatisticsClass(
@@ -155,34 +146,12 @@ class UserStatisticsController {
             );
           });
 
-          List<Vlegend> genreBarLegend = [];
-          List<VBarChartModel> genreBarModel = List.generate(animeGenreCount.value.keys.length, (i){
-            Color randomColor = Color((Random().nextDouble() * 0xFFFFFF).toInt()).withOpacity(1.0);
-            double count = animeGenreCount.value.values.toList()[i].toDouble();
-            genreBarLegend.add(
-              Vlegend(
-                isSquare: false,
-                color: randomColor,
-                text: animeGenreCount.value.keys.toList()[i]
-              )
-            );
-            return VBarChartModel(
-              index: i,
-              colors: [randomColor, randomColor],
-              jumlah: count,
-              tooltip: '${count.toInt()}'
-            );
-          });
-
           animeBarChartData.value.addAll([
             BarChartClass(
               'Status', statusBarModel, statusBarLegend, statusValue.reduce((a, b) => a + b).toDouble()
             ),
             BarChartClass(
               'Scores', scoreBarModel, scoreBarLegend, ((animeScoreCount.value.values.reduce((a, b) => a + b).toInt()) - animeScoreCount.value[0]!).toDouble()
-            ),
-            BarChartClass(
-              'Genres', genreBarModel, genreBarLegend, animeGenreCount.value.values.reduce((a, b) => a + b).toDouble()
             )
           ]);
           animeBarChartData.value = [...animeBarChartData.value];
@@ -207,11 +176,6 @@ class UserStatisticsController {
         updateMangaData(data[i]['node']);
         mangaDataList.add(appStateRepo.globalMangaData[data[i]['node']['id']]!.notifier.value);
         mangaScoreCount.value[mangaDataList[i].myListStatus!.score] = mangaScoreCount.value[mangaDataList[i].myListStatus!.score]! + 1;
-        List<String> mangaGenresList = mangaDataList[i].genres.map((e) => e.name).toList();
-        for(int g = 0; g < mangaGenresList.length; g++){
-          mangaGenreCount.value[mangaGenresList[g]] = mangaGenreCount.value[mangaGenresList[g]] ?? 0;
-          mangaGenreCount.value[mangaGenresList[g]] = mangaGenreCount.value[mangaGenresList[g]]! + 1;
-        }
       }
       
       userMangaStatistics.value = UserMangaStatisticsClass(
@@ -283,34 +247,12 @@ class UserStatisticsController {
           );
         });
 
-        List<Vlegend> genreBarLegend = [];
-        List<VBarChartModel> genreBarModel = List.generate(mangaGenreCount.value.keys.length, (i){
-          Color randomColor = Color((Random().nextDouble() * 0xFFFFFF).toInt()).withOpacity(1.0);
-          double count = mangaGenreCount.value.values.toList()[i].toDouble();
-          genreBarLegend.add(
-            Vlegend(
-              isSquare: false,
-              color: randomColor,
-              text: mangaGenreCount.value.keys.toList()[i]
-            )
-          );
-          return VBarChartModel(
-            index: i,
-            colors: [randomColor, randomColor],
-            jumlah: count,
-            tooltip: '${count.toInt()}'
-          );
-        });
-
         mangaBarChartData.value.addAll([
           BarChartClass(
             'Status', statusBarModel, statusBarLegend, statusValue.reduce((a, b) => a + b).toDouble()
           ),
           BarChartClass(
             'Scores', scoreBarModel, scoreBarLegend, ((mangaScoreCount.value.values.reduce((a, b) => a + b).toInt()) - mangaScoreCount.value[0]!).toDouble()
-          ),
-          BarChartClass(
-            'Genres', genreBarModel, genreBarLegend, mangaGenreCount.value.values.reduce((a, b) => a + b).toDouble()
           )
         ]);
         mangaBarChartData.value = [...mangaBarChartData.value];

@@ -85,7 +85,6 @@ class CustomUserMangaStatsWidgetState extends State<CustomUserMangaStatsWidget> 
                                   ),
                                   Text('${userMangaStats.total}', style: TextStyle(
                                     fontSize: defaultTextFontSize * 0.925,
-                                    color: Colors.white,
                                     fontWeight: FontWeight.w600
                                   ))
                                 ],
@@ -129,7 +128,6 @@ class CustomUserMangaStatsWidgetState extends State<CustomUserMangaStatsWidget> 
                                   ),
                                   Text('${userMangaStats.totalVolumes}', style: TextStyle(
                                     fontSize: defaultTextFontSize * 0.925,
-                                    color: Colors.white,
                                     fontWeight: FontWeight.w600
                                   ))
                                 ],
@@ -158,7 +156,6 @@ class CustomUserMangaStatsWidgetState extends State<CustomUserMangaStatsWidget> 
                                   ),
                                   Text('${userMangaStats.totalChapters}', style: TextStyle(
                                     fontSize: defaultTextFontSize * 0.925,
-                                    color: Colors.white,
                                     fontWeight: FontWeight.w600
                                   ))
                                 ],
@@ -202,7 +199,6 @@ class CustomUserMangaStatsWidgetState extends State<CustomUserMangaStatsWidget> 
                                   ),
                                   Text(userMangaStats.meanScore.toStringAsFixed(1), style: TextStyle(
                                     fontSize: defaultTextFontSize * 0.925,
-                                    color: Colors.white,
                                     fontWeight: FontWeight.w600
                                   ))
                                 ],
@@ -231,7 +227,6 @@ class CustomUserMangaStatsWidgetState extends State<CustomUserMangaStatsWidget> 
                                   ),
                                   Text('${userMangaStats.reading}', style: TextStyle(
                                     fontSize: defaultTextFontSize * 0.925,
-                                    color: Colors.white,
                                     fontWeight: FontWeight.w600
                                   ))
                                 ],
@@ -275,7 +270,6 @@ class CustomUserMangaStatsWidgetState extends State<CustomUserMangaStatsWidget> 
                                   ),
                                   Text('${userMangaStats.planToRead}', style: TextStyle(
                                     fontSize: defaultTextFontSize * 0.925,
-                                    color: Colors.white,
                                     fontWeight: FontWeight.w600
                                   ))
                                 ],
@@ -304,7 +298,6 @@ class CustomUserMangaStatsWidgetState extends State<CustomUserMangaStatsWidget> 
                                   ),
                                   Text('${userMangaStats.completed}', style: TextStyle(
                                     fontSize: defaultTextFontSize * 0.925,
-                                    color: Colors.white,
                                     fontWeight: FontWeight.w600
                                   ))
                                 ],
@@ -348,7 +341,6 @@ class CustomUserMangaStatsWidgetState extends State<CustomUserMangaStatsWidget> 
                                   ),
                                   Text('${userMangaStats.onHold}', style: TextStyle(
                                     fontSize: defaultTextFontSize * 0.925,
-                                    color: Colors.white,
                                     fontWeight: FontWeight.w600
                                   ))
                                 ],
@@ -377,7 +369,6 @@ class CustomUserMangaStatsWidgetState extends State<CustomUserMangaStatsWidget> 
                                   ),
                                   Text('${userMangaStats.dropped}', style: TextStyle(
                                     fontSize: defaultTextFontSize * 0.925,
-                                    color: Colors.white,
                                     fontWeight: FontWeight.w600
                                   ))
                                 ],
@@ -404,7 +395,7 @@ class CustomUserMangaStatsWidgetState extends State<CustomUserMangaStatsWidget> 
                         height: getScreenHeight() * 0.015
                       ),
                       Container(
-                        child: generateBarChart(
+                        child: generateBarChart(context, 
                           barChartData[i].model,
                           barChartData[i].legend,
                           barChartData[i].totalValue

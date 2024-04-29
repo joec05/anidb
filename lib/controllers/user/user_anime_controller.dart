@@ -59,14 +59,19 @@ class UserAnimeController {
 
           if(status == 'watching'){
             watching.value.animesList.insert(0, id);
+            watching.value.animesList.sort((a, b) => appStateRepo.globalAnimeData[a]!.notifier.value.title.compareTo(appStateRepo.globalAnimeData[b]!.notifier.value.title));
           }else if(status == 'plan_to_watch'){
             planning.value.animesList.insert(0, id);
+            planning.value.animesList.sort((a, b) => appStateRepo.globalAnimeData[a]!.notifier.value.title.compareTo(appStateRepo.globalAnimeData[b]!.notifier.value.title));
           }else if(status == 'completed'){
             completed.value.animesList.insert(0, id);
+            completed.value.animesList.sort((a, b) => appStateRepo.globalAnimeData[a]!.notifier.value.title.compareTo(appStateRepo.globalAnimeData[b]!.notifier.value.title));
           }else if(status == 'dropped'){
             dropped.value.animesList.insert(0, id);
+            dropped.value.animesList.sort((a, b) => appStateRepo.globalAnimeData[a]!.notifier.value.title.compareTo(appStateRepo.globalAnimeData[b]!.notifier.value.title));
           }else if(status == 'on_hold'){
             onHold.value.animesList.insert(0, id);
+            onHold.value.animesList.sort((a, b) => appStateRepo.globalAnimeData[a]!.notifier.value.title.compareTo(appStateRepo.globalAnimeData[b]!.notifier.value.title));
           }
 
           watching.value = watching.value.copy();

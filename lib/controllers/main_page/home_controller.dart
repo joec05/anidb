@@ -227,7 +227,7 @@ class HomeController {
   }
 
   void fetchTopCharacters() async{
-     var res = await apiCallRepo.runAPICall(
+    var res = await apiCallRepo.runAPICall(
       context,
       APICallType.get,
       jikanApiUrl,
@@ -241,6 +241,7 @@ class HomeController {
           updateBasicCharacterData(data[i]);
           topCharactersList.value.add(data[i]['mal_id']);
         }
+        topCharactersList.value = [...topCharactersList.value];
       }
     }
   }

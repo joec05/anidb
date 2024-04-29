@@ -1,11 +1,11 @@
 import 'package:anime_list_app/global_files.dart';
 import 'package:flutter/material.dart';
 
-class ViewMangaBasicDisplay extends StatelessWidget {
+class ViewMoreManga extends StatelessWidget {
   final String label;
   final MangaBasicDisplayType displayType;
 
-  const ViewMangaBasicDisplay({
+  const ViewMoreManga({
     super.key,
     required this.label,
     required this.displayType
@@ -13,27 +13,27 @@ class ViewMangaBasicDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _ViewMangaBasicDisplayStateful(
+    return _ViewMoreMangaStateful(
       label: label,
       displayType: displayType
     );
   }
 }
 
-class _ViewMangaBasicDisplayStateful extends StatefulWidget {
+class _ViewMoreMangaStateful extends StatefulWidget {
   final String label;
   final MangaBasicDisplayType displayType;
 
-  const _ViewMangaBasicDisplayStateful({
+  const _ViewMoreMangaStateful({
     required this.label,
     required this.displayType
   });
 
   @override
-  State<_ViewMangaBasicDisplayStateful> createState() => _ViewMangaBasicDisplayStatefulState();
+  State<_ViewMoreMangaStateful> createState() => _ViewMoreMangaStatefulState();
 }
 
-class _ViewMangaBasicDisplayStatefulState extends State<_ViewMangaBasicDisplayStateful>{
+class _ViewMoreMangaStatefulState extends State<_ViewMoreMangaStateful>{
   late MangaBasicController controller;
 
   @override void initState(){
@@ -67,17 +67,13 @@ class _ViewMangaBasicDisplayStatefulState extends State<_ViewMangaBasicDisplaySt
           List<int> mangasList = controller.mangasList.value;
 
           if(isLoading) {
-            return GridView.builder(
+            return ListView.builder(
               itemCount: getAnimeBasicDisplayTotalFetchCount(),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: getAnimeBasicDisplayCrossAxis(),    
-                childAspectRatio: gridChildRatio
-              ),
               itemBuilder: (context, index){
                 return shimmerSkeletonWidget(
-                  CustomBasicMangaDisplay(
-                    mangaData: MangaDataClass.fetchNewInstance(-1), 
-                    showStats: false,
+                  CustomUserListMangaDisplay(
+                    mangaData: MangaDataClass.fetchNewInstance(-1),
+                    displayType: MangaRowDisplayType.viewMore, 
                     skeletonMode: true,
                     key: UniqueKey()
                   )
@@ -86,19 +82,15 @@ class _ViewMangaBasicDisplayStatefulState extends State<_ViewMangaBasicDisplaySt
             );
           }
           
-          return GridView.builder(
+          return ListView.builder(
             itemCount: mangasList.length,
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: getAnimeBasicDisplayCrossAxis(),    
-              childAspectRatio: gridChildRatio
-            ),
             itemBuilder: (context, index){
               return ValueListenableBuilder(
                 valueListenable: appStateRepo.globalMangaData[mangasList[index]]!.notifier, 
                 builder: (context, mangaData, child){
-                  return CustomBasicMangaDisplay(
-                    mangaData: mangaData, 
-                    showStats: true,
+                  return CustomUserListMangaDisplay(
+                    mangaData: mangaData,
+                    displayType: MangaRowDisplayType.viewMore, 
                     skeletonMode: false,
                     key: UniqueKey()
                   );

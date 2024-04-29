@@ -1,24 +1,25 @@
 import 'package:anime_list_app/global_files.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:go_router/go_router.dart';
 
-class MainPageWidget extends StatelessWidget {
-  const MainPageWidget({super.key});
+class MainPage extends StatelessWidget {
+  const MainPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const _MainPageWidgetStateful();
+    return const _MainPageStateful();
   }
 }
 
-class _MainPageWidgetStateful extends StatefulWidget {
-  const _MainPageWidgetStateful();
+class _MainPageStateful extends StatefulWidget {
+  const _MainPageStateful();
 
   @override
-  State<_MainPageWidgetStateful> createState() => __MainPageWidgetStatefulState();
+  State<_MainPageStateful> createState() => __MainPageStatefulState();
 }
 
-class __MainPageWidgetStatefulState extends State<_MainPageWidgetStateful>{
+class __MainPageStatefulState extends State<_MainPageStateful>{
   ValueNotifier<int> selectedIndexValue = ValueNotifier(0);
   final PageController _pageController = PageController(initialPage: 0, keepPage: true);
 
@@ -50,6 +51,7 @@ class __MainPageWidgetStatefulState extends State<_MainPageWidgetStateful>{
         ),
         title: const Text('Home'), 
         titleSpacing: defaultHomeAppBarTitleSpacing,
+        automaticallyImplyLeading: false
       );
     }else if(index == 1){
       return AppBar(
@@ -62,16 +64,32 @@ class __MainPageWidgetStatefulState extends State<_MainPageWidgetStateful>{
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const Text('Explore'),
-            GestureDetector(
-              onTap: (){
-                runDelay(() => Navigator.push(
-                  context,
-                  NavigationTransition(
-                    page: const SearchPageWidget()
-                  )
-                ), navigatorDelayTime);
-              },
-              child: const Icon(FontAwesomeIcons.magnifyingGlass, size: 22.5)
+            Row(
+              children: [
+                InkWell(
+                  customBorder: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15)
+                  ),
+                  onTap: () => context.push('/search-page'),
+                  child: const Padding(
+                    padding: EdgeInsets.all(10),
+                    child: Icon(FontAwesomeIcons.magnifyingGlass, size: 17.5),
+                  ),
+                ),
+                SizedBox(
+                  width: getScreenWidth() * 0.05
+                ),
+                InkWell(
+                  customBorder: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15)
+                  ),
+                  onTap: () => context.push('/settings-page'),
+                  child: const Padding(
+                    padding: EdgeInsets.all(10),
+                    child: Icon(FontAwesomeIcons.gear, size: 17.5),
+                  ),
+                ),
+              ],
             )
           ]
         ), 
@@ -83,6 +101,7 @@ class __MainPageWidgetStatefulState extends State<_MainPageWidgetStateful>{
           decoration: defaultAppBarDecoration
         ),
         title: const Text('Profile'), titleSpacing: defaultHomeAppBarTitleSpacing,
+        automaticallyImplyLeading: false
       );
     }
     return AppBar();
@@ -100,27 +119,23 @@ class __MainPageWidgetStatefulState extends State<_MainPageWidgetStateful>{
             onPageChanged: onPageChanged,
             children: widgetOptions,
           ),
-          bottomNavigationBar:ClipRRect(                                                            
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(15),
-              topRight: Radius.circular(15)
-            ),                                                     
+          bottomNavigationBar: ClipRRect(                                                   
             child: BottomNavigationBar(
-              fixedColor: Colors.red.withOpacity(0.75),
-              unselectedItemColor: Colors.blueGrey,
-              backgroundColor: const Color.fromARGB(255, 78, 75, 75),
+              fixedColor: const Color.fromARGB(255, 153, 108, 54),
+              backgroundColor: const Color.fromARGB(255, 71, 75, 53),
+              unselectedItemColor: const Color.fromARGB(255, 165, 161, 149),
               key: UniqueKey(),
               items: const [
                 BottomNavigationBarItem(
-                  icon: Icon(FontAwesomeIcons.house, size: 25),
+                  icon: Icon(FontAwesomeIcons.house, size: 20),
                   label: 'Home',
                 ),
                 BottomNavigationBarItem(
-                  icon: Icon(FontAwesomeIcons.magnifyingGlass, size: 25),
+                  icon: Icon(FontAwesomeIcons.magnifyingGlass, size: 20),
                   label: 'Explore',
                 ),
                 BottomNavigationBarItem(
-                  icon: Icon(FontAwesomeIcons.user, size: 25),
+                  icon: Icon(FontAwesomeIcons.user, size: 20),
                   label: 'Profile',
                 ),
               ],

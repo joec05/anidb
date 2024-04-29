@@ -44,18 +44,14 @@ class _ExplorePageStatefulState extends State<_ExplorePageStateful> with Automat
         List<int> animesList = controller.animesList.value;
 
         if(isLoading) {
-          return GridView.builder(
+          return ListView.builder(
             itemCount: getAnimeBasicDisplayTotalFetchCount(),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: getAnimeBasicDisplayCrossAxis(),    
-              childAspectRatio: gridChildRatio,
-            ),
             itemBuilder: (context, index){
               return shimmerSkeletonWidget(
-                CustomBasicAnimeDisplay(
+                CustomUserListAnimeDisplay(
                   animeData: AnimeDataClass.fetchNewInstance(-1), 
+                  displayType: AnimeRowDisplayType.viewMore,
                   skeletonMode: true,
-                  showStats: false,
                   key: UniqueKey()
                 )
               );
@@ -63,19 +59,15 @@ class _ExplorePageStatefulState extends State<_ExplorePageStateful> with Automat
           );
         }
         
-        return GridView.builder(
+        return ListView.builder(
           itemCount: animesList.length,
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: getAnimeBasicDisplayCrossAxis(),    
-            childAspectRatio: gridChildRatio
-          ),
           itemBuilder: (context, index){
             return ValueListenableBuilder(
               valueListenable: appStateRepo.globalAnimeData[animesList[index]]!.notifier, 
               builder: (context, animeData, child){
-                return CustomBasicAnimeDisplay(
+                return CustomUserListAnimeDisplay(
                   animeData: animeData, 
-                  showStats: true,
+                  displayType: AnimeRowDisplayType.viewMore,
                   skeletonMode: false,
                   key: UniqueKey()
                 );

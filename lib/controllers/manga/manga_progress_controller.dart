@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:anime_list_app/global_files.dart';
+import 'package:anime_list_app/provider/theme_model.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -15,6 +16,7 @@ class MangaProgressController {
   bool get mounted => context.mounted;
 
   void editMyMangaList(String status, int score, String volumeStr, String chapterStr) async{
+    bool statusChanged = status != mangaData.myListStatus?.status;
     volumeStr = volumeStr.isEmpty ? '0' : volumeStr;
     chapterStr = chapterStr.isEmpty ? '0' : chapterStr;
     if(int.tryParse(volumeStr) == null || int.tryParse(chapterStr) == null){
@@ -55,11 +57,13 @@ class MangaProgressController {
         newMangaData.myListStatus!.updatedTime = DateTime.now().toIso8601String();
         newMangaData.myListStatus!.status = status;
         appStateRepo.globalMangaData[mangaData.id]!.notifier.value = newMangaData;
-        UpdateUserMangaListStreamClass().emitData(
-          UserMangaListStreamControllerClass(
-            newMangaData
-          )
-        );
+        if(statusChanged) {
+          UpdateUserMangaListStreamClass().emitData(
+            UserMangaListStreamControllerClass(
+              newMangaData
+            )
+          );
+        }
         if(mounted){
           handler.displaySnackbar(
             context,
@@ -106,7 +110,7 @@ class MangaProgressController {
     }
     showModalBottomSheet(
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
+      backgroundColor: themeModel.mode.value == ThemeMode.dark ? Theme.of(context).primaryColor : const Color.fromARGB(255, 194, 191, 191),
       context: context, 
       builder: (context){
         return StatefulBuilder(
@@ -118,7 +122,6 @@ class MangaProgressController {
                 children: [
                   Container(
                     decoration: const BoxDecoration(
-                      color: Colors.blueGrey,
                       borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(10.0),
                         topRight: Radius.circular(10.0)
@@ -136,13 +139,13 @@ class MangaProgressController {
                                 Flexible(
                                   child: Padding(
                                     padding: EdgeInsets.symmetric(
-                                      horizontal: getScreenWidth() * 0.015,
+                                      horizontal: getScreenWidth() * 0.03,
                                     ),
                                     child: Text(
                                       mangaData.title, 
                                       style: TextStyle(
-                                        fontSize: defaultTextFontSize * 0.95,
-                                        fontWeight: FontWeight.w600
+                                        fontSize: defaultTextFontSize,
+                                        fontWeight: FontWeight.bold
                                       ),
                                       textAlign: TextAlign.center
                                     ),
@@ -152,213 +155,213 @@ class MangaProgressController {
                             )
                           ]
                         ),
-                        SizedBox(height: getScreenHeight() * 0.03),
-                        Text('Read status', style: TextStyle(
-                          fontSize: defaultTextFontSize * 0.95
-                        )),
-                        SizedBox(height: getScreenHeight() * 0.015),
-                        SizedBox(
-                          height: getScreenHeight() * 0.065,
-                          child: ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                            itemCount: mangaStatusMap.keys.toList().length,
-                            itemBuilder: (c, i){
-                              return GestureDetector(
-                                behavior: HitTestBehavior.opaque,
-                                onTap: (){
-                                  if(mounted){
-                                    setState((){
-                                      selectedStatus = mangaStatusMap.keys.toList()[i];
-                                    });
-                                  }
-                                },
-                                child: Container(
-                                  width: getScreenWidth() * 0.25,
-                                  margin: EdgeInsets.symmetric(
-                                    horizontal: getScreenWidth() * 0.015,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey.withOpacity(0.5),
-                                    borderRadius: BorderRadius.circular(17.5),
-                                    border: Border.all(
-                                      width: 2,
-                                      color: selectedStatus == mangaStatusMap.keys.toList()[i] ? Colors.red.withOpacity(0.5) : Colors.grey.withOpacity(0.5)
+                        SizedBox(height: getScreenHeight() * 0.05),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text('Read status', style: TextStyle(
+                                  fontSize: defaultTextFontSize * 0.9,
+                                  fontWeight: FontWeight.w500
+                                )),
+                                SizedBox(height: getScreenHeight() * 0.01),
+                                DropdownButton(
+                                  underline: Container(height: 1, color: themeModel.mode.value == ThemeMode.dark ? Colors.white : Colors.black,),
+                                  value: selectedStatus.isEmpty ? null : selectedStatus,
+                                  items: const [
+                                    DropdownMenuItem(
+                                      value: 'reading',
+                                      child: Text('Reading')
+                                    ),
+                                    DropdownMenuItem(
+                                      value: 'plan_to_read',
+                                      child: Text('Planning')
+                                    ),
+                                    DropdownMenuItem(
+                                      value: 'completed',
+                                      child: Text('Completed')
+                                    ),
+                                    DropdownMenuItem(
+                                      value: 'on_hold',
+                                      child: Text('On hold')
+                                    ),
+                                    DropdownMenuItem(
+                                      value: 'dropped',
+                                      child: Text('Dropped')
                                     )
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      Text(mangaStatusMap[mangaStatusMap.keys.toList()[i]])
-                                    ]
-                                  )
-                                )
-                              );
-                            }
-                          ),
-                        ),
-                        SizedBox(height: getScreenHeight() * 0.03),
-                        Text('Score', style: TextStyle(
-                          fontSize: defaultTextFontSize * 0.95
-                        )),
-                        SizedBox(height: getScreenHeight() * 0.015),
-                        SizedBox(
-                          height: getScreenHeight() * 0.065,
-                          child: ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                            itemCount: 10,
-                            itemBuilder: (c, i){
-                              return GestureDetector(
-                                behavior: HitTestBehavior.opaque,
-                                onTap: (){
-                                  if(mounted){
-                                    setState((){
-                                      selectedScore = i + 1;
-                                    });
+                                  ],
+                                  onChanged: (dynamic item) {
+                                    if(mounted){
+                                      setState((){
+                                        selectedStatus = item as String;
+                                      });
+                                    }
                                   }
-                                },
-                                child: Container(
-                                  width: getScreenWidth() * 0.25,
-                                  margin: EdgeInsets.symmetric(
-                                    horizontal: getScreenWidth() * 0.015,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey.withOpacity(0.5),
-                                    borderRadius: BorderRadius.circular(17.5),
-                                    border: Border.all(
-                                      width: 2,
-                                      color: selectedScore == i + 1 ? Colors.red.withOpacity(0.5) : Colors.grey.withOpacity(0.5)
-                                    )
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      Text('${i + 1}')
-                                    ]
-                                  )
-                                )
-                              );
-                            }
-                          ),
+                                ),
+                              ],
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text('Score', style: TextStyle(
+                                  fontSize: defaultTextFontSize * 0.9,
+                                  fontWeight: FontWeight.w500
+                                )),
+                                SizedBox(height: getScreenHeight() * 0.01),
+                                DropdownButton(
+                                  underline: Container(height: 1, color: themeModel.mode.value == ThemeMode.dark ? Colors.white : Colors.black,),
+                                  value: selectedScore == 0 ? null : selectedScore,
+                                  items: List<DropdownMenuItem>.generate(10, (index) => DropdownMenuItem(
+                                    value: index + 1,
+                                    child: Text('${index + 1}')
+                                  )),
+                                  onChanged: (dynamic item) {
+                                    if(mounted){
+                                      setState((){
+                                        selectedScore = item as int;
+                                      });
+                                    }
+                                  }
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                         SizedBox(height: getScreenHeight() * 0.03),
                         Text('Volumes read', style: TextStyle(
-                          fontSize: defaultTextFontSize * 0.95
+                          fontSize: defaultTextFontSize * 0.9,
+                          fontWeight: FontWeight.w500
                         )),
-                        SizedBox(height: getScreenHeight() * 0.015),
-                        TextField(
-                          controller: volumeController,
-                          keyboardType: TextInputType.number,
-                          maxLines: 1,
-                          maxLength: 4,
-                          decoration: InputDecoration(
-                            counterText: "",
-                            contentPadding: EdgeInsets.symmetric(horizontal: getScreenWidth() * 0.025),
-                            fillColor: Colors.transparent,
-                            filled: true,
-                            hintText: 'Enter volumes read',
-                            prefixIcon: TextButton(
-                              onPressed: (){
-                                if(mounted){
-                                  setState((){
-                                    if(volumeController.text.isEmpty){
-                                      volumeController.text = '0';
-                                    }else if(mangaData.totalVolumes == 0){
-                                      volumeController.text = '${int.parse(volumeController.text) + 1}';
-                                    }else{
-                                      volumeController.text = '${min(mangaData.totalVolumes, int.parse(volumeController.text) + 1)}';
-                                    }
-                                  });
-                                }
-                              },
-                              child: const Icon(
-                                FontAwesomeIcons.plus
-                              )
-                            ),
-                            suffixIcon: TextButton(
-                              onPressed: (){
-                                volumeController.text = '${max(0, int.tryParse(volumeController.text) != null ? int.parse(volumeController.text) - 1 : 0)}';
-                              },
-                              child: const Icon(
-                                FontAwesomeIcons.minus
-                              )
-                            ),
-                            constraints: BoxConstraints(
-                              maxWidth: getScreenWidth() * 0.75,
-                              maxHeight: getScreenHeight() * 0.07,
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: Colors.white.withOpacity(0.75), width: 2),
-                              borderRadius: BorderRadius.circular(25),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: Colors.white.withOpacity(0.75), width: 2),
-                              borderRadius: BorderRadius.circular(25),
-                            ),
-                          )
+                        SizedBox(height: getScreenHeight() * 0.01),
+                        SizedBox(
+                          width: getScreenWidth() * 0.5,
+                          child: TextField(
+                            controller: volumeController,
+                            keyboardType: TextInputType.number,
+                            maxLines: 1,
+                            maxLength: 4,
+                            decoration: InputDecoration(
+                              counterText: "",
+                              contentPadding: EdgeInsets.symmetric(horizontal: getScreenWidth() * 0.025),
+                              fillColor: Colors.transparent,
+                              filled: true,
+                              hintText: '',
+                              prefixIcon: TextButton(
+                                onPressed: (){
+                                  if(mounted){
+                                    setState((){
+                                      if(volumeController.text.isEmpty){
+                                        volumeController.text = '0';
+                                      }else if(mangaData.totalVolumes == 0){
+                                        volumeController.text = '${int.parse(volumeController.text) + 1}';
+                                      }else{
+                                        volumeController.text = '${min(mangaData.totalVolumes, int.parse(volumeController.text) + 1)}';
+                                      }
+                                    });
+                                  }
+                                },
+                                child: Icon(
+                                  FontAwesomeIcons.plus,
+                                  size: 17,
+                                  color: themeModel.mode.value == ThemeMode.dark ? Colors.white : Colors.black
+                                )
+                              ),
+                              suffixIcon: TextButton(
+                                onPressed: (){
+                                  volumeController.text = '${max(0, int.tryParse(volumeController.text) != null ? int.parse(volumeController.text) - 1 : 0)}';
+                                },
+                                child: Icon(
+                                  FontAwesomeIcons.minus,
+                                  size: 17,
+                                  color: themeModel.mode.value == ThemeMode.dark ? Colors.white : Colors.black
+                                )
+                              ),
+                              constraints: BoxConstraints(
+                                maxWidth: getScreenWidth() * 0.75,
+                                maxHeight: getScreenHeight() * 0.07,
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: const BorderSide(width: 2, color: Colors.grey),
+                                borderRadius: BorderRadius.circular(25),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: const BorderSide(width: 2, color: Colors.grey),
+                                borderRadius: BorderRadius.circular(25),
+                              ),
+                            )
+                          ),
                         ),
                         SizedBox(height: getScreenHeight() * 0.03),
                         Text('Chapters read', style: TextStyle(
-                          fontSize: defaultTextFontSize * 0.95
+                          fontSize: defaultTextFontSize * 0.9,
+                          fontWeight: FontWeight.w500
                         )),
-                        SizedBox(height: getScreenHeight() * 0.015),
-                        TextField(
-                          controller: chapterController,
-                          keyboardType: TextInputType.number,
-                          maxLines: 1,
-                          maxLength: 4,
-                          decoration: InputDecoration(
-                            counterText: "",
-                            contentPadding: EdgeInsets.symmetric(horizontal: getScreenWidth() * 0.025),
-                            fillColor: Colors.transparent,
-                            filled: true,
-                            hintText: 'Enter chapters read',
-                            prefixIcon: TextButton(
-                              onPressed: (){
-                                if(mounted){
-                                  setState((){
-                                    if(chapterController.text.isEmpty){
-                                      chapterController.text = '0';
-                                    }else if(mangaData.totalChapters == 0){
-                                      chapterController.text = '${int.parse(chapterController.text) + 1}';
-                                    }else{
-                                      chapterController.text = '${min(mangaData.totalChapters, int.parse(chapterController.text) + 1)}';
-                                    }
-                                  });
-                                }
-                              },
-                              child: const Icon(
-                                FontAwesomeIcons.plus
-                              )
-                            ),
-                            suffixIcon: TextButton(
-                              onPressed: (){
-                                chapterController.text = '${int.tryParse(chapterController.text) != null ? int.parse(chapterController.text) - 1 : 0}';
-                              },
-                              child: const Icon(
-                                FontAwesomeIcons.minus
-                              )
-                            ),
-                            constraints: BoxConstraints(
-                              maxWidth: getScreenWidth() * 0.75,
-                              maxHeight: getScreenHeight() * 0.07,
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: Colors.white.withOpacity(0.75), width: 2),
-                              borderRadius: BorderRadius.circular(25),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: Colors.white.withOpacity(0.75), width: 2),
-                              borderRadius: BorderRadius.circular(25),
-                            ),
-                          )
+                        SizedBox(height: getScreenHeight() * 0.01),
+                        SizedBox(
+                          width: getScreenWidth() * 0.5,
+                          child: TextField(
+                            controller: chapterController,
+                            keyboardType: TextInputType.number,
+                            maxLines: 1,
+                            maxLength: 4,
+                            decoration: InputDecoration(
+                              counterText: "",
+                              contentPadding: EdgeInsets.symmetric(horizontal: getScreenWidth() * 0.025),
+                              fillColor: Colors.transparent,
+                              filled: true,
+                              hintText: '',
+                              prefixIcon: TextButton(
+                                onPressed: (){
+                                  if(mounted){
+                                    setState((){
+                                      if(chapterController.text.isEmpty){
+                                        chapterController.text = '0';
+                                      }else if(mangaData.totalChapters == 0){
+                                        chapterController.text = '${int.parse(chapterController.text) + 1}';
+                                      }else{
+                                        chapterController.text = '${min(mangaData.totalChapters, int.parse(chapterController.text) + 1)}';
+                                      }
+                                    });
+                                  }
+                                },
+                                child: Icon(
+                                  FontAwesomeIcons.plus,
+                                  size: 17,
+                                  color: themeModel.mode.value == ThemeMode.dark ? Colors.white : Colors.black
+                                )
+                              ),
+                              suffixIcon: TextButton(
+                                onPressed: (){
+                                  chapterController.text = '${int.tryParse(chapterController.text) != null ? int.parse(chapterController.text) - 1 : 0}';
+                                },
+                                child: Icon(
+                                  FontAwesomeIcons.minus,
+                                  size: 17,
+                                  color: themeModel.mode.value == ThemeMode.dark ? Colors.white : Colors.black
+                                )
+                              ),
+                              constraints: BoxConstraints(
+                                maxWidth: getScreenWidth() * 0.75,
+                                maxHeight: getScreenHeight() * 0.07,
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: const BorderSide(width: 2, color: Colors.grey),
+                                borderRadius: BorderRadius.circular(25),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: const BorderSide(width: 2, color: Colors.grey),
+                                borderRadius: BorderRadius.circular(25),
+                              ),
+                            )
+                          ),
                         ),
                         SizedBox(height: getScreenHeight() * 0.03),
                         CustomButton(
-                          width: getScreenWidth() * 0.5, 
-                          height: getScreenHeight() * 0.06,  
-                          buttonColor: Colors.brown, 
+                          width: getScreenWidth() * 0.75, 
+                          height: getScreenHeight() * 0.065,
+                          buttonColor: const Color.fromARGB(255, 8, 95, 86), 
                           buttonText: 'Save', 
                           onTapped: (){
                             Navigator.pop(context);
@@ -371,8 +374,8 @@ class MangaProgressController {
                           Column(
                             children: [
                               CustomButton(
-                                width: getScreenWidth() * 0.5, 
-                                height: getScreenHeight() * 0.06,  
+                                width: getScreenWidth() * 0.75, 
+                                height: getScreenHeight() * 0.065,
                                 buttonColor: Colors.redAccent, 
                                 buttonText: 'Delete from list', 
                                 onTapped: (){

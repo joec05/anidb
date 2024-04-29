@@ -55,6 +55,7 @@ class _ViewUserMangaListsStatefulState extends State<_ViewUserMangaListsStateful
                 pinned: true,
                 automaticallyImplyLeading: false,
                 bottom: TabBar(
+                  tabAlignment: TabAlignment.start,
                   onTap: (selectedIndex) {
                   },
                   isScrollable: true,

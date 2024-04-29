@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:anime_list_app/global_files.dart';
+import 'package:anime_list_app/provider/theme_model.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -19,7 +20,8 @@ class AnimeProgressController {
     int score, 
     String episodeStr
   ) async{
-    episodeStr = episodeStr.isEmpty ? '0' : episodeStr;
+    bool statusChanged = status != animeData.myListStatus?.status;
+    episodeStr = episodeStr.isEmpty ? '' : episodeStr;
     if(int.tryParse(episodeStr) == null){
       handler.displaySnackbar(
         context, 
@@ -56,11 +58,13 @@ class AnimeProgressController {
         newAnimeData.myListStatus!.updatedTime = DateTime.now().toIso8601String();
         newAnimeData.myListStatus!.status = status;
         appStateRepo.globalAnimeData[animeData.id]!.notifier.value = newAnimeData;
-        UpdateUserAnimeListStreamClass().emitData(
-          UserAnimeListStreamControllerClass(
-            newAnimeData
-          )
-        );
+        if(statusChanged) {
+          UpdateUserAnimeListStreamClass().emitData(
+            UserAnimeListStreamControllerClass(
+              newAnimeData
+            )
+          );
+        }
         if(mounted){
           handler.displaySnackbar(
             context,
@@ -106,7 +110,7 @@ class AnimeProgressController {
 
     showModalBottomSheet(
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
+      backgroundColor: themeModel.mode.value == ThemeMode.dark ? Theme.of(context).primaryColor : const Color.fromARGB(255, 194, 191, 191),
       context: context, 
       builder: (context){
         return StatefulBuilder(
@@ -118,7 +122,6 @@ class AnimeProgressController {
                 children: [
                   Container(
                     decoration: const BoxDecoration(
-                      color: Colors.blueGrey,
                       borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(10.0),
                         topRight: Radius.circular(10.0)
@@ -136,13 +139,13 @@ class AnimeProgressController {
                                 Flexible(
                                   child: Padding(
                                     padding: EdgeInsets.symmetric(
-                                      horizontal: getScreenWidth() * 0.015,
+                                      horizontal: getScreenWidth() * 0.03,
                                     ),
                                     child: Text(
                                       animeData.title, 
                                       style: TextStyle(
-                                        fontSize: defaultTextFontSize * 0.95,
-                                        fontWeight: FontWeight.w600
+                                        fontSize: defaultTextFontSize,
+                                        fontWeight: FontWeight.bold
                                       ),
                                       textAlign: TextAlign.center
                                     ),
@@ -152,157 +155,149 @@ class AnimeProgressController {
                             )
                           ]
                         ),
-                        SizedBox(height: getScreenHeight() * 0.03),
-                        Text('Watch status', style: TextStyle(
-                          fontSize: defaultTextFontSize * 0.95
-                        )),
-                        SizedBox(height: getScreenHeight() * 0.015),
-                        SizedBox(
-                          height: getScreenHeight() * 0.065,
-                          child: ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                            itemCount: animeStatusMap.keys.toList().length,
-                            itemBuilder: (c, i){
-                              return GestureDetector(
-                                behavior: HitTestBehavior.opaque,
-                                onTap: (){
-                                  if(mounted){
-                                    setState((){
-                                      selectedStatus = animeStatusMap.keys.toList()[i];
-                                    });
-                                  }
-                                },
-                                child: Container(
-                                  width: getScreenWidth() * 0.25,
-                                  margin: EdgeInsets.symmetric(
-                                    horizontal: getScreenWidth() * 0.015,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey.withOpacity(0.5),
-                                    borderRadius: BorderRadius.circular(17.5),
-                                    border: Border.all(
-                                      width: 2,
-                                      color: selectedStatus == animeStatusMap.keys.toList()[i] ? Colors.red.withOpacity(0.5) : Colors.grey.withOpacity(0.5)
+                        SizedBox(height: getScreenHeight() * 0.05),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text('Watch status', style: TextStyle(
+                                  fontSize: defaultTextFontSize * 0.9,
+                                  fontWeight: FontWeight.w500
+                                )),
+                                SizedBox(height: getScreenHeight() * 0.01),
+                                DropdownButton(
+                                  underline: Container(height: 1, color: themeModel.mode.value == ThemeMode.dark ? Colors.white : Colors.black,),
+                                  value: selectedStatus.isEmpty ? null : selectedStatus,
+                                  items: const [
+                                    DropdownMenuItem(
+                                      value: 'watching',
+                                      child: Text('Watching')
+                                    ),
+                                    DropdownMenuItem(
+                                      value: 'plan_to_watch',
+                                      child: Text('Planning')
+                                    ),
+                                    DropdownMenuItem(
+                                      value: 'completed',
+                                      child: Text('Completed')
+                                    ),
+                                    DropdownMenuItem(
+                                      value: 'on_hold',
+                                      child: Text('On hold')
+                                    ),
+                                    DropdownMenuItem(
+                                      value: 'dropped',
+                                      child: Text('Dropped')
                                     )
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      Text(animeStatusMap[animeStatusMap.keys.toList()[i]])
-                                    ]
-                                  )
-                                )
-                              );
-                            }
-                          ),
-                        ),
-                        SizedBox(height: getScreenHeight() * 0.03),
-                        Text('Score', style: TextStyle(
-                          fontSize: defaultTextFontSize * 0.95
-                        )),
-                        SizedBox(height: getScreenHeight() * 0.015),
-                        SizedBox(
-                          height: getScreenHeight() * 0.065,
-                          child: ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                            itemCount: 10,
-                            itemBuilder: (c, i){
-                              return GestureDetector(
-                                behavior: HitTestBehavior.opaque,
-                                onTap: (){
-                                  if(mounted){
-                                    setState((){
-                                      selectedScore = i + 1;
-                                    });
+                                  ],
+                                  onChanged: (dynamic item) {
+                                    if(mounted){
+                                      setState((){
+                                        selectedStatus = item as String;
+                                      });
+                                    }
                                   }
-                                },
-                                child: Container(
-                                  width: getScreenWidth() * 0.25,
-                                  margin: EdgeInsets.symmetric(
-                                    horizontal: getScreenWidth() * 0.015,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey.withOpacity(0.5),
-                                    borderRadius: BorderRadius.circular(17.5),
-                                    border: Border.all(
-                                      width: 2,
-                                      color: selectedScore == i + 1 ? Colors.red.withOpacity(0.5) : Colors.grey.withOpacity(0.5)
-                                    )
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      Text('${i + 1}')
-                                    ]
-                                  )
-                                )
-                              );
-                            }
-                          ),
+                                ),
+                              ],
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text('Score', style: TextStyle(
+                                  fontSize: defaultTextFontSize * 0.9,
+                                  fontWeight: FontWeight.w500
+                                )),
+                                SizedBox(height: getScreenHeight() * 0.01),
+                                DropdownButton(
+                                  underline: Container(height: 1, color: themeModel.mode.value == ThemeMode.dark ? Colors.white : Colors.black,),
+                                  value: selectedScore == 0 ? null : selectedScore,
+                                  items: List<DropdownMenuItem>.generate(10, (index) => DropdownMenuItem(
+                                    value: index + 1,
+                                    child: Text('${index + 1}')
+                                  )),
+                                  onChanged: (dynamic item) {
+                                    if(mounted){
+                                      setState((){
+                                        selectedScore = item as int;
+                                      });
+                                    }
+                                  }
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                         SizedBox(height: getScreenHeight() * 0.03),
                         Text('Episodes watched', style: TextStyle(
-                          fontSize: defaultTextFontSize * 0.95
+                          fontSize: defaultTextFontSize * 0.9,
+                          fontWeight: FontWeight.w500
                         )),
-                        SizedBox(height: getScreenHeight() * 0.015),
-                        TextField(
-                          controller: episodeController,
-                          keyboardType: TextInputType.number,
-                          maxLines: 1,
-                          maxLength: 4,
-                          decoration: InputDecoration(
-                            counterText: "",
-                            contentPadding: EdgeInsets.symmetric(horizontal: getScreenWidth() * 0.025),
-                            fillColor: Colors.transparent,
-                            filled: true,
-                            hintText: 'Enter episodes watched',
-                            prefixIcon: TextButton(
-                              onPressed: (){
-                                if(mounted){
-                                  setState((){
-                                    if(episodeController.text.isEmpty){
-                                      episodeController.text = '0';
-                                    }else if(animeData.totalEpisodes == 0){
-                                      episodeController.text = '${int.parse(episodeController.text) + 1}';
-                                    }else{
-                                      episodeController.text = '${min(animeData.totalEpisodes, int.parse(episodeController.text) + 1)}';
-                                    }
-                                  });
-                                }
-                              },
-                              child: const Icon(
-                                FontAwesomeIcons.plus
-                              )
-                            ),
-                            suffixIcon: TextButton(
-                              onPressed: (){
-                                episodeController.text = '${max(0, int.tryParse(episodeController.text) != null ? int.parse(episodeController.text) - 1 : 0)}';
-                              },
-                              child: const Icon(
-                                FontAwesomeIcons.minus
-                              )
-                            ),
-                            constraints: BoxConstraints(
-                              maxWidth: getScreenWidth() * 0.75,
-                              maxHeight: getScreenHeight() * 0.07,
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: Colors.white.withOpacity(0.75), width: 2),
-                              borderRadius: BorderRadius.circular(25),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: Colors.white.withOpacity(0.75), width: 2),
-                              borderRadius: BorderRadius.circular(25),
-                            ),
-                          )
+                        SizedBox(height: getScreenHeight() * 0.01),
+                        SizedBox(
+                          width: getScreenWidth() * 0.5,
+                          child: TextField(
+                            controller: episodeController,
+                            keyboardType: TextInputType.number,
+                            maxLines: 1,
+                            maxLength: 4,
+                            decoration: InputDecoration(
+                              counterText: "",
+                              contentPadding: EdgeInsets.symmetric(horizontal: getScreenWidth() * 0.025),
+                              fillColor: Colors.transparent,
+                              filled: true,
+                              hintText: '',
+                              prefixIcon: TextButton(
+                                onPressed: (){
+                                  if(mounted){
+                                    setState((){
+                                      if(episodeController.text.isEmpty){
+                                        episodeController.text = '0';
+                                      }else if(animeData.totalEpisodes == 0){
+                                        episodeController.text = '${int.parse(episodeController.text) + 1}';
+                                      }else{
+                                        episodeController.text = '${min(animeData.totalEpisodes, int.parse(episodeController.text) + 1)}';
+                                      }
+                                    });
+                                  }
+                                },
+                                child: Icon(
+                                  FontAwesomeIcons.plus,
+                                  size: 17,
+                                  color: themeModel.mode.value == ThemeMode.dark ? Colors.white : Colors.black
+                                )
+                              ),
+                              suffixIcon: TextButton(
+                                onPressed: (){
+                                  episodeController.text = '${max(0, int.tryParse(episodeController.text) != null ? int.parse(episodeController.text) - 1 : 0)}';
+                                },
+                                child: Icon(
+                                  FontAwesomeIcons.minus,
+                                  size: 17,
+                                  color: themeModel.mode.value == ThemeMode.dark ? Colors.white : Colors.black
+                                )
+                              ),
+                              constraints: BoxConstraints(
+                                maxWidth: getScreenWidth() * 0.75,
+                                maxHeight: getScreenHeight() * 0.07,
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: const BorderSide(width: 2, color: Colors.grey),
+                                borderRadius: BorderRadius.circular(25),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: const BorderSide(width: 2, color: Colors.grey),
+                                borderRadius: BorderRadius.circular(25),
+                              ),
+                            )
+                          ),
                         ),
                         SizedBox(height: getScreenHeight() * 0.03),
                         CustomButton(
-                          width: getScreenWidth() * 0.5, 
-                          height: getScreenHeight() * 0.06,  
-                          buttonColor: Colors.brown, 
+                          width: getScreenWidth() * 0.75, 
+                          height: getScreenHeight() * 0.065,  
+                          buttonColor: const Color.fromARGB(255, 8, 95, 86), 
                           buttonText: 'Save', 
                           onTapped: (){
                             Navigator.pop(context);
@@ -315,8 +310,8 @@ class AnimeProgressController {
                           Column(
                             children: [
                               CustomButton(
-                                width: getScreenWidth() * 0.5, 
-                                height: getScreenHeight() * 0.06,  
+                                width: getScreenWidth() * 0.75, 
+                                height: getScreenHeight() * 0.065,
                                 buttonColor: Colors.redAccent, 
                                 buttonText: 'Delete from list', 
                                 onTapped: (){

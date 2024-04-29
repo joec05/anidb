@@ -1,6 +1,7 @@
 import 'package:anime_list_app/global_files.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:go_router/go_router.dart';
 
 class CustomProfileDisplay extends StatefulWidget {
   final UserDataClass userData;
@@ -22,58 +23,6 @@ class CustomProfileDisplayState extends State<CustomProfileDisplay>{
   @override void initState(){
     super.initState();
     userData = widget.userData;
-  }
-
-  void askLogOut(){
-    showDialog(
-      context: context,
-      builder: (dialogContext) {
-        return AlertDialog(
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('Are you sure you want to log out?', style: TextStyle(
-                fontSize: defaultTextFontSize * 0.95
-              )),
-              SizedBox(
-                height: getScreenHeight() * 0.025
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  CustomButton(
-                    width: getScreenWidth() * 0.25, height: getScreenHeight() * 0.06, 
-                    buttonColor: Colors.redAccent, buttonText: 'Yes', 
-                    onTapped: (){
-                      authRepo.userTokenData = UserTokenClass(
-                        '', '', '', ''
-                      );
-                      secureStorageController.updateUserToken();
-                      runDelay(() => Navigator.pushAndRemoveUntil(
-                        context,
-                        NavigationTransition(
-                          page: const MyHomePage()
-                        ),
-                        (Route<dynamic> route) => false
-                      ), navigatorDelayTime);
-                    }, 
-                    setBorderRadius: true
-                  ),
-                  CustomButton(
-                    width: getScreenWidth() * 0.25, height: getScreenHeight() * 0.06, 
-                    buttonColor: Colors.orange, buttonText: 'No', 
-                    onTapped: (){
-                      Navigator.of(dialogContext).pop();
-                    }, 
-                    setBorderRadius: true
-                  )
-                ]
-              )
-            ]
-          )
-        );
-      }
-    );
   }
   
   @override
@@ -120,90 +69,68 @@ class CustomProfileDisplayState extends State<CustomProfileDisplay>{
               SizedBox(
                 height: getScreenHeight() * 0.025
               ),
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.teal.withOpacity(0.475),
-                  borderRadius: const BorderRadius.all(Radius.circular(12.5))
-                ),
-                height: getScreenHeight() * 0.07,
+              SizedBox(
+                height: getScreenHeight() * 0.05,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     SizedBox(
                       width: getScreenWidth() * 0.15,
-                      child: const Icon(FontAwesomeIcons.venusMars, size: 17.5)
+                      child: const Icon(FontAwesomeIcons.venusMars, size: 14)
                     ),
                     Text(
                       userData.gender ?? '?',
                       style: const TextStyle(
-                        fontWeight: FontWeight.w500
+                        fontWeight: FontWeight.w500,
+                        fontSize: 13
                       )
                     )
                   ]
                 ),
               ),
               SizedBox(
-                height: getScreenHeight() * 0.01
-              ),
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.teal.withOpacity(0.475),
-                  borderRadius: const BorderRadius.all(Radius.circular(12.5))
-                ),
-                height: getScreenHeight() * 0.07,
+                height: getScreenHeight() * 0.05,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     SizedBox(
                       width: getScreenWidth() * 0.15,
-                      child: const Icon(Icons.person_pin_circle_outlined, size: 25),
+                      child: const Icon(Icons.person_pin_circle_outlined, size: 21),
                     ),
                     Text(
                       userData.location != null ? userData.location!.isNotEmpty ? userData.location! : '?' : '?',
                       style: const TextStyle(
-                        fontWeight: FontWeight.w500
+                        fontWeight: FontWeight.w500,
+                        fontSize: 13
                       )
                     )
                   ]
                 )
               ),
               SizedBox(
-                height: getScreenHeight() * 0.01
-              ),
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.teal.withOpacity(0.475),
-                  borderRadius: const BorderRadius.all(Radius.circular(12.5))
-                ),
-                height: getScreenHeight() * 0.07,
+                height: getScreenHeight() * 0.05,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     SizedBox(
                       width: getScreenWidth() * 0.15,
-                      child: const Icon(Icons.cake, size: 20),
+                      child: const Icon(Icons.cake, size: 17),
                     ),
                     Text(
                       userData.birthday != null ? convertDateTimeDisplay(userData.birthday!) : '?',
                       style: const TextStyle(
-                        fontWeight: FontWeight.w500
+                        fontWeight: FontWeight.w500,
+                        fontSize: 13
                       )
                     )
                   ]
                 ),
               ),
               SizedBox(
-                height: getScreenHeight() * 0.01
-              ),
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.teal.withOpacity(0.475),
-                  borderRadius: const BorderRadius.all(Radius.circular(12.5))
-                ),
-                height: getScreenHeight() * 0.07,
+                height: getScreenHeight() * 0.05,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -214,13 +141,14 @@ class CustomProfileDisplayState extends State<CustomProfileDisplay>{
                         padding: EdgeInsets.only(
                           bottom: getScreenHeight() * 0.00175
                         ),
-                        child: const Icon(Icons.person_add, size: 22.5)
+                        child: const Icon(Icons.person_add, size: 18)
                       ),
                     ),
                     Text(
                       convertDateTimeDisplay(userData.joinedTime),
                       style: const TextStyle(
-                        fontWeight: FontWeight.w500
+                        fontWeight: FontWeight.w500,
+                        fontSize: 13
                       )
                     )
                   ]
@@ -229,50 +157,25 @@ class CustomProfileDisplayState extends State<CustomProfileDisplay>{
               SizedBox(height: getScreenHeight() * 0.025),
               CustomButton(
                 width: getScreenWidth() * 0.6, height: getScreenHeight() * 0.07, 
-                buttonColor: Colors.orange, buttonText: 'Statistics', 
-                onTapped: (){
-                  runDelay(() => Navigator.push(
-                    context,
-                    NavigationTransition(
-                      page: const ViewUserStatistics()
-                    )
-                  ), navigatorDelayTime);
-                }, 
+                buttonColor: Colors.teal.withOpacity(0.35), 
+                buttonText: 'Statistics', 
+                onTapped: () => context.push('/view-user-statistics'), 
                 setBorderRadius: true
               ),
               SizedBox(height: getScreenHeight() * 0.02),
               CustomButton(
                 width: getScreenWidth() * 0.6, height: getScreenHeight() * 0.07, 
-                buttonColor: Colors.orange, buttonText: 'Anime list', 
-                onTapped: (){
-                  runDelay(() => Navigator.push(
-                    context,
-                    NavigationTransition(
-                      page: const ViewUserAnimesList()
-                    )
-                  ), navigatorDelayTime);
-                }, 
+                buttonColor: Colors.teal.withOpacity(0.35), 
+                buttonText: 'Anime list', 
+                onTapped: () => context.push('/view-user-anime-lists'), 
                 setBorderRadius: true
               ),
               SizedBox(height: getScreenHeight() * 0.02),
               CustomButton(
                 width: getScreenWidth() * 0.6, height: getScreenHeight() * 0.07, 
-                buttonColor: Colors.orange, buttonText: 'Manga list', 
-                onTapped: (){
-                  runDelay(() => Navigator.push(
-                    context,
-                    NavigationTransition(
-                      page: const ViewUserMangaLists()
-                    )
-                  ), navigatorDelayTime);
-                }, 
-                setBorderRadius: true
-              ),
-              SizedBox(height: getScreenHeight() * 0.02),
-              CustomButton(
-                width: getScreenWidth() * 0.6, height: getScreenHeight() * 0.07, 
-                buttonColor: Colors.redAccent, buttonText: 'Log out', 
-                onTapped: () => askLogOut(), 
+                buttonColor: Colors.teal.withOpacity(0.35), 
+                buttonText: 'Manga list', 
+                onTapped: () => context.push('/view-user-manga-lists'), 
                 setBorderRadius: true
               ),
               SizedBox(
@@ -315,12 +218,8 @@ class CustomProfileDisplayState extends State<CustomProfileDisplay>{
               SizedBox(
                 height: getScreenHeight() * 0.025
               ),
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.teal.withOpacity(0.475),
-                  borderRadius: const BorderRadius.all(Radius.circular(12.5))
-                ),
-                height: getScreenHeight() * 0.07,
+              SizedBox(
+                height: getScreenHeight() * 0.05,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -333,14 +232,7 @@ class CustomProfileDisplayState extends State<CustomProfileDisplay>{
                 ),
               ),
               SizedBox(
-                height: getScreenHeight() * 0.01
-              ),
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.teal.withOpacity(0.475),
-                  borderRadius: const BorderRadius.all(Radius.circular(12.5))
-                ),
-                height: getScreenHeight() * 0.07,
+                height: getScreenHeight() * 0.05,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -353,14 +245,7 @@ class CustomProfileDisplayState extends State<CustomProfileDisplay>{
                 )
               ),
               SizedBox(
-                height: getScreenHeight() * 0.01
-              ),
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.teal.withOpacity(0.475),
-                  borderRadius: const BorderRadius.all(Radius.circular(12.5))
-                ),
-                height: getScreenHeight() * 0.07,
+                height: getScreenHeight() * 0.05,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -373,14 +258,7 @@ class CustomProfileDisplayState extends State<CustomProfileDisplay>{
                 ),
               ),
               SizedBox(
-                height: getScreenHeight() * 0.01
-              ),
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.teal.withOpacity(0.475),
-                  borderRadius: const BorderRadius.all(Radius.circular(12.5))
-                ),
-                height: getScreenHeight() * 0.07,
+                height: getScreenHeight() * 0.05,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.center,

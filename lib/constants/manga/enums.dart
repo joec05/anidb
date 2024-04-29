@@ -3,5 +3,5 @@ enum MangaBasicDisplayType{
 }
 
 enum MangaRowDisplayType{
-  myUserList, search
+  myUserList, search, viewMore
 }

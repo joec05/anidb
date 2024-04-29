@@ -2,41 +2,36 @@ import 'package:anime_list_app/global_files.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-class SearchPageWidget extends StatelessWidget {
-  const SearchPageWidget({super.key});
+class SearchPage extends StatelessWidget {
+  const SearchPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const _SearchPageWidgetStateful();
+    return const _SearchPageStateful();
   }
 }
 
-class _SearchPageWidgetStateful extends StatefulWidget {
-  const _SearchPageWidgetStateful();
+class _SearchPageStateful extends StatefulWidget {
+  const _SearchPageStateful();
 
   @override
-  State<_SearchPageWidgetStateful> createState() => __SearchPageWidgetStatefulState();
+  State<_SearchPageStateful> createState() => __SearchPageStatefulState();
 }
 
-class __SearchPageWidgetStatefulState extends State<_SearchPageWidgetStateful> with SingleTickerProviderStateMixin{
+class __SearchPageStatefulState extends State<_SearchPageStateful> with SingleTickerProviderStateMixin{
   TextEditingController searchController = TextEditingController();
   ValueNotifier<String> searchedText = ValueNotifier('');
-  ValueNotifier<bool> verifySearchedFormat = ValueNotifier(false);
   late TabController _tabController;
 
   @override void initState(){
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
-    searchController.addListener((){
-      verifySearchedFormat.value = searchController.text.isNotEmpty;
-    });
   }
 
   @override void dispose(){
     super.dispose();
     searchController.dispose();
     searchedText.dispose();
-    verifySearchedFormat.dispose();
     _tabController.dispose();
   }
 
@@ -45,52 +40,45 @@ class __SearchPageWidgetStatefulState extends State<_SearchPageWidgetStateful> w
     return Scaffold(
       appBar: AppBar(
         leading: defaultLeadingWidget(context),
-        title: ValueListenableBuilder(
-          valueListenable: verifySearchedFormat,
-          builder: (context, allowPress, child){
-            return TextField(
-              controller: searchController,
-              maxLines: 1,
-              maxLength: 30,
-              decoration: InputDecoration(
-                counterText: "",
-                contentPadding: EdgeInsets.symmetric(horizontal: getScreenWidth() * 0.025),
-                fillColor: Colors.transparent,
-                filled: true,
-                hintText: 'Search anything',
-                suffixIcon: TextButton(
-                  onPressed: (){
-                    if(searchController.text.length < 4){
-                      handler.displaySnackbar(
-                        context,
-                        SnackbarType.error,
-                        tErr.searchTextMin
-                      );
-                    }else{
-                      searchedText.value = searchController.text;
-                    }
-                  },
-                  child: Icon(
-                    FontAwesomeIcons.magnifyingGlass, 
-                    size: 20, 
-                    color: allowPress ? Colors.blue : Colors.white.withOpacity(0.65)
-                  )
-                ),
-                constraints: BoxConstraints(
-                  maxWidth: getScreenWidth() * 0.75,
-                  maxHeight: getScreenHeight() * 0.07,
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.white.withOpacity(0.75), width: 2),
-                  borderRadius: BorderRadius.circular(12.5),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.white.withOpacity(0.75), width: 2),
-                  borderRadius: BorderRadius.circular(12.5),
-                ),
-              )
-            );
-          }
+        title: TextField(
+          controller: searchController,
+          maxLines: 1,
+          maxLength: 30,
+          onEditingComplete: () {
+            if(searchController.text.length < 4){
+              handler.displaySnackbar(
+                context,
+                SnackbarType.error,
+                tErr.searchTextMin
+              );
+            }else{
+              searchedText.value = searchController.text;
+            }
+          },
+          decoration: InputDecoration(
+            counterText: "",
+            contentPadding: EdgeInsets.symmetric(horizontal: getScreenWidth() * 0.025),
+            fillColor: Colors.transparent,
+            filled: true,
+            hintText: 'Search anything',
+            prefixIcon: Icon(
+              FontAwesomeIcons.magnifyingGlass, 
+              size: 16.5,
+              color: Theme.of(context).iconTheme.color,
+            ),
+            constraints: BoxConstraints(
+              maxWidth: getScreenWidth() * 0.75,
+              maxHeight: getScreenHeight() * 0.07,
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderSide: const BorderSide(width: 2, color: Colors.grey),
+              borderRadius: BorderRadius.circular(12.5),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderSide: const BorderSide(width: 2, color: Colors.grey),
+              borderRadius: BorderRadius.circular(12.5),
+            ),
+          )
         ),
         titleSpacing: getScreenWidth() * 0.025,
       ),

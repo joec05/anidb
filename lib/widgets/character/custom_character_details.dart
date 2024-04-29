@@ -196,7 +196,6 @@ class CustomCharacterDetailsState extends State<CustomCharacterDetails>{
                                   ),
                                   Text('${characterData.favouritedCount}', style: TextStyle(
                                     fontSize: defaultTextFontSize * 0.925,
-                                    color: Colors.white,
                                     fontWeight: FontWeight.w600
                                   ))
                                 ],
@@ -225,7 +224,6 @@ class CustomCharacterDetailsState extends State<CustomCharacterDetails>{
                                   ),
                                   Text('${characterData.animes.length}', style: TextStyle(
                                     fontSize: defaultTextFontSize * 0.925,
-                                    color: Colors.white,
                                     fontWeight: FontWeight.w600
                                   ))
                                 ],
@@ -263,7 +261,6 @@ class CustomCharacterDetailsState extends State<CustomCharacterDetails>{
                                   ),
                                   Text('${characterData.mangas.length}', style: TextStyle(
                                     fontSize: defaultTextFontSize * 0.925,
-                                    color: Colors.white,
                                     fontWeight: FontWeight.w600
                                   ))
                                 ],
@@ -292,7 +289,6 @@ class CustomCharacterDetailsState extends State<CustomCharacterDetails>{
                                   ),
                                   Text('${characterData.voices.length}', style: TextStyle(
                                     fontSize: defaultTextFontSize * 0.925,
-                                    color: Colors.white,
                                     fontWeight: FontWeight.w600
                                   ))
                                 ],

@@ -1,11 +1,11 @@
 import 'package:anime_list_app/global_files.dart';
 import 'package:flutter/material.dart';
 
-class ViewAnimeBasicDisplay extends StatelessWidget {
+class ViewMoreAnime extends StatelessWidget {
   final String label;
   final AnimeBasicDisplayType displayType;
 
-  const ViewAnimeBasicDisplay({
+  const ViewMoreAnime({
     super.key,
     required this.label,
     required this.displayType
@@ -13,27 +13,27 @@ class ViewAnimeBasicDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _ViewAnimeBasicDisplayStateful(
+    return _ViewMoreAnimeStateful(
       label: label,
       displayType: displayType
     );
   }
 }
 
-class _ViewAnimeBasicDisplayStateful extends StatefulWidget {
+class _ViewMoreAnimeStateful extends StatefulWidget {
   final String label;
   final AnimeBasicDisplayType displayType;
 
-  const _ViewAnimeBasicDisplayStateful({
+  const _ViewMoreAnimeStateful({
     required this.label,
     required this.displayType
   });
 
   @override
-  State<_ViewAnimeBasicDisplayStateful> createState() => _ViewAnimeBasicDisplayStatefulState();
+  State<_ViewMoreAnimeStateful> createState() => _ViewMoreAnimeStatefulState();
 }
 
-class _ViewAnimeBasicDisplayStatefulState extends State<_ViewAnimeBasicDisplayStateful>{
+class _ViewMoreAnimeStatefulState extends State<_ViewMoreAnimeStateful>{
   late AnimeBasicController controller;
 
   @override void initState(){
@@ -67,18 +67,14 @@ class _ViewAnimeBasicDisplayStatefulState extends State<_ViewAnimeBasicDisplaySt
           List<int> animesList = controller.animesList.value;
           
           if(isLoading) {
-            return GridView.builder(
+            return ListView.builder(
               itemCount: getAnimeBasicDisplayTotalFetchCount(),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: getAnimeBasicDisplayCrossAxis(),    
-                childAspectRatio: gridChildRatio
-              ),
               itemBuilder: (context, index){
                 return shimmerSkeletonWidget(
-                  CustomBasicAnimeDisplay(
+                  CustomUserListAnimeDisplay(
                     animeData: AnimeDataClass.fetchNewInstance(-1), 
                     skeletonMode: true,
-                    showStats: false,
+                    displayType: AnimeRowDisplayType.viewMore,
                     key: UniqueKey()
                   )
                 );
@@ -86,20 +82,16 @@ class _ViewAnimeBasicDisplayStatefulState extends State<_ViewAnimeBasicDisplaySt
             );
           }
 
-          return GridView.builder(
+          return ListView.builder(
             itemCount: animesList.length,
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: getAnimeBasicDisplayCrossAxis(),    
-              childAspectRatio: gridChildRatio,
-            ),
             itemBuilder: (context, index){
               return ValueListenableBuilder(
                 valueListenable: appStateRepo.globalAnimeData[animesList[index]]!.notifier, 
                 builder: (context, animeData, child){
-                  return CustomBasicAnimeDisplay(
-                    showStats: true,
-                    animeData: animeData,
-                    skeletonMode: false, 
+                  return CustomUserListAnimeDisplay(
+                    animeData: animeData, 
+                    displayType: AnimeRowDisplayType.viewMore,
+                    skeletonMode: false,
                     key: UniqueKey()
                   );
                 }

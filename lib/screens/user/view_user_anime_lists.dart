@@ -1,23 +1,23 @@
 import 'package:anime_list_app/global_files.dart';
 import 'package:flutter/material.dart';
 
-class ViewUserAnimesList extends StatelessWidget {
-  const ViewUserAnimesList({super.key});
+class ViewUserAnimeLists extends StatelessWidget {
+  const ViewUserAnimeLists({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const _ViewUserAnimesListStateful();
+    return const _ViewUserAnimeListsStateful();
   }
 }
 
-class _ViewUserAnimesListStateful extends StatefulWidget {
-  const _ViewUserAnimesListStateful();
+class _ViewUserAnimeListsStateful extends StatefulWidget {
+  const _ViewUserAnimeListsStateful();
 
   @override
-  State<_ViewUserAnimesListStateful> createState() => _ViewUserAnimesListStatefulState();
+  State<_ViewUserAnimeListsStateful> createState() => _ViewUserAnimeListsStatefulState();
 }
 
-class _ViewUserAnimesListStatefulState extends State<_ViewUserAnimesListStateful> with SingleTickerProviderStateMixin{
+class _ViewUserAnimeListsStatefulState extends State<_ViewUserAnimeListsStateful> with SingleTickerProviderStateMixin{
   late UserAnimeController controller;
   late TabController _tabController;
 
@@ -55,6 +55,7 @@ class _ViewUserAnimesListStatefulState extends State<_ViewUserAnimesListStateful
                 pinned: true,
                 automaticallyImplyLeading: false,
                 bottom: TabBar(
+                  tabAlignment: TabAlignment.start,
                   onTap: (selectedIndex) {
                   },
                   isScrollable: true,

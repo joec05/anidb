@@ -35,7 +35,7 @@ class CustomButtonState extends State<CustomButton> {
       child: Container(
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: widget.onTapped == null ? Colors.white.withOpacity(0.5) : widget.buttonColor,
+          color: widget.onTapped == null ? const Color.fromARGB(255, 78, 72, 72).withOpacity(0.5) : widget.buttonColor,
           borderRadius: widget.setBorderRadius ? const BorderRadius.all(Radius.circular(5)) : BorderRadius.zero
         ),
         child: Material(

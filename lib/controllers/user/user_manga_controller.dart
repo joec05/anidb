@@ -58,14 +58,19 @@ class UserMangaController {
 
           if(status == 'reading'){
             reading.value.mangasList.insert(0, id);
+            reading.value.mangasList.sort((a, b) => appStateRepo.globalMangaData[a]!.notifier.value.title.compareTo(appStateRepo.globalMangaData[b]!.notifier.value.title));
           }else if(status == 'plan_to_read'){
             planning.value.mangasList.insert(0, id);
+            planning.value.mangasList.sort((a, b) => appStateRepo.globalMangaData[a]!.notifier.value.title.compareTo(appStateRepo.globalMangaData[b]!.notifier.value.title));
           }else if(status == 'completed'){
             completed.value.mangasList.insert(0, id);
+            completed.value.mangasList.sort((a, b) => appStateRepo.globalMangaData[a]!.notifier.value.title.compareTo(appStateRepo.globalMangaData[b]!.notifier.value.title));
           }else if(status == 'dropped'){
             dropped.value.mangasList.insert(0, id);
+            dropped.value.mangasList.sort((a, b) => appStateRepo.globalMangaData[a]!.notifier.value.title.compareTo(appStateRepo.globalMangaData[b]!.notifier.value.title));
           }else if(status == 'on_hold'){
             onHold.value.mangasList.insert(0, id);
+            onHold.value.mangasList.sort((a, b) => appStateRepo.globalMangaData[a]!.notifier.value.title.compareTo(appStateRepo.globalMangaData[b]!.notifier.value.title));
           }
 
           reading.value = reading.value.copy();

@@ -46,11 +46,11 @@ String getFormattedAnimeMediaType(String str){
   if(str == 'tv' || str == 'ova' || str == 'ona'){
     return str.toUpperCase();
   }else{
-    return '${str[0].toUpperCase()}${str.substring(1)}';
+    return '${str[0].toUpperCase()}${str.substring(1).split('_').join(' ')}';
   }
 }
 
-String getFormattedAnimeSource(String str){
+String getFormattedSource(String str){
   if(str.contains('_')){
     List<String> words = str.split('_');
     if(int.tryParse(words[0][0]) != null){

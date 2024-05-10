@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'package:anime_list_app/global_files.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ExploreController {
   final BuildContext context;
-  ValueNotifier<List<int>> animesList = ValueNotifier([]);
-  ValueNotifier<bool> isLoading = ValueNotifier(true);
+  late AutoDisposeAsyncNotifierProvider<ExploreNotifier, List<AnimeDataClass>> exploreNotifier;
 
   ExploreController (
     this.context
@@ -14,32 +14,36 @@ class ExploreController {
   bool get mounted => context.mounted;
 
   void initializeController() {
-    fetchAnimesList();
+    exploreNotifier = AsyncNotifierProvider.autoDispose<ExploreNotifier, List<AnimeDataClass>>(
+      () => ExploreNotifier(context)
+    );
   }
 
   void dispose(){
-    isLoading.dispose();
-    animesList.dispose();
+  }
+}
+
+class ExploreNotifier extends AutoDisposeAsyncNotifier<List<AnimeDataClass>> {
+  final BuildContext context;
+  late AnimeRepository animeRepository;
+  List<AnimeDataClass> animeList = [];
+
+  ExploreNotifier(this.context);
+
+  @override
+  FutureOr<List<AnimeDataClass>> build() async {
+    state = const AsyncLoading();
+    animeRepository = AnimeRepository(context);
+    APIResponseModel response = await animeRepository.fetchSuggestedAnime();
+    if(response.error != null) {
+      state = AsyncError(response.error!.object, response.error!.stackTrace);
+      throw Exception(response.error!.object);
+    } else {
+      animeList = response.data;
+      state = AsyncData(animeList);
+    }
+    return animeList;
   }
 
-  Future<void> fetchAnimesList() async{
-    var res = await apiCallRepo.runAPICall(
-      context,
-      APICallType.get,
-      malApiUrl,
-      '$malApiUrl/anime/suggestions?$fetchAllAnimeFieldsStr&limit=${getAnimeBasicDisplayTotalFetchCount()}',
-      {}
-    );
-    if(res != null) {
-      var data = res['data'];
-      if(mounted) {
-        for(int i = 0; i < data.length; i++){
-          updateAnimeData(data[i]['node']);
-          animesList.value.add(data[i]['node']['id']);
-        }
-        animesList.value = [...animesList.value];
-        isLoading.value = false;
-      }
-    }
-  }
+  Future<void> refresh() async => await build();
 }

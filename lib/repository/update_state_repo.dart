@@ -1,58 +1,73 @@
 import 'package:anime_list_app/global_files.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-void updateAnimeData(Map animeDataMap){
-  if(appStateRepo.globalAnimeData[animeDataMap['id']] != null){
-    AnimeDataClass animeDataClass = appStateRepo.globalAnimeData[animeDataMap['id']]!.notifier.value;
-    appStateRepo.globalAnimeData[animeDataClass.id]!.notifier.value = animeDataClass.fromMapUpdateAll(animeDataMap);
-  }else{
-    AnimeDataClass animeDataClass = AnimeDataClass.fetchNewInstance(animeDataMap['id']).fromMapUpdateAll(animeDataMap);
-    final animeDataNotifier = ValueNotifier<AnimeDataClass>(
+void updateAnimeStatusFromMap(BuildContext context, int id, Map? map) {
+  if(map == null) {
+    return;
+  }
+  
+  AnimeMyListStatusClass animeDataClass = AnimeMyListStatusClass.fromMap(map);
+  if(appStateRepo.globalAnimeData[id] != null){
+    context.read(appStateRepo.globalAnimeData[id]!.notifier).update(
       animeDataClass
     );
-    final animeDataNotifierWrapper = AnimeDataNotifier(animeDataClass.id, animeDataNotifier);
-    appStateRepo.globalAnimeData[animeDataClass.id] = animeDataNotifierWrapper;
+  }else{
+    appStateRepo.globalAnimeData[id] = NotifierProvider<AnimeStatusNotifier, AnimeMyListStatusClass>(
+      () => AnimeStatusNotifier()
+    );
+    context.read(appStateRepo.globalAnimeData[id]!.notifier).update(
+      animeDataClass
+    );
   }
 }
 
-void updateMangaData(Map mangaDataMap){
-  if(appStateRepo.globalMangaData[mangaDataMap['id']] != null){
-    MangaDataClass mangaDataClass = appStateRepo.globalMangaData[mangaDataMap['id']]!.notifier.value;
-    appStateRepo.globalMangaData[mangaDataClass.id]!.notifier.value = mangaDataClass.fromMapUpdateAll(mangaDataMap);
+void updateAnimeStatusFromModel(BuildContext context, int id, AnimeMyListStatusClass? model) {
+  if(model == null) {
+    return;
+  }
+  
+  if(appStateRepo.globalAnimeData[id] != null){
+    context.read(appStateRepo.globalAnimeData[id]!.notifier).update(model);
   }else{
-    MangaDataClass mangaDataClass = MangaDataClass.fetchNewInstance(mangaDataMap['id']).fromMapUpdateAll(mangaDataMap);
-    final mangaDataNotifier = ValueNotifier<MangaDataClass>(
+    appStateRepo.globalAnimeData[id] = NotifierProvider<AnimeStatusNotifier, AnimeMyListStatusClass>(
+      () => AnimeStatusNotifier()
+    );
+    context.read(appStateRepo.globalAnimeData[id]!.notifier).update(model);
+  }
+}
+
+void updateMangaStatusFromMap(BuildContext context, int id, Map? map) {
+  if(map == null) {
+    return;
+  }
+  
+  MangaMyListStatusClass mangaDataClass = MangaMyListStatusClass.fromMap(map);
+  if(appStateRepo.globalMangaData[id] != null){
+    context.read(appStateRepo.globalMangaData[id]!.notifier).update(
       mangaDataClass
     );
-    final mangaDataNotifierWrapper = MangaDataNotifier(mangaDataClass.id, mangaDataNotifier);
-    appStateRepo.globalMangaData[mangaDataClass.id] = mangaDataNotifierWrapper;
+  }else{
+    appStateRepo.globalMangaData[id] = NotifierProvider<MangaStatusNotifier, MangaMyListStatusClass>(
+      () => MangaStatusNotifier()
+    );
+    context.read(appStateRepo.globalMangaData[id]!.notifier).update(
+      mangaDataClass
+    );
   }
 }
 
-void updateBasicCharacterData(Map characterDataMap){
-  if(appStateRepo.globalCharacterData[characterDataMap['mal_id']] != null){
-    CharacterDataClass characterDataClass = appStateRepo.globalCharacterData[characterDataMap['mal_id']]!.notifier.value;
-    appStateRepo.globalCharacterData[characterDataClass.id]!.notifier.value = characterDataClass.fromMapUpdateBasic(characterDataMap);
-  }else{
-    CharacterDataClass characterDataClass = CharacterDataClass.fetchNewInstance(characterDataMap['mal_id']).fromMapUpdateBasic(characterDataMap);
-    final characterDataNotifier = ValueNotifier<CharacterDataClass>(
-      characterDataClass
-    );
-    final charaterDataNotifierWrapper = CharacterDataNotifier(characterDataClass.id, characterDataNotifier);
-    appStateRepo.globalCharacterData[characterDataClass.id] = charaterDataNotifierWrapper;
+void updateMangaStatusFromModel(BuildContext context, int id, MangaMyListStatusClass? model) {
+  if(model == null) {
+    return;
   }
-}
-
-void updateCharacterData(Map characterDataMap){
-  if(appStateRepo.globalCharacterData[characterDataMap['mal_id']] != null){
-    CharacterDataClass characterDataClass = appStateRepo.globalCharacterData[characterDataMap['mal_id']]!.notifier.value;
-    appStateRepo.globalCharacterData[characterDataClass.id]!.notifier.value = characterDataClass.fromMapUpdateAll(characterDataMap);
+  
+  if(appStateRepo.globalMangaData[id] != null){
+    context.read(appStateRepo.globalMangaData[id]!.notifier).update(model);
   }else{
-    CharacterDataClass characterDataClass = CharacterDataClass.fetchNewInstance(characterDataMap['mal_id']).fromMapUpdateAll(characterDataMap);
-    final characterDataNotifier = ValueNotifier<CharacterDataClass>(
-      characterDataClass
+    appStateRepo.globalMangaData[id] = NotifierProvider<MangaStatusNotifier, MangaMyListStatusClass>(
+      () => MangaStatusNotifier()
     );
-    final charaterDataNotifierWrapper = CharacterDataNotifier(characterDataClass.id, characterDataNotifier);
-    appStateRepo.globalCharacterData[characterDataClass.id] = charaterDataNotifierWrapper;
+    context.read(appStateRepo.globalMangaData[id]!.notifier).update(model);
   }
 }

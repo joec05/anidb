@@ -1,23 +1,24 @@
 import 'package:anime_list_app/global_files.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ExplorePage extends StatelessWidget {
+class ExplorePage extends ConsumerWidget {
   const ExplorePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return const _ExplorePageStateful();
   }
 }
 
-class _ExplorePageStateful extends StatefulWidget {
+class _ExplorePageStateful extends ConsumerStatefulWidget {
   const _ExplorePageStateful();
 
   @override
-  State<_ExplorePageStateful> createState() => _ExplorePageStatefulState();
+  ConsumerState<_ExplorePageStateful> createState() => _ExplorePageStatefulState();
 }
 
-class _ExplorePageStatefulState extends State<_ExplorePageStateful> with AutomaticKeepAliveClientMixin{
+class _ExplorePageStatefulState extends ConsumerState<_ExplorePageStateful> with AutomaticKeepAliveClientMixin{
   late ExploreController controller;
 
   @override void initState(){
@@ -34,48 +35,37 @@ class _ExplorePageStatefulState extends State<_ExplorePageStateful> with Automat
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return ListenableBuilder(
-      listenable: Listenable.merge([
-        controller.isLoading,
-        controller.animesList
-      ]),
-      builder: (context, child) {
-        bool isLoading = controller.isLoading.value;
-        List<int> animesList = controller.animesList.value;
+    AsyncValue<List<AnimeDataClass>> viewAnimeDataState = ref.watch(controller.exploreNotifier);
 
-        if(isLoading) {
-          return ListView.builder(
-            itemCount: getAnimeBasicDisplayTotalFetchCount(),
-            itemBuilder: (context, index){
-              return shimmerSkeletonWidget(
-                CustomUserListAnimeDisplay(
-                  animeData: AnimeDataClass.fetchNewInstance(-1), 
-                  displayType: AnimeRowDisplayType.viewMore,
-                  skeletonMode: true,
-                  key: UniqueKey()
-                )
-              );
-            }
-          );
-        }
-        
-        return ListView.builder(
-          itemCount: animesList.length,
+    return RefreshIndicator(
+      onRefresh: () => context.read(controller.exploreNotifier.notifier).refresh(),
+      child: viewAnimeDataState.when(
+        data: (data) => ListView.builder(
+          itemCount: data.length,
           itemBuilder: (context, index){
-            return ValueListenableBuilder(
-              valueListenable: appStateRepo.globalAnimeData[animesList[index]]!.notifier, 
-              builder: (context, animeData, child){
-                return CustomUserListAnimeDisplay(
-                  animeData: animeData, 
-                  displayType: AnimeRowDisplayType.viewMore,
-                  skeletonMode: false,
-                  key: UniqueKey()
-                );
-              }
+            return CustomUserListAnimeDisplay(
+              animeData: data[index], 
+              displayType: AnimeRowDisplayType.viewMore,
+              skeletonMode: false,
+              key: UniqueKey()
             );
           }
-        );
-      }
+        ),
+        error: (obj, stackTrace) => DisplayErrorWidget(displayText: obj.toString()),
+        loading: () => ListView.builder(
+          itemCount: getAnimeBasicDisplayTotalFetchCount(),
+          itemBuilder: (context, index){
+            return ShimmerWidget(
+              child: CustomUserListAnimeDisplay(
+                animeData: AnimeDataClass.fetchNewInstance(-1), 
+                displayType: AnimeRowDisplayType.viewMore,
+                skeletonMode: true,
+                key: UniqueKey()
+              )
+            );
+          }
+        )
+      ),
     );
   }
   

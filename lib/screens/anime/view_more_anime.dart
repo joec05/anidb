@@ -1,7 +1,8 @@
 import 'package:anime_list_app/global_files.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ViewMoreAnime extends StatelessWidget {
+class ViewMoreAnime extends ConsumerWidget {
   final String label;
   final AnimeBasicDisplayType displayType;
 
@@ -12,7 +13,7 @@ class ViewMoreAnime extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return _ViewMoreAnimeStateful(
       label: label,
       displayType: displayType
@@ -20,7 +21,7 @@ class ViewMoreAnime extends StatelessWidget {
   }
 }
 
-class _ViewMoreAnimeStateful extends StatefulWidget {
+class _ViewMoreAnimeStateful extends ConsumerStatefulWidget {
   final String label;
   final AnimeBasicDisplayType displayType;
 
@@ -30,15 +31,15 @@ class _ViewMoreAnimeStateful extends StatefulWidget {
   });
 
   @override
-  State<_ViewMoreAnimeStateful> createState() => _ViewMoreAnimeStatefulState();
+  ConsumerState<_ViewMoreAnimeStateful> createState() => _ViewMoreAnimeStatefulState();
 }
 
-class _ViewMoreAnimeStatefulState extends State<_ViewMoreAnimeStateful>{
-  late AnimeBasicController controller;
+class _ViewMoreAnimeStatefulState extends ConsumerState<_ViewMoreAnimeStateful>{
+  late ViewMoreAnimeController controller;
 
   @override void initState(){
     super.initState();
-    controller = AnimeBasicController(context, widget.displayType);
+    controller = ViewMoreAnimeController(context, widget.displayType);
     controller.initializeController();
   }
 
@@ -51,52 +52,44 @@ class _ViewMoreAnimeStatefulState extends State<_ViewMoreAnimeStateful>{
   Widget build(BuildContext context){
     return Scaffold(
       appBar: AppBar(
-        leading: defaultLeadingWidget(context),
+        leading: const AppBarWidget(),
         flexibleSpace: Container(
           decoration: defaultAppBarDecoration
         ),
         title: Text(widget.label), titleSpacing: defaultAppBarTitleSpacing,
       ),
-      body: ListenableBuilder(
-        listenable: Listenable.merge([
-          controller.isLoading,
-          controller.animesList
-        ]),
-        builder: (context, child) {
-          bool isLoading = controller.isLoading.value;
-          List<int> animesList = controller.animesList.value;
-          
-          if(isLoading) {
-            return ListView.builder(
-              itemCount: getAnimeBasicDisplayTotalFetchCount(),
-              itemBuilder: (context, index){
-                return shimmerSkeletonWidget(
-                  CustomUserListAnimeDisplay(
-                    animeData: AnimeDataClass.fetchNewInstance(-1), 
-                    skeletonMode: true,
-                    displayType: AnimeRowDisplayType.viewMore,
-                    key: UniqueKey()
-                  )
-                );
-              }
-            );
-          }
-
-          return ListView.builder(
-            itemCount: animesList.length,
-            itemBuilder: (context, index){
-              return ValueListenableBuilder(
-                valueListenable: appStateRepo.globalAnimeData[animesList[index]]!.notifier, 
-                builder: (context, animeData, child){
+      body: Builder(
+        builder: (context) {
+          AsyncValue<List<AnimeDataClass>> viewAnimeDataState = ref.watch(controller.animeDataNotifier);
+          return RefreshIndicator(
+            onRefresh: () => context.read(controller.animeDataNotifier.notifier).refresh(),
+            child: viewAnimeDataState.when(
+              data: (data) => ListView.builder(
+                itemCount: data.length,
+                itemBuilder: (context, index){
                   return CustomUserListAnimeDisplay(
-                    animeData: animeData, 
+                    animeData: data[index], 
                     displayType: AnimeRowDisplayType.viewMore,
                     skeletonMode: false,
                     key: UniqueKey()
                   );
+                },
+              ),
+              error: (obj, stackTrace) => DisplayErrorWidget(displayText: obj.toString()), 
+              loading: () => ListView.builder(
+                itemCount: getAnimeBasicDisplayTotalFetchCount(),
+                itemBuilder: (context, index){
+                  return ShimmerWidget(
+                    child: CustomUserListAnimeDisplay(
+                      animeData: AnimeDataClass.fetchNewInstance(-1), 
+                      skeletonMode: true,
+                      displayType: AnimeRowDisplayType.viewMore,
+                      key: UniqueKey()
+                    )
+                  );
                 }
-              );
-            },
+              )
+            ),
           );
         }
       )

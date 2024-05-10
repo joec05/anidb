@@ -1,3 +1,5 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 class AnimeMyListStatusClass {
   String? status;
   int score;
@@ -34,7 +36,7 @@ class AnimeMyListStatusClass {
 
   factory AnimeMyListStatusClass.generateNewInstance(){
     return AnimeMyListStatusClass(
-      '', 0, 0, false, '', '', [], ''
+      null, 0, 0, false, '', '', [], ''
     );
   }
 
@@ -53,4 +55,17 @@ class AnimeMyListStatusClass {
       myListStatus.updatedTime
     );
   }
+}
+
+class AnimeStatusNotifier extends Notifier<AnimeMyListStatusClass> {
+  @override
+  AnimeMyListStatusClass build() {
+    return AnimeMyListStatusClass.generateNewInstance();
+  }
+
+  void update(AnimeMyListStatusClass updatedAnimeListStatus) {
+    state = updatedAnimeListStatus;
+  }
+
+  AnimeMyListStatusClass getState() => state;
 }

@@ -1,23 +1,24 @@
 import 'package:anime_list_app/global_files.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ViewUserAnimeLists extends StatelessWidget {
+class ViewUserAnimeLists extends ConsumerWidget {
   const ViewUserAnimeLists({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return const _ViewUserAnimeListsStateful();
   }
 }
 
-class _ViewUserAnimeListsStateful extends StatefulWidget {
+class _ViewUserAnimeListsStateful extends ConsumerStatefulWidget {
   const _ViewUserAnimeListsStateful();
 
   @override
-  State<_ViewUserAnimeListsStateful> createState() => _ViewUserAnimeListsStatefulState();
+  ConsumerState<_ViewUserAnimeListsStateful> createState() => _ViewUserAnimeListsStatefulState();
 }
 
-class _ViewUserAnimeListsStatefulState extends State<_ViewUserAnimeListsStateful> with SingleTickerProviderStateMixin{
+class _ViewUserAnimeListsStatefulState extends ConsumerState<_ViewUserAnimeListsStateful> with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin{
   late UserAnimeController controller;
   late TabController _tabController;
 
@@ -36,9 +37,13 @@ class _ViewUserAnimeListsStatefulState extends State<_ViewUserAnimeListsStateful
   
   @override
   Widget build(BuildContext context) {
+    super.build(context);
+    final statusNotifiers = controller.statusNotifiers;
+    List<AsyncValue<UserAnimeListStatusClass>> watchProviders = List.generate(statusNotifiers.length, (i) => ref.watch(statusNotifiers[i]));
+
     return Scaffold(
       appBar: AppBar(
-        leading: defaultLeadingWidget(context),
+        leading: const AppBarWidget(),
         flexibleSpace: Container(
           decoration: defaultAppBarDecoration
         ),
@@ -77,103 +82,96 @@ class _ViewUserAnimeListsStatefulState extends State<_ViewUserAnimeListsStateful
             )
           ];
         },
-        body: ListenableBuilder(
-          listenable: Listenable.merge([
-            controller.watching, 
-            controller.planning, 
-            controller.completed, 
-            controller.onHold, 
-            controller.dropped
-          ]),
-          builder: (context, child) {
-            List<UserAnimeListStatusClass> lists = [
-              controller.watching.value, 
-              controller.planning.value, 
-              controller.completed.value, 
-              controller.onHold.value, 
-              controller.dropped.value
-            ];
-
-            List<ValueNotifier<UserAnimeListStatusClass>> listenables = [
-              controller.watching, 
-              controller.planning, 
-              controller.completed, 
-              controller.onHold, 
-              controller.dropped
-            ];
-
-            return TabBarView(
-              controller: _tabController,
-              children: [
-                for(int x = 0; x < lists.length; x++)
-                Builder(
+        body: TabBarView(
+          controller: _tabController,
+          children: [
+            for(int x = 0; x < watchProviders.length; x++)
+            watchProviders[x].when(
+              loading: () => Builder(
+                builder: (context) {
+                  return CustomScrollView(
+                    slivers: [
+                      SliverOverlapInjector(
+                        handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context)
+                      ),
+                      SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          childCount: skeletonLoadingDefaultLimit, 
+                          (c, i) {
+                            return ShimmerWidget(
+                              child: CustomUserListAnimeDisplay(
+                                animeData: AnimeDataClass.fetchNewInstance(-1),
+                                displayType: AnimeRowDisplayType.myUserList,
+                                skeletonMode: true,
+                                key: UniqueKey()
+                              )
+                            );
+                          }
+                        )
+                      ),
+                    ],
+                  );
+                }
+              ),
+              error: (obj, stackTrace) => Builder(
+                builder: (context) {
+                  return  CustomScrollView(
+                    slivers: [
+                      SliverOverlapInjector(
+                        handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context)
+                      ),
+                      SliverFillRemaining(
+                        hasScrollBody: false, 
+                        child: DisplayErrorWidget(displayText: obj.toString())
+                      ),
+                    ],
+                  );
+                }
+              ),
+              data: (data) {
+                return Builder(
                   builder: (context) {
                     return LoadMoreBottom(
-                      addBottomSpace: lists[x].canPaginate,
+                      addBottomSpace: data.canPaginate,
                       loadMore: () async{
-                        if(lists[x].canPaginate){
-                          lists[x].paginationStatus = PaginationStatus.loading;
-                          controller.fetchUserAnimesList(listenables[x]);
+                        if(data.canPaginate){
+                          context.read(statusNotifiers[x].notifier).paginate();
                         }
                       },
-                      status: lists[x].paginationStatus,
-                      refresh: null,
+                      status: data.paginationStatus,
+                      refresh: () => context.read(controller.statusNotifiers[x].notifier).refresh(),
                       child: CustomScrollView(
                         physics: const AlwaysScrollableScrollPhysics(),
                         slivers: <Widget>[
                           SliverOverlapInjector(
                             handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context)
                           ),
-                          ValueListenableBuilder(
-                            valueListenable: controller.isLoading,
-                            builder: (context, isLoadingValue, child) {
-                              if(isLoadingValue == true) {
-                                return SliverList(
-                                  delegate: SliverChildBuilderDelegate(
-                                    childCount: skeletonLoadingDefaultLimit, 
-                                    (c, i) {
-                                      return shimmerSkeletonWidget(
-                                        CustomUserListAnimeDisplay(
-                                          animeData: AnimeDataClass.fetchNewInstance(-1),
-                                          displayType: AnimeRowDisplayType.myUserList,
-                                          skeletonMode: true,
-                                          key: UniqueKey()
-                                        )
-                                      );
-                                    }
-                                  )
+                          SliverList(
+                            delegate: SliverChildBuilderDelegate(
+                              childCount: data.animeList.length, 
+                              (c, i) {
+                                return CustomUserListAnimeDisplay(
+                                  animeData: data.animeList[i],
+                                  displayType: AnimeRowDisplayType.myUserList,
+                                  skeletonMode: false,
+                                  key: UniqueKey()
                                 );
                               }
-                              return SliverList(
-                                delegate: SliverChildBuilderDelegate(
-                                  childCount: lists[x].animesList.length, 
-                                  (c, i) {
-                                    return ValueListenableBuilder(
-                                      valueListenable: appStateRepo.globalAnimeData[lists[x].animesList[i]]!.notifier, 
-                                      builder: (context, animeData, child){
-                                        return CustomUserListAnimeDisplay(
-                                          animeData: animeData,
-                                          displayType: AnimeRowDisplayType.myUserList,
-                                          skeletonMode: false,
-                                          key: UniqueKey()
-                                        );
-                                      }
-                                    );
-                                  }
-                                )
-                              );
-                            }
+                            )
                           )
                         ]
                       )
                     );
                   }
-                )
-              ]
-            );
-          }
+                );
+              }
+            )
+          ]
         )
       )
     );
   }
+  
+  @override
+  bool get wantKeepAlive => true;
 }

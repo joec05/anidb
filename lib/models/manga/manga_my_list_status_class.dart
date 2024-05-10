@@ -1,3 +1,5 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 class MangaMyListStatusClass{
   String? status;
   int score;
@@ -57,4 +59,17 @@ class MangaMyListStatusClass{
       myListStatus.updatedTime
     );
   }
+}
+
+class MangaStatusNotifier extends Notifier<MangaMyListStatusClass> {
+  @override
+  MangaMyListStatusClass build() {
+    return MangaMyListStatusClass.generateNewInstance();
+  }
+
+  void update(MangaMyListStatusClass updatedMangaListStatus) {
+    state = updatedMangaListStatus;
+  }
+
+  MangaMyListStatusClass getState() => state;
 }

@@ -1,8 +1,8 @@
 import 'package:anime_list_app/global_files.dart';
-import 'package:anime_list_app/widgets/display/custom_complete_character_display.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ViewMoreCharacters extends StatelessWidget {
+class ViewMoreCharacters extends ConsumerWidget {
   final String label;
   final CharacterBasicDisplayType displayType;
 
@@ -13,7 +13,7 @@ class ViewMoreCharacters extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return _ViewMoreCharactersStateful(
       label: label,
       displayType: displayType
@@ -21,7 +21,7 @@ class ViewMoreCharacters extends StatelessWidget {
   }
 }
 
-class _ViewMoreCharactersStateful extends StatefulWidget {
+class _ViewMoreCharactersStateful extends ConsumerStatefulWidget {
   final String label;
   final CharacterBasicDisplayType displayType;
 
@@ -31,15 +31,15 @@ class _ViewMoreCharactersStateful extends StatefulWidget {
   });
 
   @override
-  State<_ViewMoreCharactersStateful> createState() => _ViewMoreCharactersStatefulState();
+  ConsumerState<_ViewMoreCharactersStateful> createState() => _ViewMoreCharactersStatefulState();
 }
 
-class _ViewMoreCharactersStatefulState extends State<_ViewMoreCharactersStateful>{
-  late CharacterBasicController controller;
+class _ViewMoreCharactersStatefulState extends ConsumerState<_ViewMoreCharactersStateful>{
+  late ViewMoreCharactersController controller;
 
   @override void initState(){
     super.initState();
-    controller = CharacterBasicController(context, widget.displayType);
+    controller = ViewMoreCharactersController(context, widget.displayType);
     controller.initializeController();
   }
 
@@ -52,50 +52,42 @@ class _ViewMoreCharactersStatefulState extends State<_ViewMoreCharactersStateful
   Widget build(BuildContext context){
     return Scaffold(
       appBar: AppBar(
-        leading: defaultLeadingWidget(context),
+        leading: const AppBarWidget(),
         flexibleSpace: Container(
           decoration: defaultAppBarDecoration
         ),
         title: Text(widget.label), titleSpacing: defaultAppBarTitleSpacing,
       ),
-      body: ListenableBuilder(
-        listenable: Listenable.merge([
-          controller.isLoading,
-          controller.charactersList
-        ]),
-        builder: (context, child) {
-          bool isLoading = controller.isLoading.value;
-          List<int> charactersList = controller.charactersList.value;
-
-          if(isLoading) {
-            return ListView.builder(
-              itemCount: getAnimeBasicDisplayTotalFetchCount(),
-              itemBuilder: (context, index){
-                return shimmerSkeletonWidget(
-                  CustomCompleteCharacterDisplay(
-                    characterData: CharacterDataClass.fetchNewInstance(-1), 
-                    skeletonMode: true,
-                    key: UniqueKey()
-                  )
-                );
-              }
-            );
-          }
-
-          return ListView.builder(
-            itemCount: charactersList.length,
-            itemBuilder: (context, index){
-              return ValueListenableBuilder(
-                valueListenable: appStateRepo.globalCharacterData[charactersList[index]]!.notifier, 
-                builder: (context, characterData, child){
+      body: Builder(
+        builder: (context) {
+          AsyncValue<List<CharacterDataClass>> viewCharacterDataState = ref.watch(controller.characterDataNotifier);
+          return RefreshIndicator(
+            onRefresh: () => context.read(controller.characterDataNotifier.notifier).refresh(),
+            child: viewCharacterDataState.when(
+              data: (data) => ListView.builder(
+                itemCount: data.length,
+                itemBuilder: (context, index){
                   return CustomCompleteCharacterDisplay(
-                    characterData: characterData, 
+                    characterData: data[index], 
                     skeletonMode: false,
                     key: UniqueKey()
                   );
+                },
+              ),
+              error: (obj, stackTrace) => DisplayErrorWidget(displayText: obj.toString()), 
+              loading: () => ListView.builder(
+                itemCount: getAnimeBasicDisplayTotalFetchCount(),
+                itemBuilder: (context, index){
+                  return ShimmerWidget(
+                    child: CustomCompleteCharacterDisplay(
+                      characterData: CharacterDataClass.fetchNewInstance(-1), 
+                      skeletonMode: true,
+                      key: UniqueKey()
+                    )
+                  );
                 }
-              );
-            },
+              )
+            ),
           );
         }
       )

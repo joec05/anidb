@@ -29,6 +29,7 @@ class CustomBasicVoiceDisplayState extends State<CustomBasicVoiceDisplay>{
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: (){},
+      behavior: HitTestBehavior.opaque,
       child: Center(
         child: Container(
           width: animeGridDisplayWidgetSize.width,
@@ -44,7 +45,7 @@ class CustomBasicVoiceDisplayState extends State<CustomBasicVoiceDisplay>{
                   SizedBox(
                     width: animeGridDisplayCoverSize.width,
                     height: animeGridDisplayCoverSize.height,
-                    child: generateCachedImage(voiceData.personCover)
+                    child: CachedImageWidget(imageClass: voiceData.personCover)
                   )
                 ],
               ),

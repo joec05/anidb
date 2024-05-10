@@ -1,18 +1,11 @@
+import 'dart:async';
 import 'package:anime_list_app/global_files.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class HomeController {
   final BuildContext context;
-  ValueNotifier<List<int>> seasonAnimeList = ValueNotifier([]);
-  ValueNotifier<List<int>> topAnimeList = ValueNotifier([]);
-  ValueNotifier<List<int>> topAiringAnimeList = ValueNotifier([]);
-  ValueNotifier<List<int>> topUpcomingAnimeList = ValueNotifier([]);
-  ValueNotifier<List<int>> mostPopularAnimeList = ValueNotifier([]);
-  ValueNotifier<List<int>> topFavouritedAnimeList = ValueNotifier([]);
-  ValueNotifier<List<int>> topMangaList = ValueNotifier([]);
-  ValueNotifier<List<int>> mostPopularMangaList = ValueNotifier([]);
-  ValueNotifier<List<int>> topFavouritedMangaList = ValueNotifier([]);
-  ValueNotifier<List<int>> topCharactersList = ValueNotifier([]);
+  late AutoDisposeAsyncNotifierProvider<HomeNotifier, List<HomeFrontDisplayModel>> homeNotifier;
 
   HomeController (
     this.context
@@ -21,228 +14,154 @@ class HomeController {
   bool get mounted => context.mounted;
 
   void initializeController(){
-    fetchTopAnime();
-    fetchTopFavouritedAnime();
-    fetchMostPopularAnime();
-    fetchTopAiringAnime();
-    fetchTopUpcomingAnime();
-    fetchSeasonAnime();
-    fetchTopManga();
-    fetchTopFavouritedManga();
-    fetchMostPopularManga();
-    fetchTopCharacters();
+    homeNotifier = AsyncNotifierProvider.autoDispose<HomeNotifier, List<HomeFrontDisplayModel>>(
+      () => HomeNotifier(context)
+    );
   }
 
   void dispose(){
-    seasonAnimeList.dispose();
-    topAnimeList.dispose();
-    topAiringAnimeList.dispose();
-    topUpcomingAnimeList.dispose();
-    mostPopularAnimeList.dispose();
-    topFavouritedAnimeList.dispose();
-    topMangaList.dispose();
-    mostPopularMangaList.dispose();
-    topFavouritedMangaList.dispose();
-    topCharactersList.dispose();
   }
+}
 
-  void fetchSeasonAnime() async{
-    var res = await apiCallRepo.runAPICall(
-      context,
-      APICallType.get,
-      malApiUrl,
-      '$malApiUrl/anime/season/${DateTime.now().year}/${getCurrentSeason()}?fields=$fetchAllAnimeFieldsStr&limit=${getAnimeBasicDisplayFetchCount()}',
-      {}
-    );
-    if(res != null) {
-      var data = res['data'];
-      if(mounted) {
-        for(int i = 0; i < data.length; i++){
-          updateAnimeData(data[i]['node']);
-          seasonAnimeList.value.add(data[i]['node']['id']);
+class HomeNotifier extends AutoDisposeAsyncNotifier<List<HomeFrontDisplayModel>> {
+  final BuildContext context;
+  late AnimeRepository animeRepository;
+  late MangaRepository mangaRepository;
+  late CharacterRepository characterRepository;
+  List<HomeFrontDisplayModel> displayed = [
+    HomeFrontDisplayModel(
+      'Animes this season', 
+      AnimeBasicDisplayType.season, 
+      []
+    ),
+    HomeFrontDisplayModel(
+      'Airing now', 
+      AnimeBasicDisplayType.airing, 
+      []
+    ),
+    HomeFrontDisplayModel(
+      'Upcoming anime', 
+      AnimeBasicDisplayType.upcoming, 
+      []
+    ),
+    HomeFrontDisplayModel(
+      'Top scoring anime', 
+      AnimeBasicDisplayType.top, 
+      []
+    ),
+    HomeFrontDisplayModel(
+      'Popular anime', 
+      AnimeBasicDisplayType.mostPopular, 
+      []
+    ),
+    HomeFrontDisplayModel(
+      'Top favourited anime', 
+      AnimeBasicDisplayType.favourites, 
+      []
+    ),
+    HomeFrontDisplayModel(
+      'Top scoring mangas',
+      MangaBasicDisplayType.top, 
+      []
+    ),
+    HomeFrontDisplayModel(
+      'Popular mangas',
+      MangaBasicDisplayType.mostPopular, 
+      [],
+    ),
+    HomeFrontDisplayModel(
+      'Top favorited mangas',
+      MangaBasicDisplayType.favourites, 
+      []
+    ),
+    HomeFrontDisplayModel(
+      'Top characters',
+      CharacterBasicDisplayType.top, 
+      []
+    ),
+  ];
+
+  HomeNotifier(this.context);
+
+  @override
+  FutureOr<List<HomeFrontDisplayModel>> build() async {
+    state = const AsyncLoading();
+    animeRepository = AnimeRepository(context);
+    mangaRepository = MangaRepository(context);
+    characterRepository = CharacterRepository(context);
+    APIResponseModel response = await animeRepository.fetchSeasonAnime();
+    if(response.error != null) {
+      state = AsyncError(response.error!.object, response.error!.stackTrace);
+      throw Exception(response.error!.object);
+    } else {
+      displayed[0].dataList = response.data;
+      APIResponseModel response2 = await animeRepository.fetchTopAiringAnime();
+      if(response2.error != null) {
+        state = AsyncError(response2.error!.object, response2.error!.stackTrace);
+        throw Exception(response.error!.object);
+      } else {
+        displayed[1].dataList = response2.data;
+        APIResponseModel response3 = await animeRepository.fetchTopUpcomingAnime();
+        if(response3.error != null) {
+          state = AsyncError(response3.error!.object, response3.error!.stackTrace);
+          throw Exception(response.error!.object);
+        } else {
+          displayed[2].dataList = response3.data;
+          APIResponseModel response4 = await animeRepository.fetchTopAnime();
+          if(response4.error != null) {
+            state = AsyncError(response4.error!.object, response4.error!.stackTrace);
+            throw Exception(response.error!.object);
+          } else {
+            displayed[3].dataList = response4.data;
+            APIResponseModel response5 = await animeRepository.fetchMostPopularAnime();
+            if(response5.error != null) {
+              state = AsyncError(response5.error!.object, response5.error!.stackTrace);
+              throw Exception(response.error!.object);
+            } else {
+              displayed[4].dataList = response5.data;
+              APIResponseModel response6 = await animeRepository.fetchTopFavouritedAnime();
+              if(response6.error != null) {
+                state = AsyncError(response6.error!.object, response6.error!.stackTrace);
+                throw Exception(response.error!.object);
+              } else {
+                displayed[5].dataList = response6.data;
+                APIResponseModel response7 = await mangaRepository.fetchTopManga();
+                if(response7.error != null) {
+                  state = AsyncError(response7.error!.object, response7.error!.stackTrace);
+                  throw Exception(response.error!.object);
+                } else {
+                  displayed[6].dataList = response7.data;
+                  APIResponseModel response8 = await mangaRepository.fetchMostPopularManga();
+                  if(response8.error != null) {
+                    state = AsyncError(response8.error!.object, response8.error!.stackTrace);
+                    throw Exception(response.error!.object);
+                  } else {
+                    displayed[7].dataList = response8.data;
+                    APIResponseModel response9 = await mangaRepository.fetchTopFavouritedManga();
+                    if(response9.error != null) {
+                      state = AsyncError(response9.error!.object, response9.error!.stackTrace);
+                      throw Exception(response.error!.object);
+                    } else {
+                      displayed[8].dataList = response9.data;
+                      APIResponseModel response10 = await characterRepository.fetchTopCharacters();
+                      if(response10.error != null) {
+                        state = AsyncError(response10.error!.object, response10.error!.stackTrace);
+                        throw Exception(response.error!.object);
+                      } else {
+                        displayed[9].dataList = response10.data;
+                        state = AsyncData(displayed);
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
         }
-        seasonAnimeList.value = [...seasonAnimeList.value];
       }
     }
+    return displayed;
   }
 
-  void fetchTopAnime() async{
-    var res = await apiCallRepo.runAPICall(
-      context,
-      APICallType.get,
-      malApiUrl,
-      '$malApiUrl/anime/ranking?$fetchAllAnimeFieldsStr&$fetchAllAnimeFieldsStr&ranking_type=all&limit=${getAnimeBasicDisplayFetchCount()}',
-      {}
-    );
-    if(res != null) {
-      var data = res['data'];
-      if(mounted) {
-        for(int i = 0; i < data.length; i++){
-          updateAnimeData(data[i]['node']);
-          topAnimeList.value.add(data[i]['node']['id']);
-        }
-        topAnimeList.value = [...topAnimeList.value];
-      }
-    }
-  }
-
-  void fetchTopAiringAnime() async{
-    var res = await apiCallRepo.runAPICall(
-      context,
-      APICallType.get,
-      malApiUrl,
-      '$malApiUrl/anime/ranking?$fetchAllAnimeFieldsStr&ranking_type=airing&limit=${getAnimeBasicDisplayFetchCount()}',
-      {}
-    );
-    if(res != null) {
-      var data = res['data'];
-      if(mounted) {
-        for(int i = 0; i < data.length; i++){
-          updateAnimeData(data[i]['node']);
-          topAiringAnimeList.value.add(data[i]['node']['id']);
-        }
-        topAiringAnimeList.value = [...topAiringAnimeList.value];
-      }
-    }
-  }
-
-  void fetchTopUpcomingAnime() async{
-    var res = await apiCallRepo.runAPICall(
-      context,
-      APICallType.get,
-      malApiUrl,
-      '$malApiUrl/anime/ranking?$fetchAllAnimeFieldsStr&ranking_type=upcoming&limit=${getAnimeBasicDisplayFetchCount()}',
-      {}
-    );
-    if(res != null) {
-      var data = res['data'];
-      if(mounted) {
-        for(int i = 0; i < data.length; i++){
-          updateAnimeData(data[i]['node']);
-          topUpcomingAnimeList.value.add(data[i]['node']['id']);
-        }
-        topUpcomingAnimeList.value = [...topUpcomingAnimeList.value];
-      }
-    }
-  }
-
-  void fetchMostPopularAnime() async{
-    var res = await apiCallRepo.runAPICall(
-      context,
-      APICallType.get,
-      malApiUrl,
-      '$malApiUrl/anime/ranking?$fetchAllAnimeFieldsStr&ranking_type=bypopularity&limit=${getAnimeBasicDisplayFetchCount()}',
-      {}
-    );
-    if(res != null) {
-      var data = res['data'];
-      if(mounted) {
-        for(int i = 0; i < data.length; i++){
-          updateAnimeData(data[i]['node']);
-          mostPopularAnimeList.value.add(data[i]['node']['id']);
-        }
-        mostPopularAnimeList.value = [...mostPopularAnimeList.value];
-      }
-    }
-  }
-
-  void fetchTopFavouritedAnime() async{
-    var res = await apiCallRepo.runAPICall(
-      context,
-      APICallType.get,
-      malApiUrl,
-      '$malApiUrl/anime/ranking?$fetchAllAnimeFieldsStr&ranking_type=favorite&limit=${getAnimeBasicDisplayFetchCount()}',
-      {}
-    );
-    if(res != null) {
-      var data = res['data'];
-      if(mounted) {
-        for(int i = 0; i < data.length; i++){
-          updateAnimeData(data[i]['node']);
-          topFavouritedAnimeList.value.add(data[i]['node']['id']);
-        }
-        topFavouritedAnimeList.value = [...topFavouritedAnimeList.value];
-      }
-    }
-  }
-
-  void fetchTopManga() async{
-    var res = await apiCallRepo.runAPICall(
-      context,
-      APICallType.get,
-      malApiUrl,
-      '$malApiUrl/manga/ranking?$fetchAllMangaFieldsStr&ranking_type=manga&limit=${getAnimeBasicDisplayFetchCount()}',
-      {}
-    );
-    if(res != null) {
-      var data = res['data'];
-      if(mounted) {
-        for(int i = 0; i < data.length; i++){
-          updateMangaData(data[i]['node']);
-          topMangaList.value.add(data[i]['node']['id']);
-        }
-        topMangaList.value = [...topMangaList.value];
-      }  
-    }
-  }
-
-  void fetchTopFavouritedManga() async{
-    var res = await apiCallRepo.runAPICall(
-      context,
-      APICallType.get,
-      malApiUrl,
-      '$malApiUrl/manga/ranking?$fetchAllMangaFieldsStr&ranking_type=favorite&limit=${getAnimeBasicDisplayFetchCount()}',
-      {}
-    );
-    if(res != null) {
-      var data = res['data'];
-      if(mounted) {
-        for(int i = 0; i < data.length; i++){
-          updateMangaData(data[i]['node']);
-          topFavouritedMangaList.value.add(data[i]['node']['id']);
-        }
-        topFavouritedMangaList.value = [...topFavouritedMangaList.value];
-      }
-    }
-  }
-
-  void fetchMostPopularManga() async{
-    var res = await apiCallRepo.runAPICall(
-      context,
-      APICallType.get,
-      malApiUrl,
-      '$malApiUrl/manga/ranking?$fetchAllMangaFieldsStr&ranking_type=bypopularity&limit=${getAnimeBasicDisplayFetchCount()}',
-      {}
-    );
-    if(res != null) {
-      var data = res['data'];
-      if(mounted) {
-        for(int i = 0; i < data.length; i++){
-          updateMangaData(data[i]['node']);
-          mostPopularMangaList.value.add(data[i]['node']['id']);
-        }
-        mostPopularMangaList.value = [...mostPopularMangaList.value];
-      }
-    }
-  }
-
-  void fetchTopCharacters() async{
-    var res = await apiCallRepo.runAPICall(
-      context,
-      APICallType.get,
-      jikanApiUrl,
-      '$jikanApiUrl/top/characters?limit=${getAnimeBasicDisplayFetchCount()}',
-      {}
-    );
-    if(res != null) {
-      var data = res['data'];
-      if(mounted) {
-        for(int i = 0; i < data.length; i++){
-          updateBasicCharacterData(data[i]);
-          topCharactersList.value.add(data[i]['mal_id']);
-        }
-        topCharactersList.value = [...topCharactersList.value];
-      }
-    }
-  }
+  Future<void> refresh() async => await build();
 }

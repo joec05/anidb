@@ -1,7 +1,8 @@
-import 'package:anime_list_app/global_files.dart'; 
+import 'package:anime_list_app/global_files.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class SearchedCharactersWidget extends StatelessWidget {
+class SearchedCharactersWidget extends ConsumerWidget {
   final String searchedText;
   final BuildContext absorberContext;
 
@@ -12,7 +13,7 @@ class SearchedCharactersWidget extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return _SearchedCharactersWidgetStateful(
       searchedText: searchedText,
       absorberContext: absorberContext
@@ -20,7 +21,7 @@ class SearchedCharactersWidget extends StatelessWidget {
   }
 }
 
-class _SearchedCharactersWidgetStateful extends StatefulWidget {
+class _SearchedCharactersWidgetStateful extends ConsumerStatefulWidget {
   final String searchedText;
   final BuildContext absorberContext;
   
@@ -30,11 +31,11 @@ class _SearchedCharactersWidgetStateful extends StatefulWidget {
   });
 
   @override
-  State<_SearchedCharactersWidgetStateful> createState() => _SearchedCharactersWidgetStatefulState();
+  ConsumerState<_SearchedCharactersWidgetStateful> createState() => _SearchedCharactersWidgetStatefulState();
 }
 
 
-class _SearchedCharactersWidgetStatefulState extends State<_SearchedCharactersWidgetStateful> with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin{
+class _SearchedCharactersWidgetStatefulState extends ConsumerState<_SearchedCharactersWidgetStateful> with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin{
   late SearchedCharactersController controller;
 
   @override void initState() {
@@ -57,16 +58,36 @@ class _SearchedCharactersWidgetStatefulState extends State<_SearchedCharactersWi
         SliverOverlapInjector(
           handle: NestedScrollView.sliverOverlapAbsorberHandleFor(widget.absorberContext)
         ),
-        ValueListenableBuilder(
-          valueListenable: controller.isLoading,
-          builder: (context, isLoadingValue, child) {
-            if(isLoadingValue == true) {
-              return SliverList(
+        Builder(
+          builder: (context) {
+            if(controller.searchedText.isEmpty) {
+              return const SliverToBoxAdapter();
+            }
+    
+            AsyncValue<List<CharacterDataClass>> viewCharacterDataState = ref.watch(controller.searchedCharactersNotifier);
+            return viewCharacterDataState.when(
+              data: (data) => SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  childCount: data.length, 
+                  (c, i) {
+                    return CustomRowCharacterDisplay(
+                      characterData: data[i],
+                      skeletonMode: false,
+                      key: UniqueKey()
+                    );
+                  }
+                )
+              ),
+              error: (obj, stackTrace) => SliverFillRemaining(
+                hasScrollBody: false, 
+                child: DisplayErrorWidget(displayText: obj.toString())
+              ),
+              loading: () => SliverList(
                 delegate: SliverChildBuilderDelegate(
                   childCount: skeletonLoadingDefaultLimit, 
                   (c, i) {
-                    return shimmerSkeletonWidget(
-                      CustomRowCharacterDisplay(
+                    return ShimmerWidget(
+                      child: CustomRowCharacterDisplay(
                         characterData: CharacterDataClass.fetchNewInstance(-1),
                         skeletonMode: true,
                         key: UniqueKey()
@@ -74,33 +95,7 @@ class _SearchedCharactersWidgetStatefulState extends State<_SearchedCharactersWi
                     );
                   }
                 )
-              );
-            }
-
-            return ValueListenableBuilder(
-              valueListenable: controller.charactersList,
-              builder: (context, charactersList, child) {
-                return SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    childCount: charactersList.length, 
-                    (c, i) {
-                      if(appStateRepo.globalCharacterData[charactersList[i]] != null){
-                        return ValueListenableBuilder(
-                          valueListenable: appStateRepo.globalCharacterData[charactersList[i]]!.notifier, 
-                          builder: (context, characterData, child){
-                            return CustomRowCharacterDisplay(
-                              characterData: characterData,
-                              skeletonMode: false,
-                              key: UniqueKey()
-                            );
-                          }
-                        );
-                      }
-                      return Container();
-                    }
-                  )
-                );
-              }
+              )
             );
           }
         )

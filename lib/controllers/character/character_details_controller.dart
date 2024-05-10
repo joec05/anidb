@@ -1,10 +1,14 @@
-import 'package:anime_list_app/global_files.dart';
+import 'dart:async';
+import 'package:anime_list_app/models/api/api_response_model.dart';
+import 'package:anime_list_app/models/character/character_data_class.dart';
+import 'package:anime_list_app/repository/character_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class CharacterDetailsController {
   final BuildContext context;
   final int characterID;
-  ValueNotifier<bool> isLoading = ValueNotifier(true);
+  late AutoDisposeAsyncNotifierProvider<CharacterDetailsNotifier, CharacterDataClass> characterDataNotifier;
 
   CharacterDetailsController (
     this.context,
@@ -13,28 +17,38 @@ class CharacterDetailsController {
   
   bool get mounted => context.mounted;
 
-  void initializeController(){
-    fetchCharacterDetails();
+  void initializeController() {
+    characterDataNotifier = AsyncNotifierProvider.autoDispose<CharacterDetailsNotifier, CharacterDataClass>(
+      () => CharacterDetailsNotifier(context, characterID)
+    );
   }
 
   void dispose(){
-    isLoading.dispose();
+  }  
+}
+
+class CharacterDetailsNotifier extends AutoDisposeAsyncNotifier<CharacterDataClass>{
+  final BuildContext context;
+  final int characterID;
+  late CharacterRepository characterRepository;
+  CharacterDataClass characterData = CharacterDataClass.fetchNewInstance(-1);
+
+  CharacterDetailsNotifier(this.context, this.characterID);
+
+  @override
+  FutureOr<CharacterDataClass> build() async {
+    state = const AsyncLoading();
+    characterRepository = CharacterRepository(context);
+    APIResponseModel response = await characterRepository.fetchCharacterDetails(characterID);
+    if(response.error != null) {
+      state = AsyncError(response.error!.object, response.error!.stackTrace);
+      throw Exception(response.error!.object);
+    } else {
+      characterData = response.data;
+      state = AsyncData(characterData);
+    }
+    return characterData;
   }
 
-  void fetchCharacterDetails() async{
-    var res = await apiCallRepo.runAPICall(
-      context,
-      APICallType.get,
-      jikanApiUrl,
-      '$jikanApiUrl/characters/$characterID/full',
-      {}
-    );
-    if(res != null) {
-      var data = res['data'];
-      updateCharacterData(data);
-      if(mounted) {
-        isLoading.value = false;
-      }
-    }
-  }
+  Future<void> refresh() async => await build();
 }

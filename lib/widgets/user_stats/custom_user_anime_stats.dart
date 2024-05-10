@@ -351,12 +351,10 @@ class CustomUserAnimeStatsWidgetState extends State<CustomUserAnimeStatsWidget> 
                       SizedBox(
                         height: getScreenHeight() * 0.015
                       ),
-                      Container(
-                        child: generateBarChart(context, 
-                          barChartData[i].model,
-                          barChartData[i].legend,
-                          barChartData[i].totalValue
-                        )
+                      VerticalBarChartWidget(
+                        bardata: barChartData[i].model,
+                        legend: barChartData[i].legend,
+                        sum: barChartData[i].totalValue
                       ),
                       SizedBox(
                         height: getScreenHeight() * 0.025

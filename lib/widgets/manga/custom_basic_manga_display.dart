@@ -35,6 +35,7 @@ class CustomBasicMangaDisplayState extends State<CustomBasicMangaDisplay>{
     if(!widget.skeletonMode){
       return GestureDetector(
         onTap: () => context.pushNamed('view-manga-details', pathParameters: {'mangaID': '${mangaData.id}'}),
+        behavior: HitTestBehavior.opaque,
         child: Center(
           child: Container(
             width: animeGridDisplayWidgetSize.width,
@@ -48,7 +49,7 @@ class CustomBasicMangaDisplayState extends State<CustomBasicMangaDisplay>{
                 SizedBox(
                   width: animeGridDisplayCoverSize.width,
                   height: animeGridDisplayCoverSize.height,
-                  child: generateCachedImage(mangaData.cover)
+                  child: CachedImageWidget(imageClass: mangaData.cover)
                 ),
                 SizedBox(
                   height: getScreenHeight() * 0.01

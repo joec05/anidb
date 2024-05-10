@@ -1,11 +1,12 @@
+import 'dart:async';
 import 'package:anime_list_app/global_files.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class SearchedAnimeController {
   final BuildContext context;
   final String searchedText;
-  ValueNotifier<List<int>> animesList = ValueNotifier([]);
-  ValueNotifier<bool> isLoading = ValueNotifier(false);
+  late AutoDisposeAsyncNotifierProvider<SearchedAnimeNotifier, List<AnimeDataClass>> searchedAnimeNotifier;
 
   SearchedAnimeController(
     this.context,
@@ -15,35 +16,34 @@ class SearchedAnimeController {
   bool get mounted => context.mounted;
 
   void initializeController() {
-    if(mounted){
-      fetchUserAnimesList();
-    }
+    searchedAnimeNotifier = AsyncNotifierProvider.autoDispose<SearchedAnimeNotifier, List<AnimeDataClass>>(
+      () => SearchedAnimeNotifier(context, searchedText)
+    );
   }
-  
-  void fetchUserAnimesList() async{
-    if(searchedText.isNotEmpty){
-      isLoading.value = true;
-      var res = await apiCallRepo.runAPICall(
-        context,
-        APICallType.get,
-        malApiUrl,
-        '$malApiUrl/anime?$fetchAllAnimeFieldsStr&q=$searchedText&limit=$searchFetchLimit',
-        {}
-      );
-      if(res != null) {
-        var data = res['data'];
-        if(mounted) {
-          for(int i = 0; i < data.length; i++){
-            updateAnimeData(data[i]['node']);
-            int id = data[i]['node']['id'];
-            if(appStateRepo.globalAnimeData[id] != null){
-              animesList.value.add(id);
-            }
-          }
-          animesList.value = [...animesList.value];
-          isLoading.value = false;
-        }
-      }
+}
+
+class SearchedAnimeNotifier extends AutoDisposeAsyncNotifier<List<AnimeDataClass>>{
+  final BuildContext context;
+  final String searchedText;
+  late AnimeRepository animeRepository;
+  List<AnimeDataClass> animeList = [];
+
+  SearchedAnimeNotifier(this.context, this.searchedText);
+
+  @override
+  FutureOr<List<AnimeDataClass>> build() async {
+    state = const AsyncLoading();
+    animeRepository = AnimeRepository(context);
+    APIResponseModel response = await animeRepository.searchAnime(searchedText);
+    if(response.error != null) {
+      state = AsyncError(response.error!.object, response.error!.stackTrace);
+      throw Exception(response.error!.object);
+    } else {
+      animeList = response.data;
+      state = AsyncData(animeList);
     }
+    return animeList;
   }
+
+  Future<void> refresh() async => await build();
 }

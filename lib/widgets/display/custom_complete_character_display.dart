@@ -33,6 +33,7 @@ class CustomCompleteCharacterDisplayState extends State<CustomCompleteCharacterD
     if(!widget.skeletonMode){
       return GestureDetector(
         onTap: () => context.pushNamed('view-character-details', pathParameters: {'characterID': '${characterData.id}'}),
+        behavior: HitTestBehavior.opaque,
         child: Center(
           child: Container(
             padding: EdgeInsets.symmetric(
@@ -46,7 +47,7 @@ class CustomCompleteCharacterDisplayState extends State<CustomCompleteCharacterD
                 SizedBox(
                   width: animeDisplayCoverSize.width,
                   height: animeDisplayCoverSize.height,
-                  child: generateCachedImage(characterData.cover)
+                  child: CachedImageWidget(imageClass: characterData.cover)
                 ),
                 SizedBox(
                   width: getScreenWidth() * 0.025
@@ -83,7 +84,7 @@ class CustomCompleteCharacterDisplayState extends State<CustomCompleteCharacterD
                             SizedBox(
                               height: getScreenHeight() * 0.01
                             ),
-                            Text(characterData.about ?? '', maxLines: 3, style: TextStyle(
+                            Text(characterData.about ?? 'No description provided', maxLines: 3, style: TextStyle(
                               fontSize: defaultTextFontSize * 0.8,
                               fontWeight: FontWeight.w500
                             )),

@@ -1,36 +1,11 @@
 import 'dart:async';
 import 'package:anime_list_app/global_files.dart';
 import 'package:flutter/material.dart';
-
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class UserAnimeController {
   BuildContext context;
-  ValueNotifier<UserAnimeListStatusClass> watching = ValueNotifier(
-    UserAnimeListStatusClass(
-      [], 'watching', false, PaginationStatus.loaded
-    )
-  );
-  ValueNotifier<UserAnimeListStatusClass> planning = ValueNotifier(
-    UserAnimeListStatusClass(
-      [], 'plan_to_watch', false, PaginationStatus.loaded
-    )
-  );
-  ValueNotifier<UserAnimeListStatusClass> completed = ValueNotifier(
-    UserAnimeListStatusClass(
-      [], 'completed', false, PaginationStatus.loaded
-    )
-  );
-  ValueNotifier<UserAnimeListStatusClass> dropped = ValueNotifier(
-    UserAnimeListStatusClass(
-      [], 'dropped', false, PaginationStatus.loaded
-    )
-  );
-  ValueNotifier<UserAnimeListStatusClass> onHold = ValueNotifier(
-    UserAnimeListStatusClass(
-      [], 'on_hold', false, PaginationStatus.loaded
-    )
-  );
-  ValueNotifier<bool> isLoading = ValueNotifier(true);
+  late List<AutoDisposeAsyncNotifierProvider<MyAnimeListNotifier, UserAnimeListStatusClass>> statusNotifiers = [];
   late StreamSubscription updateUserAnimeListStreamClassSubscription;
 
   UserAnimeController(
@@ -40,45 +15,62 @@ class UserAnimeController {
   bool get mounted => context.mounted;
 
   void initializeController() {
-    fetchUserAnimesList(watching);
-    fetchUserAnimesList(planning);
-    fetchUserAnimesList(completed);
-    fetchUserAnimesList(dropped);
-    fetchUserAnimesList(onHold);
+    statusNotifiers = [
+      AsyncNotifierProvider.autoDispose<MyAnimeListNotifier, UserAnimeListStatusClass>(() => 
+        MyAnimeListNotifier(
+          context,
+          UserAnimeListStatusClass(
+            [], 'watching', false, PaginationStatus.loaded
+          )
+        )
+      ),
+      AsyncNotifierProvider.autoDispose<MyAnimeListNotifier, UserAnimeListStatusClass>(() => 
+        MyAnimeListNotifier(
+          context,
+          UserAnimeListStatusClass(
+            [], 'plan_to_watch', false, PaginationStatus.loaded
+          )
+        )
+      ),
+      AsyncNotifierProvider.autoDispose<MyAnimeListNotifier, UserAnimeListStatusClass>(() => 
+        MyAnimeListNotifier(
+          context,
+          UserAnimeListStatusClass(
+            [], 'completed', false, PaginationStatus.loaded
+          )
+        )
+      ),
+      AsyncNotifierProvider.autoDispose<MyAnimeListNotifier, UserAnimeListStatusClass>(() => 
+        MyAnimeListNotifier(
+          context,
+          UserAnimeListStatusClass(
+            [], 'dropped', false, PaginationStatus.loaded
+          )
+        )
+      ),
+      AsyncNotifierProvider.autoDispose<MyAnimeListNotifier, UserAnimeListStatusClass>(() => 
+        MyAnimeListNotifier(
+          context,
+          UserAnimeListStatusClass(
+            [], 'on_hold', false, PaginationStatus.loaded
+          )
+        )
+      ),
+    ];
     updateUserAnimeListStreamClassSubscription = UpdateUserAnimeListStreamClass().userAnimeListStream.listen((UserAnimeListStreamControllerClass data) {
       if(mounted){
-        int id = data.animeData.id;
-        String status = data.animeData.myListStatus!.status!; 
-
-        if(mounted) {
-          watching.value.animesList.remove(id);
-          planning.value.animesList.remove(id);
-          completed.value.animesList.remove(id);
-          dropped.value.animesList.remove(id);
-          onHold.value.animesList.remove(id);
-
-          if(status == 'watching'){
-            watching.value.animesList.insert(0, id);
-            watching.value.animesList.sort((a, b) => appStateRepo.globalAnimeData[a]!.notifier.value.title.compareTo(appStateRepo.globalAnimeData[b]!.notifier.value.title));
-          }else if(status == 'plan_to_watch'){
-            planning.value.animesList.insert(0, id);
-            planning.value.animesList.sort((a, b) => appStateRepo.globalAnimeData[a]!.notifier.value.title.compareTo(appStateRepo.globalAnimeData[b]!.notifier.value.title));
-          }else if(status == 'completed'){
-            completed.value.animesList.insert(0, id);
-            completed.value.animesList.sort((a, b) => appStateRepo.globalAnimeData[a]!.notifier.value.title.compareTo(appStateRepo.globalAnimeData[b]!.notifier.value.title));
-          }else if(status == 'dropped'){
-            dropped.value.animesList.insert(0, id);
-            dropped.value.animesList.sort((a, b) => appStateRepo.globalAnimeData[a]!.notifier.value.title.compareTo(appStateRepo.globalAnimeData[b]!.notifier.value.title));
-          }else if(status == 'on_hold'){
-            onHold.value.animesList.insert(0, id);
-            onHold.value.animesList.sort((a, b) => appStateRepo.globalAnimeData[a]!.notifier.value.title.compareTo(appStateRepo.globalAnimeData[b]!.notifier.value.title));
+        AnimeDataClass animeData = data.animeData;
+        int id = animeData.id;
+        if(context.mounted) {
+          AnimeMyListStatusClass? myAnimeStatus = context.read(appStateRepo.globalAnimeData[id]!.notifier).getState();
+          String? status = myAnimeStatus.status;
+          if(mounted) {
+            for(int i = 0; i < statusNotifiers.length; i++) {
+              context.read(statusNotifiers[i].notifier).removeByIDAndAddByStatus(
+                id, status, data.animeData
+              );
+            }
           }
-
-          watching.value = watching.value.copy();
-          planning.value = planning.value.copy();
-          completed.value = completed.value.copy();
-          onHold.value = onHold.value.copy();
-          dropped.value = dropped.value.copy();
         }
       }
     });
@@ -86,62 +78,59 @@ class UserAnimeController {
 
   void dispose(){
     updateUserAnimeListStreamClassSubscription.cancel();
-    isLoading.dispose();
-    watching.dispose();
-    planning.dispose();
-    completed.dispose();
-    onHold.dispose();
-    dropped.dispose();
-  }
-  
-  void fetchUserAnimesList(ValueNotifier<UserAnimeListStatusClass> statusClass) async{
-    if(mounted){
-      if(!isLoading.value){
-        statusClass.value = statusClass.value.updatePaginationStatus(PaginationStatus.loading);
-      }
+  }  
+}
+
+class MyAnimeListNotifier extends AutoDisposeAsyncNotifier<UserAnimeListStatusClass> {
+  final BuildContext context;
+  UserAnimeListStatusClass statusClass;
+  late AnimeRepository animeRepository;
+
+  MyAnimeListNotifier(
+    this.context,
+    this.statusClass
+  );
+
+  @override
+  FutureOr<UserAnimeListStatusClass> build() async {
+    state = const AsyncLoading();
+    animeRepository = AnimeRepository(context);
+    APIResponseModel response = await animeRepository.fetchMyAnimesList(statusClass);
+    if(response.error != null) {
+      state = AsyncError(response.error!.object, response.error!.stackTrace);
+      throw Exception(response.error!.object);
+    } else {
+      statusClass = response.data;
+      state = AsyncData(statusClass);
     }
-    var res = await apiCallRepo.runAPICall(
-      context,
-      APICallType.get,
-      malApiUrl,
-      '$malApiUrl/users/@me/animelist?status=${statusClass.value.status}&offset=${statusClass.value.animesList.length}&limit=$userDisplayFetchLimit&$fetchAllAnimeFieldsStr',
-      {}
-    );
-    if(res != null) {
-      statusClass.value = statusClass.value.updateCanPaginate((res['paging']['next'] != null));
-      var data = res['data'];
-      if(mounted) {
-        for(int i = 0; i < data.length; i++){
-          updateAnimeData(data[i]['node']);
-          int id = data[i]['node']['id'];
-          if(appStateRepo.globalAnimeData[id] != null){
-            if(appStateRepo.globalAnimeData[id]!.notifier.value.myListStatus != null){
-              String? status = appStateRepo.globalAnimeData[id]!.notifier.value.myListStatus!.status;
-              if(status == 'watching'){
-                watching.value.animesList.add(id);
-              }else if(status == 'plan_to_watch'){
-                planning.value.animesList.add(id);
-              }else if(status == 'completed'){
-                completed.value.animesList.add(id);
-              }else if(status == 'on_hold'){
-                onHold.value.animesList.add(id);
-              }else if(status == 'dropped'){
-                dropped.value.animesList.add(id);
-              }
-            }
-          }
-        }
-        watching.value = watching.value.copy();
-        planning.value = planning.value.copy();
-        completed.value = completed.value.copy();
-        onHold.value = onHold.value.copy();
-        dropped.value = dropped.value.copy();
-        if(isLoading.value){
-          isLoading.value = false;
-        }else{
-          statusClass.value = statusClass.value.updatePaginationStatus(PaginationStatus.loaded);
-        }
-      }
+    return statusClass;
+  }
+
+  Future<UserAnimeListStatusClass> paginate() async {
+    state = AsyncData(statusClass.updatePaginationStatus(PaginationStatus.loading));
+    APIResponseModel response = await animeRepository.fetchMyAnimesList(statusClass);
+    if(response.error != null) {
+      state = AsyncData(statusClass.updatePaginationStatus(PaginationStatus.loaded));
+      state = AsyncError(response.error!.object, response.error!.stackTrace);
+    } else {
+      statusClass = response.data;
+      statusClass = statusClass.updatePaginationStatus(PaginationStatus.loaded);
+      state = AsyncData(statusClass);
+    }
+    return statusClass;
+  }
+
+  void removeByIDAndAddByStatus(int id, String? status, AnimeDataClass animeData) {
+    int index = statusClass.animeList.indexWhere((e) => e.id == id);
+    if(index > -1) {
+      statusClass.animeList.removeAt(index);
+      state = AsyncData(statusClass);
+    }
+    if(status == statusClass.status) {
+      statusClass.animeList.insert(0, animeData);
+      statusClass.animeList.sort((a, b) => a.title.compareTo(b.title));
     }
   }
+
+  Future<void> refresh() async => await build();
 }

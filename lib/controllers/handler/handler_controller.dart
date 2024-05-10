@@ -23,7 +23,7 @@ class HandlerController {
   /// the snackbar will display
   IconData? getIconData(SnackbarType type) {
     if(type == SnackbarType.error){
-      return FontAwesomeIcons.x;
+      return FontAwesomeIcons.xmark;
     }else if(type == SnackbarType.successful){
       return FontAwesomeIcons.check;
     }else if(type == SnackbarType.regular){

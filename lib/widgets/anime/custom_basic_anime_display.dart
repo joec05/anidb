@@ -35,6 +35,7 @@ class CustomBasicAnimeDisplayState extends State<CustomBasicAnimeDisplay>{
     if(!widget.skeletonMode){
       return GestureDetector(
         onTap: () => context.pushNamed('view-anime-details', pathParameters: {'animeID': '${animeData.id}'}),
+        behavior: HitTestBehavior.opaque,
         child: Center(
           child: Container(
             width: animeGridDisplayWidgetSize.width,
@@ -48,7 +49,7 @@ class CustomBasicAnimeDisplayState extends State<CustomBasicAnimeDisplay>{
                 SizedBox(
                   width: animeGridDisplayCoverSize.width,
                   height: animeGridDisplayCoverSize.height,
-                  child: generateCachedImage(animeData.cover)
+                  child: CachedImageWidget(imageClass: animeData.cover)
                 ),
                 SizedBox(
                   height: getScreenHeight() * 0.01

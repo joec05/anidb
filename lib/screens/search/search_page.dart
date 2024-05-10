@@ -18,7 +18,7 @@ class _SearchPageStateful extends StatefulWidget {
   State<_SearchPageStateful> createState() => __SearchPageStatefulState();
 }
 
-class __SearchPageStatefulState extends State<_SearchPageStateful> with SingleTickerProviderStateMixin{
+class __SearchPageStatefulState extends State<_SearchPageStateful> with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin{
   TextEditingController searchController = TextEditingController();
   ValueNotifier<String> searchedText = ValueNotifier('');
   late TabController _tabController;
@@ -37,9 +37,10 @@ class __SearchPageStatefulState extends State<_SearchPageStateful> with SingleTi
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       appBar: AppBar(
-        leading: defaultLeadingWidget(context),
+        leading: const AppBarWidget(),
         title: TextField(
           controller: searchController,
           maxLines: 1,
@@ -140,4 +141,7 @@ class __SearchPageStatefulState extends State<_SearchPageStateful> with SingleTi
       )
     );
   }
+  
+  @override
+  bool get wantKeepAlive => true;
 }

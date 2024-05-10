@@ -1,65 +1,51 @@
 import 'dart:async';
 import 'package:anime_list_app/global_files.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class AnimeBasicController {
+class ViewMoreAnimeController {
   final BuildContext context;
   AnimeBasicDisplayType type;
-  ValueNotifier<List<int>> animesList = ValueNotifier([]);
-  ValueNotifier<bool> isLoading = ValueNotifier(true);
+  late AutoDisposeAsyncNotifierProvider<ViewMoreAnimeNotifier, List<AnimeDataClass>> animeDataNotifier;
 
-  AnimeBasicController(
+  ViewMoreAnimeController(
     this.context,
     this.type
   );
 
   bool get mounted => context.mounted;
 
-  void initializeController(){
-    fetchAnimesList();
+  void initializeController() async {
+    animeDataNotifier = AsyncNotifierProvider.autoDispose<ViewMoreAnimeNotifier, List<AnimeDataClass>>(
+      () => ViewMoreAnimeNotifier(context, type)
+    );
   }
 
-  void dispose(){
-    animesList.dispose();
-  }
+  void dispose() {}
+}
 
-  String generateAPIRequestPath(){
-    if(type == AnimeBasicDisplayType.season){
-      return '$malApiUrl/anime/season/${DateTime.now().year}/${getCurrentSeason()}?$fetchAllAnimeFieldsStr&limit=${getAnimeBasicDisplayTotalFetchCount()}';
-    }else if(type == AnimeBasicDisplayType.top){
-      return '$malApiUrl/anime/ranking?$fetchAllAnimeFieldsStr&ranking_type=all&limit=${getAnimeBasicDisplayTotalFetchCount()}';
-    }else if(type == AnimeBasicDisplayType.airing){
-      return '$malApiUrl/anime/ranking?$fetchAllAnimeFieldsStr&ranking_type=airing&limit=${getAnimeBasicDisplayTotalFetchCount()}';
-    }else if(type == AnimeBasicDisplayType.upcoming){
-      return '$malApiUrl/anime/ranking?$fetchAllAnimeFieldsStr&ranking_type=upcoming&limit=${getAnimeBasicDisplayTotalFetchCount()}';
-    }else if(type == AnimeBasicDisplayType.mostPopular){
-      return '$malApiUrl/anime/ranking?$fetchAllAnimeFieldsStr&ranking_type=bypopularity&limit=${getAnimeBasicDisplayTotalFetchCount()}';
-    }else if(type == AnimeBasicDisplayType.favourites){
-      return '$malApiUrl/anime/ranking?$fetchAllAnimeFieldsStr&ranking_type=favorite&limit=${getAnimeBasicDisplayTotalFetchCount()}';
+class ViewMoreAnimeNotifier extends AutoDisposeAsyncNotifier<List<AnimeDataClass>>{
+  final BuildContext context;
+  final AnimeBasicDisplayType type;
+  late AnimeRepository animeRepository;
+  List<AnimeDataClass> animeList = [];
+
+  ViewMoreAnimeNotifier(this.context, this.type);
+
+  @override
+  FutureOr<List<AnimeDataClass>> build() async {
+    state = const AsyncLoading();
+    animeRepository = AnimeRepository(context);
+    APIResponseModel response = await animeRepository.fetchAnimeListFromType(type);
+    if(response.error != null) {
+      state = AsyncError(response.error!.object, response.error!.stackTrace);
+      throw Exception(response.error!.object);
+    } else {
+      animeList = response.data;
+      state = AsyncData(animeList);
     }
-    return '';
+    return animeList;
   }
 
-  Future<void> fetchAnimesList() async{
-    if(mounted){
-      var res = await apiCallRepo.runAPICall(
-        context,
-        APICallType.get,
-        malApiUrl,
-        generateAPIRequestPath(),
-        {}
-      );
-      if(res != null) {
-        var data = res['data'];
-        if(mounted) {
-          for(int i = 0; i < data.length; i++){
-            updateAnimeData(data[i]['node']);
-            animesList.value.add(data[i]['node']['id']);
-          }
-          animesList.value = [...animesList.value];
-          isLoading.value = false;
-        }
-      }
-    }
-  }
+  Future<void> refresh() async => await build();
 }

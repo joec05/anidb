@@ -1,23 +1,24 @@
 import 'package:anime_list_app/global_files.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends ConsumerWidget {
   const HomePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return const _HomePageStateful();
   }
 }
 
-class _HomePageStateful extends StatefulWidget {
+class _HomePageStateful extends ConsumerStatefulWidget {
   const _HomePageStateful();
 
   @override
-  State<_HomePageStateful> createState() => _HomePageStatefulState();
+  ConsumerState<_HomePageStateful> createState() => _HomePageStatefulState();
 }
 
-class _HomePageStatefulState extends State<_HomePageStateful> with AutomaticKeepAliveClientMixin{
+class _HomePageStatefulState extends ConsumerState<_HomePageStateful> with AutomaticKeepAliveClientMixin{
   late HomeController controller;
 
   @override void initState(){
@@ -34,109 +35,36 @@ class _HomePageStatefulState extends State<_HomePageStateful> with AutomaticKeep
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return ListenableBuilder(
-      listenable: Listenable.merge([
-        controller.seasonAnimeList,
-        controller.topAnimeList,
-        controller.topAiringAnimeList,
-        controller.topUpcomingAnimeList,
-        controller.mostPopularAnimeList,
-        controller.topFavouritedAnimeList,
-        controller.topMangaList,
-        controller.mostPopularMangaList,
-        controller.topFavouritedMangaList,
-        controller.topCharactersList
-      ]),
-      builder: (context, child) {
-        List<int> seasonAnimeList = controller.seasonAnimeList.value;
-        List<int> topAnimeList = controller.topAnimeList.value;
-        List<int> topAiringAnimeList = controller.topAiringAnimeList.value;
-        List<int> topUpcomingAnimeList = controller.topUpcomingAnimeList.value;
-        List<int> mostPopularAnimeList = controller.mostPopularAnimeList.value;
-        List<int> topFavouritedAnimeList = controller.topFavouritedAnimeList.value;
-        List<int> topMangaList = controller.topMangaList.value;
-        List<int> mostPopularMangaList = controller.mostPopularMangaList.value;
-        List<int> topFavouritedMangaList = controller.topFavouritedMangaList.value;
-        List<int> topCharactersList = controller.topCharactersList.value;
-        
-        return ListView(
-          children: [
-            CustomHomeFrontDisplay(
-              label: 'Animes this season',
-              displayType: AnimeBasicDisplayType.season, 
-              dataList: seasonAnimeList,
-              isLoading: seasonAnimeList.isEmpty,
+    AsyncValue<List<HomeFrontDisplayModel>> viewAnimeDataState = ref.watch(controller.homeNotifier);
+
+    return RefreshIndicator(
+      onRefresh: () => context.read(controller.homeNotifier.notifier).refresh(),
+      child: viewAnimeDataState.when(
+        data: (data) => ListView.builder(
+          itemCount: data.length,
+          itemBuilder: (context, i) => CustomHomeFrontDisplay(
+            label: data[i].label,
+            displayType: data[i].displayType, 
+            dataList: data[i].dataList,
+            isLoading: false,
+            key: UniqueKey(),
+          ),
+        ) ,
+        error: (obj, stackTrace) => DisplayErrorWidget(displayText: obj.toString()), 
+        loading: () => ListView.builder(
+          itemCount: context.read(controller.homeNotifier.notifier).displayed.length,
+          itemBuilder: (context, i) {
+            HomeFrontDisplayModel data = context.read(controller.homeNotifier.notifier).displayed[i];
+            return CustomHomeFrontDisplay(
+              label: data.label,
+              displayType: data.displayType, 
+              dataList: data.dataList,
+              isLoading: true,
               key: UniqueKey(),
-            ),
-            CustomHomeFrontDisplay(
-              label: 'Airing now',
-              displayType: AnimeBasicDisplayType.airing, 
-              dataList: topAiringAnimeList,
-              isLoading: topAiringAnimeList.isEmpty,
-              key: UniqueKey(),
-            ),
-            CustomHomeFrontDisplay(
-              label: 'Upcoming animes',
-              displayType: AnimeBasicDisplayType.upcoming, 
-              dataList: topUpcomingAnimeList,
-              isLoading: topUpcomingAnimeList.isEmpty,
-              key: UniqueKey(),
-            ),
-            CustomHomeFrontDisplay(
-              label: 'Top scoring animes',
-              displayType: AnimeBasicDisplayType.top, 
-              isLoading: topAnimeList.isEmpty,
-              dataList: topAnimeList,
-              key: UniqueKey(),
-            ),
-            CustomHomeFrontDisplay(
-              label: 'Popular animes',
-              displayType: AnimeBasicDisplayType.mostPopular, 
-              dataList: mostPopularAnimeList,
-              isLoading: mostPopularAnimeList.isEmpty,
-              key: UniqueKey(),
-            ),
-            CustomHomeFrontDisplay(
-              label: 'Top favorited animes',
-              displayType: AnimeBasicDisplayType.favourites, 
-              dataList: topFavouritedAnimeList,
-              isLoading: topFavouritedAnimeList.isEmpty,
-              key: UniqueKey(),
-            ),
-            CustomHomeFrontDisplay(
-              label: 'Top scoring mangas',
-              displayType: MangaBasicDisplayType.top, 
-              dataList: topMangaList,
-              isLoading: topMangaList.isEmpty,
-              key: UniqueKey(),
-            ),
-            CustomHomeFrontDisplay(
-              label: 'Popular mangas',
-              displayType: MangaBasicDisplayType.mostPopular, 
-              dataList: mostPopularMangaList,
-              isLoading: mostPopularMangaList.isEmpty,
-              key: UniqueKey(),
-            ),
-            CustomHomeFrontDisplay(
-              label: 'Top favorited mangas',
-              displayType: MangaBasicDisplayType.favourites, 
-              dataList: topFavouritedMangaList,
-              isLoading: topFavouritedMangaList.isEmpty,
-              key: UniqueKey(),
-            ),
-            CustomHomeFrontDisplay(
-              label: 'Top characters',
-              displayType: CharacterBasicDisplayType.top, 
-              dataList: topCharactersList,
-              isLoading: topCharactersList.isEmpty,
-              key: UniqueKey(),
-            ),
-            SizedBox(
-              height: defaultVerticalPadding * 2
-            ),
-          ]
-        );
-      }
+            );
+          }
+        )
+      ),
     );
   }
   

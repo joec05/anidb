@@ -1,13 +1,13 @@
 import 'package:anime_list_app/global_files.dart';
 
 class UserAnimeListStatusClass{
-  List<int> animesList;
+  List<AnimeDataClass> animeList;
   String status;
   bool canPaginate;
   PaginationStatus paginationStatus;
 
   UserAnimeListStatusClass(
-    this.animesList,
+    this.animeList,
     this.status,
     this.canPaginate,
     this.paginationStatus
@@ -15,7 +15,7 @@ class UserAnimeListStatusClass{
 
   UserAnimeListStatusClass copy() {
     return UserAnimeListStatusClass(
-      animesList,
+      animeList,
       status,
       canPaginate,
       paginationStatus
@@ -24,7 +24,7 @@ class UserAnimeListStatusClass{
 
   UserAnimeListStatusClass updatePaginationStatus(PaginationStatus paginationStatus) {
     return UserAnimeListStatusClass(
-      animesList, 
+      animeList, 
       status, 
       canPaginate, 
       paginationStatus
@@ -33,7 +33,7 @@ class UserAnimeListStatusClass{
 
   UserAnimeListStatusClass updateCanPaginate(bool canPaginate) {
     return UserAnimeListStatusClass(
-      animesList, 
+      animeList, 
       status, 
       canPaginate, 
       paginationStatus

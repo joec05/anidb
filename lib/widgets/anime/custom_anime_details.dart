@@ -1,10 +1,11 @@
 import 'dart:math';
 import 'package:anime_list_app/global_files.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vertical_barchart/vertical-barchartmodel.dart';
 import 'package:vertical_barchart/vertical-legend.dart';
 
-class CustomAnimeDetails extends StatefulWidget {
+class CustomAnimeDetails extends ConsumerStatefulWidget {
   final AnimeDataClass animeData;
   final bool skeletonMode;
 
@@ -15,14 +16,15 @@ class CustomAnimeDetails extends StatefulWidget {
   });
 
   @override
-  State<CustomAnimeDetails> createState() => CustomAnimeDetailsState();
+  ConsumerState<CustomAnimeDetails> createState() => CustomAnimeDetailsState();
 }
 
-class CustomAnimeDetailsState extends State<CustomAnimeDetails>{
+class CustomAnimeDetailsState extends ConsumerState<CustomAnimeDetails>{
   late AnimeDataClass animeData;
   late AnimeProgressController progressController;
   ValueNotifier<SelectedTitle> selectedTitle = ValueNotifier(SelectedTitle.main);
   List<AnimeDataClass> relatedAnimesData = [];
+
 
   @override void initState(){
     super.initState();
@@ -181,7 +183,7 @@ class CustomAnimeDetailsState extends State<CustomAnimeDetails>{
                     SizedBox(
                       width: animeDetailDisplayCoverSize.width,
                       height: animeDetailDisplayCoverSize.height,
-                      child: generateCachedImage(animeData.cover)
+                      child: CachedImageWidget(imageClass: animeData.cover)
                     ),
                     SizedBox(
                       width: getScreenWidth() * 0.03
@@ -646,24 +648,14 @@ class CustomAnimeDetailsState extends State<CustomAnimeDetails>{
                 SizedBox(
                   height: getScreenHeight() * 0.0125
                 ),
-                animeData.myListStatus != null ?
-                  CustomButton(
-                    width: fullWidth, 
-                    height: getScreenHeight() * 0.075, 
-                    buttonColor: Colors.brown.withOpacity(0.4), 
-                    buttonText: 'Edit in list', 
-                    onTapped: () => progressController.openActionDrawer(), 
-                    setBorderRadius: true
-                  )
-                : 
-                  CustomButton(
-                    width: fullWidth, 
-                    height: getScreenHeight() * 0.075, 
-                    buttonColor: Colors.brown.withOpacity(0.4), 
-                    buttonText: 'Add to list', 
-                    onTapped: () => progressController.openActionDrawer(), 
-                    setBorderRadius: true
-                  ),
+                CustomButton(
+                  width: fullWidth, 
+                  height: getScreenHeight() * 0.075, 
+                  buttonColor: Colors.brown.withOpacity(0.4), 
+                  buttonText: 'Edit in list', 
+                  onTapped: () => progressController.openActionDrawer(), 
+                  setBorderRadius: true
+                ),
                 SizedBox(
                   height: getScreenHeight() * 0.0125
                 ),
@@ -845,21 +837,7 @@ class CustomAnimeDetailsState extends State<CustomAnimeDetails>{
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               for(int i = 0; i < min(detailImgWidgetMaxAmount, animeData.pictures.length); i++)
-                              Container(
-                                alignment: Alignment.centerLeft,
-                                margin: EdgeInsets.symmetric(
-                                  horizontal: getScreenWidth() * 0.015,
-                                  vertical: getScreenHeight() * 0.0025,
-                                ),
-                                decoration: const BoxDecoration(
-                                  borderRadius: BorderRadius.all(Radius.circular(10))
-                                ),
-                                child: SizedBox(
-                                  width: animeGridDisplayCoverSize.width,
-                                  height: animeGridDisplayCoverSize.height,
-                                  child: generateCachedImage(animeData.pictures[i])
-                                ),
-                              )
+                              PictureWidget(imageData: animeData.pictures[i])
                             ]
                           )
                         )
@@ -914,8 +892,8 @@ class CustomAnimeDetailsState extends State<CustomAnimeDetails>{
                         horizontal: getScreenWidth() * 0.025,
                         vertical: getScreenHeight() * 0.02,
                       ),
-                      child: generateBarChart(context, 
-                        [
+                      child: VerticalBarChartWidget( 
+                        bardata: [
                           VBarChartModel(
                             index: 0,
                             colors: [Colors.orange, Colors.orange],
@@ -947,34 +925,34 @@ class CustomAnimeDetailsState extends State<CustomAnimeDetails>{
                             tooltip: totalActivitiesCount == 0 ? '0%' : '${((statusStats.dropped / totalActivitiesCount) * 100).roundToDouble().toString()}%'
                           )
                         ],
-                        [
-                          const Vlegend(
+                        legend: const [
+                          Vlegend(
                             isSquare: false,
                             color: Colors.orange,
                             text: 'Watching'
                           ),
-                          const Vlegend(
+                          Vlegend(
                             isSquare: false,
                             color: Colors.red,
                             text: 'Planning'
                           ),
-                          const Vlegend(
+                          Vlegend(
                             isSquare: false,
                             color: Colors.green,
                             text: 'Completed'
                           ),
-                          const Vlegend(
+                          Vlegend(
                             isSquare: false,
                             color: Colors.cyan,
                             text: 'On Hold'
                           ),
-                          const Vlegend(
+                          Vlegend(
                             isSquare: false,
                             color: Colors.purple,
                             text: 'Dropped'
                           )
                         ],
-                        totalActivitiesCount.toDouble()
+                        sum: totalActivitiesCount.toDouble()
                       )
                     )
                   ]
@@ -988,575 +966,577 @@ class CustomAnimeDetailsState extends State<CustomAnimeDetails>{
         ),
       );
     }else{
-      return Center(
-        child: Container(
-          padding: EdgeInsets.symmetric(
-            horizontal: defaultHorizontalPadding,
-          ),
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                SizedBox(
-                  height: getScreenHeight() * 0.025
-                ),
-                Column(
-                  children: [
-                    Row(
+      return ShimmerWidget(
+        child: Center(
+          child: Container(
+            padding: EdgeInsets.symmetric(
+              horizontal: defaultHorizontalPadding,
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: getScreenHeight() * 0.025
+                  ),
+                  Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            onTap: (){
+                              selectedTitle.value = SelectedTitle.main;
+                            },
+                            child: Container(
+                              decoration: const BoxDecoration(
+                                color: Colors.grey,
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(15),
+                                  bottomLeft: Radius.circular(15)
+                                )
+                              ),
+                              width: getScreenWidth() * 0.2,
+                              height: getScreenHeight() * 0.05,
+                            ),
+                          ),
+                          GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            onTap: (){
+                              selectedTitle.value = SelectedTitle.english;
+                            },
+                            child: Container(
+                              decoration: const BoxDecoration(
+                                color: Colors.grey,
+                              ),
+                              width: getScreenWidth() * 0.2,
+                              height: getScreenHeight() * 0.05,
+                            ),
+                          ),
+                          GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            onTap: (){
+                              selectedTitle.value = SelectedTitle.japanese;
+                            },
+                            child: Container(
+                              decoration: const BoxDecoration(
+                                color: Colors.grey,
+                                borderRadius: BorderRadius.only(
+                                  topRight: Radius.circular(15),
+                                  bottomRight: Radius.circular(15)
+                                )
+                              ),
+                              width: getScreenWidth() * 0.2,
+                              height: getScreenHeight() * 0.05
+                            )
+                          )
+                        ],
+                      ),
+                      SizedBox(
+                        height: getScreenHeight() * 0.0075
+                      ),
+                      SizedBox(
+                        height: getScreenHeight() * 0.075,
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(vertical: getScreenHeight() * 0.01),
+                          child: Container(
+                            height: getScreenHeight() * 0.045,
+                            color: Colors.grey,
+                            width: fullWidth
+                          )
+                        )  
+                      )
+                    ]
+                  ),
+                  SizedBox(
+                    height: getScreenHeight() * 0.0125
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: animeDetailDisplayCoverSize.width,
+                        height: animeDetailDisplayCoverSize.height,
+                        color: Colors.grey
+                      ),
+                      SizedBox(
+                        width: getScreenWidth() * 0.03
+                      ),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            width: besideImageWidth,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.lime.withOpacity(0.475),
+                                    borderRadius: const BorderRadius.all(Radius.circular(12.5))
+                                  ),
+                                  width: besideImageWidth * 0.475,
+                                  height: getScreenHeight() * 0.09,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Text('Score', style: TextStyle(
+                                        fontSize: defaultTextFontSize * 0.825,
+                                        fontWeight: FontWeight.w400
+                                      )),
+                                      SizedBox(
+                                        height: getScreenHeight() * 0.005,
+                                      ),
+                                      const Text('')
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: besideImageWidth * 0.05,
+                                ),
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.lime.withOpacity(0.475),
+                                    borderRadius: const BorderRadius.all(Radius.circular(12.5))
+                                  ),
+                                  width: besideImageWidth * 0.475,
+                                  height: getScreenHeight() * 0.09,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Text('Rank', style: TextStyle(
+                                        fontSize: defaultTextFontSize * 0.825,
+                                        fontWeight: FontWeight.w400
+                                      )),
+                                      SizedBox(
+                                        height: getScreenHeight() * 0.005,
+                                      ),
+                                      const Text('')
+                                    ],
+                                  ),
+                                ),
+                              ]
+                            )
+                          ),
+                          SizedBox(
+                            height: getScreenHeight() * 0.01
+                          ),
+                          SizedBox(
+                            width: besideImageWidth,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.lime.withOpacity(0.475),
+                                    borderRadius: const BorderRadius.all(Radius.circular(12.5))
+                                  ),
+                                  width: besideImageWidth * 0.475,
+                                  height: getScreenHeight() * 0.09,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Text('Popularity', style: TextStyle(
+                                        fontSize: defaultTextFontSize * 0.825,
+                                        fontWeight: FontWeight.w400
+                                      )),
+                                      SizedBox(
+                                        height: getScreenHeight() * 0.005,
+                                      ),
+                                      const Text('')
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: besideImageWidth * 0.05
+                                ),
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.lime.withOpacity(0.475),
+                                    borderRadius: const BorderRadius.all(Radius.circular(12.5))
+                                  ),
+                                  width: besideImageWidth * 0.475,
+                                  height: getScreenHeight() * 0.09,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Text('Listed', style: TextStyle(
+                                        fontSize: defaultTextFontSize * 0.825,
+                                        fontWeight: FontWeight.w400
+                                      )),
+                                      SizedBox(
+                                        height: getScreenHeight() * 0.005,
+                                      ),
+                                      const Text('')
+                                    ],
+                                  ),
+                                ),
+                              ]
+                            )
+                          ),
+                          SizedBox(
+                            height: getScreenHeight() * 0.01
+                          ),
+                          SizedBox(
+                            width: besideImageWidth,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.lime.withOpacity(0.475),
+                                    borderRadius: const BorderRadius.all(Radius.circular(12.5))
+                                  ),
+                                  width: besideImageWidth * 0.475,
+                                  height: getScreenHeight() * 0.09,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Text('Scored', style: TextStyle(
+                                        fontSize: defaultTextFontSize * 0.825,
+                                        fontWeight: FontWeight.w400
+                                      )),
+                                      SizedBox(
+                                        height: getScreenHeight() * 0.005,
+                                      ),
+                                      const Text('')
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: besideImageWidth * 0.05,
+                                ),
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.lime.withOpacity(0.475),
+                                    borderRadius: const BorderRadius.all(Radius.circular(12.5))
+                                  ),
+                                  width: besideImageWidth * 0.475,
+                                  height: getScreenHeight() * 0.09,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Text('Type', style: TextStyle(
+                                        fontSize: defaultTextFontSize * 0.825,
+                                        fontWeight: FontWeight.w400
+                                      )),
+                                      SizedBox(
+                                        height: getScreenHeight() * 0.005,
+                                      ),
+                                      const Text('')
+                                    ],
+                                  ),
+                                ),
+                              ]
+                            )
+                          ),
+                          SizedBox(
+                            height: getScreenHeight() * 0.01
+                          ),
+                          SizedBox(
+                            width: besideImageWidth,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.lime.withOpacity(0.475),
+                                    borderRadius: const BorderRadius.all(Radius.circular(12.5))
+                                  ),
+                                  width: besideImageWidth * 0.475,
+                                  height: getScreenHeight() * 0.09,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Text('Status', style: TextStyle(
+                                        fontSize: defaultTextFontSize * 0.825,
+                                        fontWeight: FontWeight.w400
+                                      )),
+                                      SizedBox(
+                                        height: getScreenHeight() * 0.005,
+                                      ),
+                                      const Text('')
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: besideImageWidth * 0.05,
+                                ),
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.lime.withOpacity(0.475),
+                                    borderRadius: const BorderRadius.all(Radius.circular(12.5))
+                                  ),
+                                  width: besideImageWidth * 0.475,
+                                  height: getScreenHeight() * 0.09,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Text('Episodes', style: TextStyle(
+                                        fontSize: defaultTextFontSize * 0.825,
+                                        fontWeight: FontWeight.w400
+                                      )),
+                                      SizedBox(
+                                        height: getScreenHeight() * 0.005,
+                                      ),
+                                      const Text('')
+                                    ],
+                                  ),
+                                ),
+                              ]
+                            )
+                          )
+                        ]
+                      )
+                    ]
+                  ),
+                  SizedBox(
+                    height: getScreenHeight() * 0.0125
+                  ),
+                  SizedBox(
+                    width: fullWidth,
+                    child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        GestureDetector(
-                          behavior: HitTestBehavior.opaque,
-                          onTap: (){
-                            selectedTitle.value = SelectedTitle.main;
-                          },
-                          child: Container(
-                            decoration: const BoxDecoration(
-                              color: Colors.grey,
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(15),
-                                bottomLeft: Radius.circular(15)
-                              )
-                            ),
-                            width: getScreenWidth() * 0.2,
-                            height: getScreenHeight() * 0.05,
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.lime.withOpacity(0.475),
+                            borderRadius: const BorderRadius.all(Radius.circular(12.5))
+                          ),
+                          width: fullWidth * 0.325,
+                          height: getScreenHeight() * 0.09,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text('Aired at', style: TextStyle(
+                                fontSize: defaultTextFontSize * 0.825,
+                                fontWeight: FontWeight.w400
+                              )),
+                              SizedBox(
+                                height: getScreenHeight() * 0.005,
+                              ),
+                              const Text('')
+                            ],
                           ),
                         ),
-                        GestureDetector(
-                          behavior: HitTestBehavior.opaque,
-                          onTap: (){
-                            selectedTitle.value = SelectedTitle.english;
-                          },
-                          child: Container(
-                            decoration: const BoxDecoration(
-                              color: Colors.grey,
-                            ),
-                            width: getScreenWidth() * 0.2,
-                            height: getScreenHeight() * 0.05,
+                        SizedBox(
+                          width: fullWidth * 0.025,
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.lime.withOpacity(0.475),
+                            borderRadius: const BorderRadius.all(Radius.circular(12.5))
+                          ),
+                          width: fullWidth * 0.325,
+                          height: getScreenHeight() * 0.09,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text('Finished at', style: TextStyle(
+                                fontSize: defaultTextFontSize * 0.825,
+                                fontWeight: FontWeight.w400
+                              )),
+                              SizedBox(
+                                height: getScreenHeight() * 0.005,
+                              ),
+                              const Text('')
+                            ],
                           ),
                         ),
-                        GestureDetector(
-                          behavior: HitTestBehavior.opaque,
-                          onTap: (){
-                            selectedTitle.value = SelectedTitle.japanese;
-                          },
-                          child: Container(
-                            decoration: const BoxDecoration(
-                              color: Colors.grey,
-                              borderRadius: BorderRadius.only(
-                                topRight: Radius.circular(15),
-                                bottomRight: Radius.circular(15)
-                              )
-                            ),
-                            width: getScreenWidth() * 0.2,
-                            height: getScreenHeight() * 0.05
-                          )
-                        )
-                      ],
-                    ),
-                    SizedBox(
-                      height: getScreenHeight() * 0.0075
-                    ),
-                    SizedBox(
-                      height: getScreenHeight() * 0.075,
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(vertical: getScreenHeight() * 0.01),
-                        child: Container(
-                          height: getScreenHeight() * 0.045,
-                          color: Colors.grey,
-                          width: fullWidth
-                        )
-                      )  
-                    )
-                  ]
-                ),
-                SizedBox(
-                  height: getScreenHeight() * 0.0125
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: animeDetailDisplayCoverSize.width,
-                      height: animeDetailDisplayCoverSize.height,
-                      color: Colors.grey
-                    ),
-                    SizedBox(
-                      width: getScreenWidth() * 0.03
-                    ),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
                         SizedBox(
-                          width: besideImageWidth,
-                          child: Row(
+                          width: fullWidth * 0.025,
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.lime.withOpacity(0.475),
+                            borderRadius: const BorderRadius.all(Radius.circular(12.5))
+                          ),
+                          width: fullWidth * 0.3,
+                          height: getScreenHeight() * 0.09,
+                          child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.lime.withOpacity(0.475),
-                                  borderRadius: const BorderRadius.all(Radius.circular(12.5))
-                                ),
-                                width: besideImageWidth * 0.475,
-                                height: getScreenHeight() * 0.09,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text('Score', style: TextStyle(
-                                      fontSize: defaultTextFontSize * 0.825,
-                                      fontWeight: FontWeight.w400
-                                    )),
-                                    SizedBox(
-                                      height: getScreenHeight() * 0.005,
-                                    ),
-                                    const Text('')
-                                  ],
-                                ),
-                              ),
+                              Text('Duration', style: TextStyle(
+                                fontSize: defaultTextFontSize * 0.825,
+                                fontWeight: FontWeight.w400
+                              )),
                               SizedBox(
-                                width: besideImageWidth * 0.05,
+                                height: getScreenHeight() * 0.005,
                               ),
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.lime.withOpacity(0.475),
-                                  borderRadius: const BorderRadius.all(Radius.circular(12.5))
-                                ),
-                                width: besideImageWidth * 0.475,
-                                height: getScreenHeight() * 0.09,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text('Rank', style: TextStyle(
-                                      fontSize: defaultTextFontSize * 0.825,
-                                      fontWeight: FontWeight.w400
-                                    )),
-                                    SizedBox(
-                                      height: getScreenHeight() * 0.005,
-                                    ),
-                                    const Text('')
-                                  ],
-                                ),
-                              ),
-                            ]
-                          )
-                        ),
-                        SizedBox(
-                          height: getScreenHeight() * 0.01
-                        ),
-                        SizedBox(
-                          width: besideImageWidth,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.lime.withOpacity(0.475),
-                                  borderRadius: const BorderRadius.all(Radius.circular(12.5))
-                                ),
-                                width: besideImageWidth * 0.475,
-                                height: getScreenHeight() * 0.09,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text('Popularity', style: TextStyle(
-                                      fontSize: defaultTextFontSize * 0.825,
-                                      fontWeight: FontWeight.w400
-                                    )),
-                                    SizedBox(
-                                      height: getScreenHeight() * 0.005,
-                                    ),
-                                    const Text('')
-                                  ],
-                                ),
-                              ),
-                              SizedBox(
-                                width: besideImageWidth * 0.05
-                              ),
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.lime.withOpacity(0.475),
-                                  borderRadius: const BorderRadius.all(Radius.circular(12.5))
-                                ),
-                                width: besideImageWidth * 0.475,
-                                height: getScreenHeight() * 0.09,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text('Listed', style: TextStyle(
-                                      fontSize: defaultTextFontSize * 0.825,
-                                      fontWeight: FontWeight.w400
-                                    )),
-                                    SizedBox(
-                                      height: getScreenHeight() * 0.005,
-                                    ),
-                                    const Text('')
-                                  ],
-                                ),
-                              ),
-                            ]
-                          )
-                        ),
-                        SizedBox(
-                          height: getScreenHeight() * 0.01
-                        ),
-                        SizedBox(
-                          width: besideImageWidth,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.lime.withOpacity(0.475),
-                                  borderRadius: const BorderRadius.all(Radius.circular(12.5))
-                                ),
-                                width: besideImageWidth * 0.475,
-                                height: getScreenHeight() * 0.09,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text('Scored', style: TextStyle(
-                                      fontSize: defaultTextFontSize * 0.825,
-                                      fontWeight: FontWeight.w400
-                                    )),
-                                    SizedBox(
-                                      height: getScreenHeight() * 0.005,
-                                    ),
-                                    const Text('')
-                                  ],
-                                ),
-                              ),
-                              SizedBox(
-                                width: besideImageWidth * 0.05,
-                              ),
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.lime.withOpacity(0.475),
-                                  borderRadius: const BorderRadius.all(Radius.circular(12.5))
-                                ),
-                                width: besideImageWidth * 0.475,
-                                height: getScreenHeight() * 0.09,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text('Type', style: TextStyle(
-                                      fontSize: defaultTextFontSize * 0.825,
-                                      fontWeight: FontWeight.w400
-                                    )),
-                                    SizedBox(
-                                      height: getScreenHeight() * 0.005,
-                                    ),
-                                    const Text('')
-                                  ],
-                                ),
-                              ),
-                            ]
-                          )
-                        ),
-                        SizedBox(
-                          height: getScreenHeight() * 0.01
-                        ),
-                        SizedBox(
-                          width: besideImageWidth,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.lime.withOpacity(0.475),
-                                  borderRadius: const BorderRadius.all(Radius.circular(12.5))
-                                ),
-                                width: besideImageWidth * 0.475,
-                                height: getScreenHeight() * 0.09,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text('Status', style: TextStyle(
-                                      fontSize: defaultTextFontSize * 0.825,
-                                      fontWeight: FontWeight.w400
-                                    )),
-                                    SizedBox(
-                                      height: getScreenHeight() * 0.005,
-                                    ),
-                                    const Text('')
-                                  ],
-                                ),
-                              ),
-                              SizedBox(
-                                width: besideImageWidth * 0.05,
-                              ),
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.lime.withOpacity(0.475),
-                                  borderRadius: const BorderRadius.all(Radius.circular(12.5))
-                                ),
-                                width: besideImageWidth * 0.475,
-                                height: getScreenHeight() * 0.09,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text('Episodes', style: TextStyle(
-                                      fontSize: defaultTextFontSize * 0.825,
-                                      fontWeight: FontWeight.w400
-                                    )),
-                                    SizedBox(
-                                      height: getScreenHeight() * 0.005,
-                                    ),
-                                    const Text('')
-                                  ],
-                                ),
-                              ),
-                            ]
-                          )
+                              const Text('')
+                            ],
+                          ),
                         )
                       ]
                     )
-                  ]
-                ),
-                SizedBox(
-                  height: getScreenHeight() * 0.0125
-                ),
-                SizedBox(
-                  width: fullWidth,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.lime.withOpacity(0.475),
-                          borderRadius: const BorderRadius.all(Radius.circular(12.5))
+                  ),
+                  SizedBox(
+                    height: getScreenHeight() * 0.0125
+                  ),
+                  SizedBox(
+                    width: fullWidth,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.lime.withOpacity(0.475),
+                            borderRadius: const BorderRadius.all(Radius.circular(12.5))
+                          ),
+                          width: fullWidth * 0.4,
+                          height: getScreenHeight() * 0.09,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text('Broadcast', style: TextStyle(
+                                fontSize: defaultTextFontSize * 0.825,
+                                fontWeight: FontWeight.w400
+                              )),
+                              SizedBox(
+                                height: getScreenHeight() * 0.005,
+                              ),
+                              const Text('')
+                            ],
+                          ),
                         ),
-                        width: fullWidth * 0.325,
-                        height: getScreenHeight() * 0.09,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Text('Aired at', style: TextStyle(
-                              fontSize: defaultTextFontSize * 0.825,
-                              fontWeight: FontWeight.w400
-                            )),
-                            SizedBox(
-                              height: getScreenHeight() * 0.005,
-                            ),
-                            const Text('')
-                          ],
+                        SizedBox(
+                          width: fullWidth * 0.025,
                         ),
-                      ),
-                      SizedBox(
-                        width: fullWidth * 0.025,
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.lime.withOpacity(0.475),
-                          borderRadius: const BorderRadius.all(Radius.circular(12.5))
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.lime.withOpacity(0.475),
+                            borderRadius: const BorderRadius.all(Radius.circular(12.5))
+                          ),
+                          width: fullWidth * 0.25,
+                          height: getScreenHeight() * 0.09,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text('Rating', style: TextStyle(
+                                fontSize: defaultTextFontSize * 0.825,
+                                fontWeight: FontWeight.w400
+                              )),
+                              SizedBox(
+                                height: getScreenHeight() * 0.005,
+                              ),
+                              const Text('')
+                            ],
+                          ),
                         ),
-                        width: fullWidth * 0.325,
-                        height: getScreenHeight() * 0.09,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Text('Finished at', style: TextStyle(
-                              fontSize: defaultTextFontSize * 0.825,
-                              fontWeight: FontWeight.w400
-                            )),
-                            SizedBox(
-                              height: getScreenHeight() * 0.005,
-                            ),
-                            const Text('')
-                          ],
+                        SizedBox(
+                          width: fullWidth * 0.025,
                         ),
-                      ),
-                      SizedBox(
-                        width: fullWidth * 0.025,
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.lime.withOpacity(0.475),
-                          borderRadius: const BorderRadius.all(Radius.circular(12.5))
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.lime.withOpacity(0.475),
+                            borderRadius: const BorderRadius.all(Radius.circular(12.5))
+                          ),
+                          width: fullWidth * 0.3,
+                          height: getScreenHeight() * 0.09,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text('Original', style: TextStyle(
+                                fontSize: defaultTextFontSize * 0.825,
+                                fontWeight: FontWeight.w400
+                              )),
+                              SizedBox(
+                                height: getScreenHeight() * 0.005,
+                              ),
+                              const Text('')
+                            ],
+                          ),
                         ),
-                        width: fullWidth * 0.3,
-                        height: getScreenHeight() * 0.09,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Text('Duration', style: TextStyle(
-                              fontSize: defaultTextFontSize * 0.825,
-                              fontWeight: FontWeight.w400
-                            )),
-                            SizedBox(
-                              height: getScreenHeight() * 0.005,
-                            ),
-                            const Text('')
-                          ],
-                        ),
-                      )
-                    ]
-                  )
-                ),
-                SizedBox(
-                  height: getScreenHeight() * 0.0125
-                ),
-                SizedBox(
-                  width: fullWidth,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.lime.withOpacity(0.475),
-                          borderRadius: const BorderRadius.all(Radius.circular(12.5))
-                        ),
-                        width: fullWidth * 0.4,
-                        height: getScreenHeight() * 0.09,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Text('Broadcast', style: TextStyle(
-                              fontSize: defaultTextFontSize * 0.825,
-                              fontWeight: FontWeight.w400
-                            )),
-                            SizedBox(
-                              height: getScreenHeight() * 0.005,
-                            ),
-                            const Text('')
-                          ],
-                        ),
-                      ),
-                      SizedBox(
-                        width: fullWidth * 0.025,
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.lime.withOpacity(0.475),
-                          borderRadius: const BorderRadius.all(Radius.circular(12.5))
-                        ),
-                        width: fullWidth * 0.25,
-                        height: getScreenHeight() * 0.09,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Text('Rating', style: TextStyle(
-                              fontSize: defaultTextFontSize * 0.825,
-                              fontWeight: FontWeight.w400
-                            )),
-                            SizedBox(
-                              height: getScreenHeight() * 0.005,
-                            ),
-                            const Text('')
-                          ],
-                        ),
-                      ),
-                      SizedBox(
-                        width: fullWidth * 0.025,
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.lime.withOpacity(0.475),
-                          borderRadius: const BorderRadius.all(Radius.circular(12.5))
-                        ),
-                        width: fullWidth * 0.3,
-                        height: getScreenHeight() * 0.09,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Text('Original', style: TextStyle(
-                              fontSize: defaultTextFontSize * 0.825,
-                              fontWeight: FontWeight.w400
-                            )),
-                            SizedBox(
-                              height: getScreenHeight() * 0.005,
-                            ),
-                            const Text('')
-                          ],
-                        ),
-                      ),
-                    ]
-                  )
-                ),
-                SizedBox(
-                  height: getScreenHeight() * 0.0125
-                ),
-                CustomButton(
-                  width: fullWidth, 
-                  height: getScreenHeight() * 0.075, 
-                  buttonColor: Colors.grey,
-                  buttonText: '',
-                  onTapped: (){},
-                  setBorderRadius: true
-                ),
-                SizedBox(
-                  height: getScreenHeight() * 0.0125
-                ),
-                const ExpansionTile(
-                  title: Text('Synopsis')
-                ),
-                SizedBox(
-                  height: getScreenHeight() * 0.0125
-                ),
-                const ExpansionTile(
-                  title: Text('Background')
-                ),
-                SizedBox(
-                  height: getScreenHeight() * 0.0125
-                ),
-                const ExpansionTile(
-                  title: Text('Characters')
-                ),
-                SizedBox(
-                  height: getScreenHeight() * 0.0125
-                ),
-                const ExpansionTile(
-                  title: Text('Genres')
-                ),
-                SizedBox(
-                  height: getScreenHeight() * 0.0125
-                ),
-                const ExpansionTile(
-                  title: Text('Studios')
-                ),
-                SizedBox(
-                  height: getScreenHeight() * 0.0125
-                ),
-                const ExpansionTile(
-                  title: Text('Pictures')
-                ),
-                SizedBox(
-                  height: getScreenHeight() * 0.0125
-                ),
-                const ExpansionTile(
-                  title: Text('Related Animes')
-                ),
-                SizedBox(
-                  height: getScreenHeight() * 0.0125
-                ),
-                const ExpansionTile(
-                  title: Text('Statistics')
-                ),
-                SizedBox(
-                  height: getScreenHeight() * 0.025
-                ),
-              ],
+                      ]
+                    )
+                  ),
+                  SizedBox(
+                    height: getScreenHeight() * 0.0125
+                  ),
+                  CustomButton(
+                    width: fullWidth, 
+                    height: getScreenHeight() * 0.075, 
+                    buttonColor: Colors.grey,
+                    buttonText: '',
+                    onTapped: (){},
+                    setBorderRadius: true
+                  ),
+                  SizedBox(
+                    height: getScreenHeight() * 0.0125
+                  ),
+                  const ExpansionTile(
+                    title: Text('Synopsis')
+                  ),
+                  SizedBox(
+                    height: getScreenHeight() * 0.0125
+                  ),
+                  const ExpansionTile(
+                    title: Text('Background')
+                  ),
+                  SizedBox(
+                    height: getScreenHeight() * 0.0125
+                  ),
+                  const ExpansionTile(
+                    title: Text('Characters')
+                  ),
+                  SizedBox(
+                    height: getScreenHeight() * 0.0125
+                  ),
+                  const ExpansionTile(
+                    title: Text('Genres')
+                  ),
+                  SizedBox(
+                    height: getScreenHeight() * 0.0125
+                  ),
+                  const ExpansionTile(
+                    title: Text('Studios')
+                  ),
+                  SizedBox(
+                    height: getScreenHeight() * 0.0125
+                  ),
+                  const ExpansionTile(
+                    title: Text('Pictures')
+                  ),
+                  SizedBox(
+                    height: getScreenHeight() * 0.0125
+                  ),
+                  const ExpansionTile(
+                    title: Text('Related Animes')
+                  ),
+                  SizedBox(
+                    height: getScreenHeight() * 0.0125
+                  ),
+                  const ExpansionTile(
+                    title: Text('Statistics')
+                  ),
+                  SizedBox(
+                    height: getScreenHeight() * 0.025
+                  ),
+                ],
+              ),
             ),
           ),
         ),

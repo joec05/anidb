@@ -1,10 +1,12 @@
+import 'dart:async';
 import 'package:anime_list_app/global_files.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class AnimeDetailsController {
   final BuildContext context;
   final int animeID;
-  ValueNotifier<bool> isLoading = ValueNotifier(true);
+  late AutoDisposeAsyncNotifierProvider<AnimeDetailsNotifier, AnimeDataClass> animeDataNotifier;
 
   AnimeDetailsController (
     this.context,
@@ -13,53 +15,45 @@ class AnimeDetailsController {
 
   bool get mounted => context.mounted;
 
-  void initializeController(){
-    fetchAnimeDetails();
-    fetchAnimeCharacters();
+  void initializeController() async {
+    animeDataNotifier = AsyncNotifierProvider.autoDispose<AnimeDetailsNotifier, AnimeDataClass>(
+      () => AnimeDetailsNotifier(context, animeID)
+    );
   }
 
   void dispose(){
-    isLoading.dispose();
   }
+}
 
-  void fetchAnimeDetails() async{
-    var res = await apiCallRepo.runAPICall(
-      context,
-      APICallType.get,
-      malApiUrl,
-      '$malApiUrl/anime/$animeID?$fetchAllAnimeFieldsStr',
-      {}
-    );
-    if(res != null) {
-      updateAnimeData(res);
-    }
-  }
+class AnimeDetailsNotifier extends AutoDisposeAsyncNotifier<AnimeDataClass>{
+  final BuildContext context;
+  final int animeID;
+  late AnimeRepository animeRepository;
+  AnimeDataClass animeData = AnimeDataClass.fetchNewInstance(-1);
 
-  void fetchAnimeCharacters() async{
-    var res = await apiCallRepo.runAPICall(
-      context,
-      APICallType.get,
-      jikanApiUrl,
-      '$jikanApiUrl/anime/$animeID/characters',
-      {}
-    );
-    if(res != null) {
-      var data = res['data'];
-      AnimeDataClass animeData = appStateRepo.globalAnimeData[animeID]!.notifier.value;
-      AnimeDataClass newAnimeData = AnimeDataClass.generateNewCopy(animeData);
-      newAnimeData.characters = List.generate(data.length, (i){
-        CharacterDataClass newCharacterData = CharacterDataClass.fetchNewInstance(data[i]['character']['mal_id']);
-        newCharacterData.name = data[i]['character']['name'];
-        newCharacterData.cover = CharacterImageClass(
-          data[i]['character']['images']['jpg']['small_image_url'],
-          data[i]['character']['images']['jpg']['image_url']
-        );
-        return newCharacterData;
-      });
-      appStateRepo.globalAnimeData[animeID]!.notifier.value = newAnimeData;
-      if(mounted) {
-        isLoading.value = false;
+  AnimeDetailsNotifier(this.context, this.animeID);
+
+  @override
+  FutureOr<AnimeDataClass> build() async {
+    state = const AsyncLoading();
+    animeRepository = AnimeRepository(context);
+    APIResponseModel response = await animeRepository.fetchAnimeDetails(animeID);
+    if(response.error != null) {
+      state = AsyncError(response.error!.object, response.error!.stackTrace);
+      throw Exception(response.error!.object);
+    } else {
+      animeData = response.data;
+      APIResponseModel response2 = await animeRepository.fetchAnimeCharacters(animeID);
+      if(response2.error != null) {
+        state = AsyncError(response2.error!.object, response2.error!.stackTrace);
+        throw Exception(response.error!.object);
+      } else {
+        animeData.characters = response2.data;
+        state = AsyncData(animeData);
       }
     }
+    return animeData;
   }
+
+  Future<void> refresh() async => await build();
 }

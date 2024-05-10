@@ -1,5 +1,3 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'package:anime_list_app/global_files.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -37,11 +35,9 @@ class CustomUserListAnimeDisplayState extends State<CustomUserListAnimeDisplay>{
    @override
   Widget build(BuildContext context) {
     if(!widget.skeletonMode){
-      if(animeData.myListStatus == null && widget.displayType == AnimeRowDisplayType.myUserList){
-        return Container();
-      }
       return GestureDetector(
         onTap: () => context.pushNamed('view-anime-details', pathParameters: {'animeID': '${animeData.id}'}),
+        behavior: HitTestBehavior.opaque,
         child: Center(
           child: Container(
             padding: EdgeInsets.symmetric(
@@ -55,7 +51,7 @@ class CustomUserListAnimeDisplayState extends State<CustomUserListAnimeDisplay>{
                 SizedBox(
                   width: animeDisplayCoverSize.width,
                   height: animeDisplayCoverSize.height,
-                  child: generateCachedImage(animeData.cover)
+                  child: CachedImageWidget(imageClass: animeData.cover)
                 ),
                 SizedBox(
                   width: getScreenWidth() * 0.025
@@ -112,24 +108,14 @@ class CustomUserListAnimeDisplayState extends State<CustomUserListAnimeDisplay>{
                             ),
                           ]
                         ),
-                        animeData.myListStatus != null ?
-                          CustomButton(
-                            width: getScreenWidth() - animeDisplayCoverSize.width - defaultHorizontalPadding * 2, 
-                            height: getScreenHeight() * 0.06, 
-                            buttonColor: Colors.brown.withOpacity(0.4), 
-                            buttonText: 'Edit in list', 
-                            onTapped: () => progressController.openActionDrawer(), 
-                            setBorderRadius: true
-                          )
-                        : 
-                          CustomButton(
-                            width: getScreenWidth() - animeDisplayCoverSize.width - defaultHorizontalPadding * 2, 
-                            height: getScreenHeight() * 0.06, 
-                            buttonColor: Colors.brown.withOpacity(0.4), 
-                            buttonText: 'Add to list', 
-                            onTapped: () => progressController.openActionDrawer(), 
-                            setBorderRadius: true
-                          )
+                        CustomButton(
+                          width: getScreenWidth() - animeDisplayCoverSize.width - defaultHorizontalPadding * 2, 
+                          height: getScreenHeight() * 0.06, 
+                          buttonColor: Colors.brown.withOpacity(0.4), 
+                          buttonText: 'Edit in list', 
+                          onTapped: () => progressController.openActionDrawer(), 
+                          setBorderRadius: true
+                        )
                       ]
                     )
                   )

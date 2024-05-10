@@ -1,4 +1,3 @@
-import 'package:anime_list_app/constants/manga/functions.dart';
 import 'package:anime_list_app/global_files.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -41,6 +40,7 @@ class CustomUserListMangaDisplayState extends State<CustomUserListMangaDisplay>{
       }
       return GestureDetector(
         onTap: () => context.pushNamed('view-manga-details', pathParameters: {'mangaID': '${mangaData.id}'}),
+        behavior: HitTestBehavior.opaque,
         child: Center(
           child: Container(
             padding: EdgeInsets.symmetric(
@@ -56,7 +56,7 @@ class CustomUserListMangaDisplayState extends State<CustomUserListMangaDisplay>{
                     SizedBox(
                       width: animeDisplayCoverSize.width,
                       height: animeDisplayCoverSize.height,
-                      child: generateCachedImage(mangaData.cover)
+                      child: CachedImageWidget(imageClass: mangaData.cover)
                     ),
                     SizedBox(
                       width: getScreenWidth() * 0.025

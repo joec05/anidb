@@ -35,6 +35,7 @@ class CustomBasicCharacterDisplayState extends State<CustomBasicCharacterDisplay
     if(!widget.skeletonMode){
       return GestureDetector(
         onTap: () => context.pushNamed('view-character-details', pathParameters: {'characterID': '${characterData.id}'}),
+        behavior: HitTestBehavior.opaque,
         child: Center(
           child: Container(
             width: animeGridDisplayWidgetSize.width,
@@ -48,7 +49,7 @@ class CustomBasicCharacterDisplayState extends State<CustomBasicCharacterDisplay
                 SizedBox(
                   width: animeGridDisplayCoverSize.width,
                   height: animeGridDisplayCoverSize.height,
-                  child: generateCachedImage(characterData.cover)
+                  child: CachedImageWidget(imageClass: characterData.cover)
                 ),
                 SizedBox(
                   height: getScreenHeight() * 0.01

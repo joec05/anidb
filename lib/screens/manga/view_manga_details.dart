@@ -1,7 +1,8 @@
 import 'package:anime_list_app/global_files.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ViewMangaDetails extends StatelessWidget {
+class ViewMangaDetails extends ConsumerWidget {
   final int mangaID;
 
   const ViewMangaDetails({
@@ -10,14 +11,14 @@ class ViewMangaDetails extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return _ViewMangaDetailsStateful(
       mangaID: mangaID
     );
   }
 }
 
-class _ViewMangaDetailsStateful extends StatefulWidget {
+class _ViewMangaDetailsStateful extends ConsumerStatefulWidget {
   final int mangaID;
 
   const _ViewMangaDetailsStateful({
@@ -25,10 +26,10 @@ class _ViewMangaDetailsStateful extends StatefulWidget {
   });
 
   @override
-  State<_ViewMangaDetailsStateful> createState() => _ViewMangaDetailsStatefulState();
+  ConsumerState<_ViewMangaDetailsStateful> createState() => _ViewMangaDetailsStatefulState();
 }
 
-class _ViewMangaDetailsStatefulState extends State<_ViewMangaDetailsStateful>{
+class _ViewMangaDetailsStatefulState extends ConsumerState<_ViewMangaDetailsStateful>{
   late MangaDetailsController controller;
 
   @override void initState(){
@@ -49,31 +50,28 @@ class _ViewMangaDetailsStatefulState extends State<_ViewMangaDetailsStateful>{
         flexibleSpace: Container(
           decoration: defaultAppBarDecoration
         ),
-        leading: defaultLeadingWidget(context),
+        leading: const AppBarWidget(),
         title: const Text('Manga Details'), titleSpacing: defaultAppBarTitleSpacing,
       ),
-      body: ValueListenableBuilder(
-        valueListenable: controller.isLoading,
-        builder: (context, isLoadingValue, child) {
-          if(isLoadingValue || appStateRepo.globalMangaData[widget.mangaID] == null) {
-            return shimmerSkeletonWidget(
-              CustomMangaDetails(
-                mangaData: MangaDataClass.fetchNewInstance(-1),
-                skeletonMode: true,
-                key: UniqueKey()
-              )
-            );
-          }
-          
-          return ValueListenableBuilder(
-            valueListenable: appStateRepo.globalMangaData[widget.mangaID]!.notifier, 
-            builder: (context, mangaData, child){
-              return CustomMangaDetails(
-                mangaData: mangaData,
+      body: Builder(
+        builder: (context) {  
+          AsyncValue<MangaDataClass> viewMangaDataState = ref.watch(controller.mangaDataNotifier);
+          return RefreshIndicator(
+            onRefresh: () => context.read(controller.mangaDataNotifier.notifier).refresh(),
+            child: viewMangaDataState.when(
+              data: (data) => CustomMangaDetails(
+                mangaData: data,
                 skeletonMode: false,
-                key: UniqueKey()
-              );
-            }
+              ),
+              error: (obj, stackTrace) => DisplayErrorWidget(displayText: obj.toString()),
+              loading: () => ShimmerWidget(
+                child: CustomMangaDetails(
+                  mangaData: MangaDataClass.fetchNewInstance(-1),
+                  skeletonMode: true,
+                  key: UniqueKey()
+                )
+              )
+            ),
           );
         }
       )

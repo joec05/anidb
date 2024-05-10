@@ -1,5 +1,4 @@
 import 'dart:math';
-import 'package:anime_list_app/constants/manga/functions.dart';
 import 'package:anime_list_app/global_files.dart';
 import 'package:flutter/material.dart';
 import 'package:vertical_barchart/vertical-barchartmodel.dart';
@@ -176,7 +175,7 @@ class CustomMangaDetailsState extends State<CustomMangaDetails>{
                     SizedBox(
                       width: animeDetailDisplayCoverSize.width,
                       height: animeDetailDisplayCoverSize.height,
-                      child: generateCachedImage(mangaData.cover)
+                      child: CachedImageWidget(imageClass: mangaData.cover)
                     ),
                     SizedBox(
                       width: getScreenWidth() * 0.03
@@ -743,21 +742,7 @@ class CustomMangaDetailsState extends State<CustomMangaDetails>{
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               for(int i = 0; i < min(detailImgWidgetMaxAmount, mangaData.pictures.length); i++)
-                              Container(
-                                alignment: Alignment.centerLeft,
-                                margin: EdgeInsets.symmetric(
-                                  horizontal: getScreenWidth() * 0.015,
-                                  vertical: getScreenHeight() * 0.0025,
-                                ),
-                                decoration: const BoxDecoration(
-                                  borderRadius: BorderRadius.all(Radius.circular(10))
-                                ),
-                                child: SizedBox(
-                                  width: animeGridDisplayCoverSize.width,
-                                  height: animeGridDisplayCoverSize.height,
-                                  child: generateCachedImage(mangaData.pictures[i])
-                                ),
-                              )
+                              PictureWidget(imageData: mangaData.pictures[i])
                             ]
                           )
                         )
@@ -812,8 +797,8 @@ class CustomMangaDetailsState extends State<CustomMangaDetails>{
                         horizontal: getScreenWidth() * 0.025,
                         vertical: getScreenHeight() * 0.02,
                       ),
-                      child: generateBarChart(context, 
-                        [
+                      child: VerticalBarChartWidget(
+                        bardata: [
                           VBarChartModel(
                             index: 0,
                             colors: [Colors.orange, Colors.orange],
@@ -845,34 +830,34 @@ class CustomMangaDetailsState extends State<CustomMangaDetails>{
                             tooltip: totalActivitiesCount == 0 ? '0%' : '${((statusStats.dropped / totalActivitiesCount) * 100).roundToDouble().toString()}%'
                           )
                         ],
-                        [
-                          const Vlegend(
+                        legend: const [
+                          Vlegend(
                             isSquare: false,
                             color: Colors.orange,
                             text: 'Reading'
                           ),
-                          const Vlegend(
+                          Vlegend(
                             isSquare: false,
                             color: Colors.red,
                             text: 'Planning'
                           ),
-                          const Vlegend(
+                          Vlegend(
                             isSquare: false,
                             color: Colors.green,
                             text: 'Completed'
                           ),
-                          const Vlegend(
+                          Vlegend(
                             isSquare: false,
                             color: Colors.cyan,
                             text: 'On Hold'
                           ),
-                          const Vlegend(
+                          Vlegend(
                             isSquare: false,
                             color: Colors.purple,
                             text: 'Dropped'
                           )
                         ],
-                        totalActivitiesCount.toDouble()
+                        sum: totalActivitiesCount.toDouble()
                       )
                     )
                   ]

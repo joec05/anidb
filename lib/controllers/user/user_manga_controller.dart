@@ -1,35 +1,11 @@
 import 'dart:async';
 import 'package:anime_list_app/global_files.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class UserMangaController {
-  BuildContext context;
-  ValueNotifier<UserMangaListStatusClass> reading = ValueNotifier(
-    UserMangaListStatusClass(
-      [], 'reading', false, PaginationStatus.loaded
-    )
-  );
-  ValueNotifier<UserMangaListStatusClass> planning = ValueNotifier(
-    UserMangaListStatusClass(
-      [], 'plan_to_read', false, PaginationStatus.loaded
-    )
-  );
-  ValueNotifier<UserMangaListStatusClass> completed = ValueNotifier(
-    UserMangaListStatusClass(
-      [], 'completed', false, PaginationStatus.loaded
-    )
-  );
-  ValueNotifier<UserMangaListStatusClass> dropped = ValueNotifier(
-    UserMangaListStatusClass(
-      [], 'dropped', false, PaginationStatus.loaded
-    )
-  );
-  ValueNotifier<UserMangaListStatusClass> onHold = ValueNotifier(
-    UserMangaListStatusClass(
-      [], 'on_hold', false, PaginationStatus.loaded
-    )
-  );
-  ValueNotifier<bool> isLoading = ValueNotifier(true);
+  final BuildContext context;
+  late List<AutoDisposeAsyncNotifierProvider<MyMangaListNotifier, UserMangaListStatusClass>> statusNotifiers = [];
   late StreamSubscription updateUserMangaListStreamClassSubscription;
 
   UserMangaController(
@@ -39,45 +15,61 @@ class UserMangaController {
   bool get mounted => context.mounted;
 
   void initializeController(){
-    fetchUserMangasList(reading);
-    fetchUserMangasList(planning);
-    fetchUserMangasList(completed);
-    fetchUserMangasList(dropped);
-    fetchUserMangasList(onHold);
+    statusNotifiers = [
+      AsyncNotifierProvider.autoDispose<MyMangaListNotifier, UserMangaListStatusClass>(() => 
+        MyMangaListNotifier(
+          context,
+          UserMangaListStatusClass(
+            [], 'reading', false, PaginationStatus.loaded
+          )
+        )
+      ),
+      AsyncNotifierProvider.autoDispose<MyMangaListNotifier, UserMangaListStatusClass>(() => 
+        MyMangaListNotifier(
+          context,
+          UserMangaListStatusClass(
+            [], 'plan_to_read', false, PaginationStatus.loaded
+          )
+        )
+      ),
+      AsyncNotifierProvider.autoDispose<MyMangaListNotifier, UserMangaListStatusClass>(() => 
+        MyMangaListNotifier(
+          context,
+          UserMangaListStatusClass(
+            [], 'completed', false, PaginationStatus.loaded
+          )
+        )
+      ),
+      AsyncNotifierProvider.autoDispose<MyMangaListNotifier, UserMangaListStatusClass>(() => 
+        MyMangaListNotifier(
+          context,
+          UserMangaListStatusClass(
+            [], 'dropped', false, PaginationStatus.loaded
+          )
+        )
+      ),
+      AsyncNotifierProvider.autoDispose<MyMangaListNotifier, UserMangaListStatusClass>(() => 
+        MyMangaListNotifier(
+          context,
+          UserMangaListStatusClass(
+            [], 'on_hold', false, PaginationStatus.loaded
+          )
+        )
+      ),
+    ];
     updateUserMangaListStreamClassSubscription = UpdateUserMangaListStreamClass().userMangaListStream.listen((UserMangaListStreamControllerClass data) {
       if(mounted){
         int id = data.mangaData.id;
-        String status = data.mangaData.myListStatus!.status!; 
-
-        if(mounted) {
-          reading.value.mangasList.remove(id);
-          planning.value.mangasList.remove(id);
-          completed.value.mangasList.remove(id);
-          dropped.value.mangasList.remove(id);
-          onHold.value.mangasList.remove(id);
-
-          if(status == 'reading'){
-            reading.value.mangasList.insert(0, id);
-            reading.value.mangasList.sort((a, b) => appStateRepo.globalMangaData[a]!.notifier.value.title.compareTo(appStateRepo.globalMangaData[b]!.notifier.value.title));
-          }else if(status == 'plan_to_read'){
-            planning.value.mangasList.insert(0, id);
-            planning.value.mangasList.sort((a, b) => appStateRepo.globalMangaData[a]!.notifier.value.title.compareTo(appStateRepo.globalMangaData[b]!.notifier.value.title));
-          }else if(status == 'completed'){
-            completed.value.mangasList.insert(0, id);
-            completed.value.mangasList.sort((a, b) => appStateRepo.globalMangaData[a]!.notifier.value.title.compareTo(appStateRepo.globalMangaData[b]!.notifier.value.title));
-          }else if(status == 'dropped'){
-            dropped.value.mangasList.insert(0, id);
-            dropped.value.mangasList.sort((a, b) => appStateRepo.globalMangaData[a]!.notifier.value.title.compareTo(appStateRepo.globalMangaData[b]!.notifier.value.title));
-          }else if(status == 'on_hold'){
-            onHold.value.mangasList.insert(0, id);
-            onHold.value.mangasList.sort((a, b) => appStateRepo.globalMangaData[a]!.notifier.value.title.compareTo(appStateRepo.globalMangaData[b]!.notifier.value.title));
+        if(context.mounted) {
+          MangaMyListStatusClass? myMangaStatus = context.read(appStateRepo.globalMangaData[id]!.notifier).getState();
+          String? status = myMangaStatus.status;
+          if(mounted) {
+            for(int i = 0; i < statusNotifiers.length; i++) {
+              context.read(statusNotifiers[i].notifier).removeByIDAndAddByStatus(
+                id, status, data.mangaData
+              );
+            }
           }
-
-          reading.value = reading.value.copy();
-          planning.value = planning.value.copy();
-          completed.value = completed.value.copy();
-          onHold.value = onHold.value.copy();
-          dropped.value = dropped.value.copy();
         }
       }
     });
@@ -85,64 +77,60 @@ class UserMangaController {
 
   void dispose(){
     updateUserMangaListStreamClassSubscription.cancel();
-    isLoading.dispose();
-    reading.dispose();
-    planning.dispose();
-    completed.dispose();
-    onHold.dispose();
-    dropped.dispose();
+  }
+}
+
+class MyMangaListNotifier extends AutoDisposeAsyncNotifier<UserMangaListStatusClass> {
+  final BuildContext context;
+  UserMangaListStatusClass statusClass;
+  late MangaRepository mangaRepository;
+
+  MyMangaListNotifier(
+    this.context,
+    this.statusClass
+  );
+
+  @override
+  FutureOr<UserMangaListStatusClass> build() async {
+    state = const AsyncLoading();
+    mangaRepository = MangaRepository(context);
+    APIResponseModel response = await mangaRepository.fetchMyMangasList(statusClass);
+    if(response.error != null) {
+      state = AsyncError(response.error!.object, response.error!.stackTrace);
+      throw Exception(response.error!.object);
+    } else {
+      statusClass = response.data;
+      state = AsyncData(statusClass);
+    }
+    return statusClass;
   }
 
-  void fetchUserMangasList(ValueNotifier<UserMangaListStatusClass> statusClass) async{
-    if(mounted){
-      if(!isLoading.value){
-        statusClass.value = statusClass.value.updatePaginationStatus(PaginationStatus.loading);
-      }
+  Future<UserMangaListStatusClass> paginate() async {
+    state = AsyncData(statusClass.updatePaginationStatus(PaginationStatus.loading));
+    APIResponseModel response = await mangaRepository.fetchMyMangasList(statusClass);
+    if(response.error != null) {
+      state = AsyncData(statusClass.updatePaginationStatus(PaginationStatus.loaded));
+      state = AsyncError(response.error!.object, response.error!.stackTrace);
+    } else {
+      statusClass = response.data;
+      statusClass = statusClass.updatePaginationStatus(PaginationStatus.loaded);
+      state = AsyncData(statusClass);
     }
-    var res = await apiCallRepo.runAPICall(
-      context,
-      APICallType.get,
-      malApiUrl,
-      '$malApiUrl/users/@me/mangalist?status=${statusClass.value.status}&offset=${statusClass.value.mangasList.length}&limit=$userDisplayFetchLimit&$fetchAllMangaFieldsStr',
-      {}
-    );
-    if(res != null) {
-      statusClass.value = statusClass.value.updateCanPaginate((res['paging']['next'] != null));
-      var data = res['data'];
-      if(mounted) {
-        for(int i = 0; i < data.length; i++){
-          updateMangaData(data[i]['node']);
-          int id = data[i]['node']['id'];
-          if(appStateRepo.globalMangaData[id] != null){
-            if(appStateRepo.globalMangaData[id]!.notifier.value.myListStatus != null){
-              String? status = appStateRepo.globalMangaData[id]!.notifier.value.myListStatus!.status;
-              if(status == 'reading'){
-                reading.value.mangasList.add(id);
-              }else if(status == 'plan_to_read'){
-                planning.value.mangasList.add(id);
-              }else if(status == 'completed'){
-                completed.value.mangasList.add(id);
-              }else if(status == 'on_hold'){
-                onHold.value.mangasList.add(id);
-              }else if(status == 'dropped'){
-                dropped.value.mangasList.add(id);
-              }
-            }
-          }
-        }
-        
-        reading.value = reading.value.copy();
-        planning.value = planning.value.copy();
-        completed.value = completed.value.copy();
-        onHold.value = onHold.value.copy();
-        dropped.value = dropped.value.copy();
+    return statusClass;
+  }
 
-        if(isLoading.value){
-          isLoading.value = false;
-        }else{
-          statusClass.value = statusClass.value.updatePaginationStatus(PaginationStatus.loaded);
-        }
-      }
+  void removeByIDAndAddByStatus(int id, String? status, MangaDataClass mangaData) {
+    int index = statusClass.mangaList.indexWhere((e) => e.id == id);
+    if(index > -1) {
+      statusClass.mangaList.removeAt(index);
+      state = AsyncData(statusClass.copy());
+    }
+    if(status == statusClass.status) {
+      statusClass.mangaList.insert(0, mangaData);
+      statusClass.mangaList.sort((a, b) => a.title.compareTo(b.title));
+      state = AsyncData(statusClass.copy());
     }
   }
+
+  Future<void> refresh() async => await build();
 }

@@ -33,6 +33,7 @@ class CustomRowCharacterDisplayState extends State<CustomRowCharacterDisplay>{
     if(!widget.skeletonMode){
       return GestureDetector(
         onTap: () => context.pushNamed('view-character-details', pathParameters: {'characterID': '${characterData.id}'}),
+        behavior: HitTestBehavior.opaque,
         child: Center(
           child: Container(
             padding: EdgeInsets.symmetric(
@@ -48,17 +49,20 @@ class CustomRowCharacterDisplayState extends State<CustomRowCharacterDisplay>{
                     SizedBox(
                       width: animeDisplayCoverSize.width,
                       height: animeDisplayCoverSize.height,
-                      child: generateCachedImage(characterData.cover)
+                      child: CachedImageWidget(imageClass: characterData.cover)
                     ),
                     SizedBox(
                       width: getScreenWidth() * 0.025
                     ),
                     Flexible(
-                      child: SizedBox(
+                      child: Container(
                         width: getScreenWidth() - animeDisplayCoverSize.width - defaultHorizontalPadding * 2,
                         height: animeDisplayCoverSize.height,
+                        padding: EdgeInsets.symmetric(
+                          vertical: defaultVerticalPadding * 2.5
+                        ),
                         child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Column(
                               mainAxisAlignment: MainAxisAlignment.start,
@@ -80,76 +84,12 @@ class CustomRowCharacterDisplayState extends State<CustomRowCharacterDisplay>{
                                   ]
                                 ),
                                 SizedBox(
-                                  height: getScreenHeight() * 0.005
-                                ),
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    const Icon(Icons.favorite, size: 18),
-                                    SizedBox(
-                                      width: getScreenWidth() * 0.004,
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsets.fromLTRB(getScreenWidth() * 0.003, 0, 0, 0),
-                                      child: Text(getShortenedNumbers(characterData.favouritedCount), style: TextStyle(
-                                        fontSize: defaultTextFontSize * 0.9,
-                                        fontWeight: FontWeight.w600
-                                      ))
-                                    )
-                                  ],
-                                ),
-                                SizedBox(
-                                  height: getScreenHeight() * 0.005
-                                ),
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Flexible(
-                                      child: Text(
-                                        characterData.kanjiName ?? 'Unspecified kanji name', 
-                                        style: TextStyle(
-                                          fontSize: defaultTextFontSize * 0.9,
-                                          fontWeight: FontWeight.w500
-                                        ),
-                                        maxLines: 1,
-                                      )
-                                    )
-                                  ],
-                                ),
-                                SizedBox(
                                   height: getScreenHeight() * 0.01
                                 ),
-                                Row(
-                                  children: [
-                                    Flexible(
-                                      child: Text(
-                                        StringEllipsis.convertToEllipsis(characterData.about ?? ''), 
-                                        style: TextStyle(
-                                          fontSize: defaultTextFontSize * 0.85,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                        maxLines: 3,
-                                        overflow: TextOverflow.ellipsis
-                                      )
-                                    )
-                                  ]
-                                ),
-                              ]
-                            ),
-                            Row(
-                              children: [
-                                Flexible(
-                                  child: Text(
-                                    StringEllipsis.convertToEllipsis(characterData.nicknames.join(', ')), 
-                                    style: TextStyle(
-                                      fontSize: defaultTextFontSize * 0.85,
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.grey
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis
-                                  )
-                                )
+                                Text(characterData.about ?? 'No description provided', maxLines: 3, style: TextStyle(
+                                  fontSize: defaultTextFontSize * 0.8,
+                                  fontWeight: FontWeight.w500
+                                )),
                               ]
                             ),
                           ]

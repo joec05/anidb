@@ -1,11 +1,12 @@
 import 'package:anime_list_app/global_files.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-class CustomHomeFrontDisplay extends StatefulWidget {
+class CustomHomeFrontDisplay extends ConsumerStatefulWidget {
   final String label;
   final dynamic displayType;
-  final List<int> dataList;
+  final List<dynamic> dataList;
   final bool isLoading;
 
   const CustomHomeFrontDisplay({
@@ -17,10 +18,10 @@ class CustomHomeFrontDisplay extends StatefulWidget {
   });
 
   @override
-  State<CustomHomeFrontDisplay> createState() => CustomHomeFrontDisplayState();
+  ConsumerState<CustomHomeFrontDisplay> createState() => CustomHomeFrontDisplayState();
 }
 
-class CustomHomeFrontDisplayState extends State<CustomHomeFrontDisplay>{
+class CustomHomeFrontDisplayState extends ConsumerState<CustomHomeFrontDisplay>{
   late CharacterDataClass characterData;
 
   @override void initState(){
@@ -83,8 +84,8 @@ class CustomHomeFrontDisplayState extends State<CustomHomeFrontDisplay>{
             itemBuilder: (c, i){
               if(widget.isLoading){
                 if(widget.displayType is AnimeBasicDisplayType){
-                  return shimmerSkeletonWidget(
-                    CustomBasicAnimeDisplay(
+                  return ShimmerWidget(
+                    child: CustomBasicAnimeDisplay(
                       animeData: AnimeDataClass.fetchNewInstance(-1), 
                       skeletonMode: true,
                       showStats: false,
@@ -92,8 +93,8 @@ class CustomHomeFrontDisplayState extends State<CustomHomeFrontDisplay>{
                     )
                   );
                 }else if(widget.displayType is MangaBasicDisplayType){
-                  return shimmerSkeletonWidget(
-                    CustomBasicMangaDisplay(
+                  return ShimmerWidget(
+                    child: CustomBasicMangaDisplay(
                       mangaData: MangaDataClass.fetchNewInstance(-1), 
                       skeletonMode: true,
                       showStats: false,
@@ -101,8 +102,8 @@ class CustomHomeFrontDisplayState extends State<CustomHomeFrontDisplay>{
                     )
                   );
                 }else if(widget.displayType is CharacterBasicDisplayType){
-                  return shimmerSkeletonWidget(
-                    CustomBasicCharacterDisplay(
+                  return ShimmerWidget(
+                    child: CustomBasicCharacterDisplay(
                       characterData: CharacterDataClass.fetchNewInstance(-1), 
                       skeletonMode: true,
                       showStats: false,
@@ -113,49 +114,28 @@ class CustomHomeFrontDisplayState extends State<CustomHomeFrontDisplay>{
               }
               if(i < widget.dataList.length){
                 if(widget.displayType is AnimeBasicDisplayType){
-                  if(appStateRepo.globalAnimeData[widget.dataList[i]] == null){
-                    return Container();
-                  }
-                  return ValueListenableBuilder(
-                    valueListenable: appStateRepo.globalAnimeData[widget.dataList[i]]!.notifier, 
-                    builder: (context, animeData, child){
-                      return CustomBasicAnimeDisplay(
-                        animeData: animeData,
-                        showStats: false,
-                        skeletonMode: false,
-                        key: UniqueKey()
-                      );
-                    }
+                  final AnimeDataClass animeData = widget.dataList[i];
+                  return CustomBasicAnimeDisplay(
+                    animeData: animeData,
+                    showStats: false,
+                    skeletonMode: false,
+                    key: UniqueKey()
                   );
                 }else if(widget.displayType is MangaBasicDisplayType){
-                  if(appStateRepo.globalMangaData[widget.dataList[i]] == null){
-                    return Container();
-                  }
-                  return ValueListenableBuilder(
-                    valueListenable: appStateRepo.globalMangaData[widget.dataList[i]]!.notifier, 
-                    builder: (context, mangaData, child){
-                      return CustomBasicMangaDisplay(
-                        mangaData: mangaData,
-                        showStats: false,
-                        skeletonMode: false,
-                        key: UniqueKey()
-                      );
-                    }
+                  final MangaDataClass mangaData = widget.dataList[i];
+                  return CustomBasicMangaDisplay(
+                    mangaData: mangaData,
+                    showStats: false,
+                    skeletonMode: false,
+                    key: UniqueKey()
                   );
                 }else if(widget.displayType is CharacterBasicDisplayType){
-                  if(appStateRepo.globalCharacterData[widget.dataList[i]] == null){
-                    return Container();
-                  }
-                  return ValueListenableBuilder(
-                    valueListenable: appStateRepo.globalCharacterData[widget.dataList[i]]!.notifier, 
-                    builder: (context, characterData, child){
-                      return CustomBasicCharacterDisplay(
-                        characterData: characterData,
-                        showStats: false,
-                        skeletonMode: false,
-                        key: UniqueKey()
-                      );
-                    }
+                  final CharacterDataClass characterData = widget.dataList[i];
+                  return CustomBasicCharacterDisplay(
+                    characterData: characterData,
+                    showStats: false,
+                    skeletonMode: false,
+                    key: UniqueKey()
                   );
                 }
               }

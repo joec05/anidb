@@ -1,7 +1,8 @@
 import 'package:anime_list_app/global_files.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ViewAnimeDetails extends StatelessWidget {
+class ViewAnimeDetails extends ConsumerWidget {
   final int animeID;
 
   const ViewAnimeDetails({
@@ -10,14 +11,14 @@ class ViewAnimeDetails extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return _ViewAnimeDetailsStateful(
       animeID: animeID
     );
   }
 }
 
-class _ViewAnimeDetailsStateful extends StatefulWidget {
+class _ViewAnimeDetailsStateful extends ConsumerStatefulWidget {
   final int animeID;
 
   const _ViewAnimeDetailsStateful({
@@ -25,10 +26,10 @@ class _ViewAnimeDetailsStateful extends StatefulWidget {
   });
 
   @override
-  State<_ViewAnimeDetailsStateful> createState() => _ViewAnimeDetailsStatefulState();
+  ConsumerState<_ViewAnimeDetailsStateful> createState() => _ViewAnimeDetailsStatefulState();
 }
 
-class _ViewAnimeDetailsStatefulState extends State<_ViewAnimeDetailsStateful>{
+class _ViewAnimeDetailsStatefulState extends ConsumerState<_ViewAnimeDetailsStateful>{
   late AnimeDetailsController controller;
 
   @override void initState(){
@@ -51,28 +52,23 @@ class _ViewAnimeDetailsStatefulState extends State<_ViewAnimeDetailsStateful>{
         ),
         title: const Text('Anime Details'), titleSpacing: defaultAppBarTitleSpacing,
       ),
-      body: ValueListenableBuilder(
-        valueListenable: controller.isLoading,
-        builder: (context, isLoadingValue, child) {
-          if(isLoadingValue || appStateRepo.globalAnimeData[widget.animeID] == null){
-            return shimmerSkeletonWidget(
-              CustomAnimeDetails(
+      body: Builder(
+        builder: (context) {  
+          AsyncValue<AnimeDataClass> viewAnimeDataState = ref.watch(controller.animeDataNotifier);
+          return RefreshIndicator(
+            onRefresh: () => context.read(controller.animeDataNotifier.notifier).refresh(),
+            child: viewAnimeDataState.when(
+              data: (data) => CustomAnimeDetails(
+                animeData: data,
+                skeletonMode: false,
+              ), 
+              error: (obj, stackTrace) => DisplayErrorWidget(displayText: obj.toString()), 
+              loading: () => CustomAnimeDetails(
                 animeData: AnimeDataClass.fetchNewInstance(-1),
                 skeletonMode: true,
                 key: UniqueKey()
               )
-            );
-          }
-      
-          return ValueListenableBuilder(
-            valueListenable: appStateRepo.globalAnimeData[widget.animeID]!.notifier, 
-            builder: (context, animeData, child){
-              return CustomAnimeDetails(
-                animeData: animeData,
-                skeletonMode: false,
-                key: UniqueKey()
-              );
-            }
+            ),
           );
         }
       )

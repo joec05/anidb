@@ -1,56 +1,51 @@
 import 'dart:async';
 import 'package:anime_list_app/global_files.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class CharacterBasicController {
+class ViewMoreCharactersController {
   final BuildContext context;
   final CharacterBasicDisplayType type;
-  ValueNotifier<List<int>> charactersList = ValueNotifier([]);
-  ValueNotifier<bool> isLoading = ValueNotifier(true);
+  late AutoDisposeAsyncNotifierProvider<ViewMoreCharactersNotifier, List<CharacterDataClass>> characterDataNotifier;
 
-  CharacterBasicController(
+  ViewMoreCharactersController(
     this.context,
     this.type
   );
 
   bool get mounted => context.mounted;
 
-  void initializeController(){
-    fetchCharactersList();
+  void initializeController() {
+    characterDataNotifier = AsyncNotifierProvider.autoDispose<ViewMoreCharactersNotifier, List<CharacterDataClass>>(
+      () => ViewMoreCharactersNotifier(context, type)
+    );
   }
 
-  void dispose(){
-    charactersList.dispose();
-    isLoading.dispose();
-  }
+  void dispose(){}
+}
 
-  String generateAPIRequestPath(){
-    if(type == CharacterBasicDisplayType.top){
-      return '$jikanApiUrl/top/characters?limit=24';
+class ViewMoreCharactersNotifier extends AutoDisposeAsyncNotifier<List<CharacterDataClass>>{
+  final BuildContext context;
+  final CharacterBasicDisplayType type;
+  late CharacterRepository characterRepository;
+  List<CharacterDataClass> charactersList = [];
+
+  ViewMoreCharactersNotifier(this.context, this.type);
+
+  @override
+  FutureOr<List<CharacterDataClass>> build() async {
+    state = const AsyncLoading();
+    characterRepository = CharacterRepository(context);
+    APIResponseModel response = await characterRepository.fetchCharactersListFromType(type);
+    if(response.error != null) {
+      state = AsyncError(response.error!.object, response.error!.stackTrace);
+      throw Exception(response.error!.object);
+    } else {
+      charactersList = response.data;
+      state = AsyncData(charactersList);
     }
-    return '';
+    return charactersList;
   }
 
-  Future<void> fetchCharactersList() async{
-    if(mounted){
-      var res = await apiCallRepo.runAPICall(
-        context,
-        APICallType.get,
-        jikanApiUrl,
-        generateAPIRequestPath(),
-        {}
-      );
-      if(res != null) {
-        var data = res['data'];
-        if(mounted) {
-          for(int i = 0; i < data.length; i++){
-            updateBasicCharacterData(data[i]);
-            charactersList.value.add(data[i]['mal_id']);
-          }
-          charactersList.value = [...charactersList.value];
-          isLoading.value = false;
-        }
-      }
-    }
-  }
+  Future<void> refresh() async => await build();
 }

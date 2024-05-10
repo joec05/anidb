@@ -1,25 +1,26 @@
 import 'package:anime_list_app/global_files.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ViewUserStatistics extends StatelessWidget {
+class ViewUserStatistics extends ConsumerWidget {
   const ViewUserStatistics({
     super.key,
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return const _ViewUserStatisticsStateful();
   }
 }
 
-class _ViewUserStatisticsStateful extends StatefulWidget {
+class _ViewUserStatisticsStateful extends ConsumerStatefulWidget {
   const _ViewUserStatisticsStateful();
 
   @override
-  State<_ViewUserStatisticsStateful> createState() => _ViewUserStatisticsStatefulState();
+  ConsumerState<_ViewUserStatisticsStateful> createState() => _ViewUserStatisticsStatefulState();
 }
 
-class _ViewUserStatisticsStatefulState extends State<_ViewUserStatisticsStateful> with SingleTickerProviderStateMixin{
+class _ViewUserStatisticsStatefulState extends ConsumerState<_ViewUserStatisticsStateful> with SingleTickerProviderStateMixin{
   late TabController _tabController;
   late UserStatisticsController controller;
 
@@ -41,7 +42,7 @@ class _ViewUserStatisticsStatefulState extends State<_ViewUserStatisticsStateful
   Widget build(BuildContext context){
     return Scaffold(
       appBar: AppBar(
-        leading: defaultLeadingWidget(context),
+        leading: const AppBarWidget(),
         flexibleSpace: Container(
           decoration: defaultAppBarDecoration
         ),
@@ -77,74 +78,56 @@ class _ViewUserStatisticsStatefulState extends State<_ViewUserStatisticsStateful
           ];
         },
         body: Builder(
-          builder: (context){
+          builder: (context) {
+            final statisticsNotifiers = controller.myStatisticsNotifiers;
+            List<AsyncValue<APIResponseModel>> statisticsProviders = List.generate(statisticsNotifiers.length, (i) => ref.watch(statisticsNotifiers[i]));
             return TabBarView(
               controller: _tabController,
-              children: [
-                ListenableBuilder(
-                  listenable: Listenable.merge([
-                    controller.isLoading,
-                    controller.userAnimeStatistics,
-                    controller.animeBarChartData,
-                  ]), 
-                  builder: (context, child) {
-                    bool isLoadingValue = controller.isLoading.value;
-                    UserAnimeStatisticsClass userAnimeStatistics = controller.userAnimeStatistics.value;
-                    List<BarChartClass> animeBarChartData = controller.animeBarChartData.value;
-
-                    if(isLoadingValue) {
-                      return shimmerSkeletonWidget(
-                        CustomUserAnimeStatsWidget(
-                          userAnimeStats: userAnimeStatistics, 
-                          barChartData: animeBarChartData, 
-                          absorberContext: context,
-                          skeletonMode: true,
-                          key: UniqueKey()
-                        ),
-                      );
-                    }
-                    
-                    return CustomUserAnimeStatsWidget(
-                      userAnimeStats: userAnimeStatistics, 
-                      barChartData: animeBarChartData, 
+              children: [                
+                RefreshIndicator(
+                  onRefresh: () => context.read(controller.myStatisticsNotifiers[0].notifier).refresh(),
+                  child: statisticsProviders[0].when(
+                    data: (data) => CustomUserAnimeStatsWidget(
+                      userAnimeStats: data.data, 
+                      barChartData: data.data2, 
                       absorberContext: context,
                       skeletonMode: false,
                       key: UniqueKey()
-                    );
-                  }
+                    ),
+                    error: (obj, stackTrace) => DisplayErrorWidget(displayText: obj.toString()),
+                    loading: () => ShimmerWidget(
+                      child: CustomUserAnimeStatsWidget(
+                        userAnimeStats: UserAnimeStatisticsClass.generateNewInstance(), 
+                        barChartData: const [], 
+                        absorberContext: context,
+                        skeletonMode: true,
+                        key: UniqueKey()
+                      ),
+                    )
+                  ),
                 ),
-                ListenableBuilder(
-                  listenable: Listenable.merge([
-                    controller.isLoading2, 
-                    controller.userMangaStatistics,
-                    controller.mangaBarChartData
-                  ]), 
-                  builder: (context, child) {
-                    bool isLoadingValue2 = controller.isLoading2.value;
-                    UserMangaStatisticsClass userMangaStatistics = controller.userMangaStatistics.value;
-                    List<BarChartClass> mangaBarChartData = controller.mangaBarChartData.value;
-
-                    if(isLoadingValue2) {
-                      return shimmerSkeletonWidget(
-                        CustomUserMangaStatsWidget(
-                          userMangaStats: userMangaStatistics, 
-                          barChartData: mangaBarChartData, 
-                          absorberContext: context,
-                          skeletonMode: true,
-                          key: UniqueKey()
-                        ),
-                      );
-                    }
-
-                    return CustomUserMangaStatsWidget(
-                      userMangaStats: userMangaStatistics, 
-                      barChartData: mangaBarChartData, 
+                RefreshIndicator(
+                  onRefresh: () => context.read(controller.myStatisticsNotifiers[1].notifier).refresh(),
+                  child: statisticsProviders[1].when(
+                    data: (data) => CustomUserMangaStatsWidget(
+                      userMangaStats: data.data, 
+                      barChartData: data.data2, 
                       absorberContext: context,
                       skeletonMode: false,
                       key: UniqueKey()
-                    );                      
-                  }
-                )
+                    ),
+                    error: (obj, stackTrace) => DisplayErrorWidget(displayText: obj.toString()),
+                    loading: () => ShimmerWidget(
+                      child: CustomUserMangaStatsWidget(
+                        userMangaStats: UserMangaStatisticsClass.generateNewInstance(), 
+                        barChartData: const [], 
+                        absorberContext: context,
+                        skeletonMode: true,
+                        key: UniqueKey()
+                      ),
+                    )
+                  ),
+                ),
               ]
             );
           }

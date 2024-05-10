@@ -43,69 +43,9 @@ class __MainPageStatefulState extends State<_MainPageStateful>{
     const HomePage(), const ExplorePage(), const ProfilePage()
   ];
 
-  PreferredSizeWidget setAppBar(index){
-    if(index == 0){
-      return AppBar(
-        flexibleSpace: Container(
-          decoration: defaultAppBarDecoration
-        ),
-        title: const Text('Home'), 
-        titleSpacing: defaultHomeAppBarTitleSpacing,
-        automaticallyImplyLeading: false
-      );
-    }else if(index == 1){
-      return AppBar(
-        flexibleSpace: Container(
-          decoration: defaultAppBarDecoration
-        ),
-        automaticallyImplyLeading: false,
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const Text('Explore'),
-            Row(
-              children: [
-                InkWell(
-                  customBorder: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15)
-                  ),
-                  onTap: () => context.push('/search-page'),
-                  child: const Padding(
-                    padding: EdgeInsets.all(10),
-                    child: Icon(FontAwesomeIcons.magnifyingGlass, size: 17.5),
-                  ),
-                ),
-                SizedBox(
-                  width: getScreenWidth() * 0.05
-                ),
-                InkWell(
-                  customBorder: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15)
-                  ),
-                  onTap: () => context.push('/settings-page'),
-                  child: const Padding(
-                    padding: EdgeInsets.all(10),
-                    child: Icon(FontAwesomeIcons.gear, size: 17.5),
-                  ),
-                ),
-              ],
-            )
-          ]
-        ), 
-        titleSpacing: defaultHomeAppBarTitleSpacing,
-      );
-    }else if(index == 2){
-      return AppBar(
-        flexibleSpace: Container(
-          decoration: defaultAppBarDecoration
-        ),
-        title: const Text('Profile'), titleSpacing: defaultHomeAppBarTitleSpacing,
-        automaticallyImplyLeading: false
-      );
-    }
-    return AppBar();
-  }
+  final List<String> appBarDisplayTexts = [
+    'Home', 'Explore', 'Profile'
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -113,7 +53,47 @@ class __MainPageStatefulState extends State<_MainPageStateful>{
       valueListenable: selectedIndexValue,
       builder: (BuildContext context, int selectedIndexValue, Widget? child) {
         return Scaffold(
-          appBar: setAppBar(selectedIndexValue),
+          appBar: AppBar(
+            flexibleSpace: Container(
+              decoration: defaultAppBarDecoration
+            ),
+            automaticallyImplyLeading: false,
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(appBarDisplayTexts[selectedIndexValue]),
+                Row(
+                  children: [
+                    InkWell(
+                      customBorder: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15)
+                      ),
+                      onTap: () => context.push('/search-page'),
+                      child: const Padding(
+                        padding: EdgeInsets.all(10),
+                        child: Icon(FontAwesomeIcons.magnifyingGlass, size: 17.5),
+                      ),
+                    ),
+                    SizedBox(
+                      width: getScreenWidth() * 0.05
+                    ),
+                    InkWell(
+                      customBorder: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15)
+                      ),
+                      onTap: () => context.push('/settings-page'),
+                      child: const Padding(
+                        padding: EdgeInsets.all(10),
+                        child: Icon(FontAwesomeIcons.gear, size: 17.5),
+                      ),
+                    ),
+                  ],
+                )
+              ]
+            ), 
+            titleSpacing: defaultHomeAppBarTitleSpacing,
+          ),
           body: PageView(
             controller: _pageController,
             onPageChanged: onPageChanged,

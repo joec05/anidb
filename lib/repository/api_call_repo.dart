@@ -41,14 +41,15 @@ class APICallRepository {
           url,
           options: Options(
             headers: baseUrl == jikanApiUrl ? {} : {
-              "Content-Type": "application/x-www-form-urlencoded"
+              "Content-Type": "application/x-www-form-urlencoded",
             },
           ),
           data: {
             'client_id': data['client_id'],
             'code': data['code'],
             'code_verifier': data['code_verifier'],
-            'grant_type': 'authorization_code',
+            'grant_type': data['grant_type'],
+            'refresh_token': data['refresh_token'],
           }
         );
       }else if(type == APICallType.delete){
@@ -64,16 +65,15 @@ class APICallRepository {
         );
       }
       
-      return res.data;
-    } catch (e) {
-      if(context.mounted) {
-        handler.displaySnackbar(
-          context, 
-          SnackbarType.error, 
-          tErr.api
-        );
-        return null;
-      }
+      return APIResponseModel(
+        res.data,
+        null
+      );
+    } on Exception catch (obj, stackTrace) {
+      return APIResponseModel(
+        null, 
+        APIErrorModel(obj, stackTrace)
+      );
     }
   }
 }

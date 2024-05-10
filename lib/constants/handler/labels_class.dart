@@ -12,6 +12,8 @@ class ErrorLabels {
   final invalidInput = "Invalid input!!!";
 
   final maxValueReached = "Maximum value reached!!!";
+
+  final response = "Response error";
   
 }
 

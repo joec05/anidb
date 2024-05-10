@@ -1,7 +1,8 @@
 import 'package:anime_list_app/global_files.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ViewCharacterDetails extends StatelessWidget {
+class ViewCharacterDetails extends ConsumerWidget {
   final int characterID;
 
   const ViewCharacterDetails({
@@ -10,14 +11,14 @@ class ViewCharacterDetails extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return _ViewCharacterDetailsStateful(
       characterID: characterID
     );
   }
 }
 
-class _ViewCharacterDetailsStateful extends StatefulWidget {
+class _ViewCharacterDetailsStateful extends ConsumerStatefulWidget {
   final int characterID;
 
   const _ViewCharacterDetailsStateful({
@@ -25,10 +26,10 @@ class _ViewCharacterDetailsStateful extends StatefulWidget {
   });
 
   @override
-  State<_ViewCharacterDetailsStateful> createState() => _ViewCharacterDetailsStatefulState();
+  ConsumerState<_ViewCharacterDetailsStateful> createState() => _ViewCharacterDetailsStatefulState();
 }
 
-class _ViewCharacterDetailsStatefulState extends State<_ViewCharacterDetailsStateful>{
+class _ViewCharacterDetailsStatefulState extends ConsumerState<_ViewCharacterDetailsStateful>{
   late CharacterDetailsController controller;
 
   @override void initState(){
@@ -46,33 +47,30 @@ class _ViewCharacterDetailsStatefulState extends State<_ViewCharacterDetailsStat
   Widget build(BuildContext context){
     return Scaffold(
       appBar: AppBar(
-        leading: defaultLeadingWidget(context),
+        leading: const AppBarWidget(),
         flexibleSpace: Container(
           decoration: defaultAppBarDecoration
         ),
         title: const Text('Character Details'), titleSpacing: defaultAppBarTitleSpacing,
       ),
-      body: ValueListenableBuilder(
-        valueListenable: controller.isLoading,
-        builder: (context, isLoadingValue, child) {
-          if(isLoadingValue || appStateRepo.globalCharacterData[widget.characterID] == null) {
-            return shimmerSkeletonWidget(
-              CustomCharacterDetails(
-                characterData: CharacterDataClass.fetchNewInstance(-1),
-                skeletonMode: true,
-                key: UniqueKey()
-              )
-            );
-          }
-          return ValueListenableBuilder(
-            valueListenable: appStateRepo.globalCharacterData[widget.characterID]!.notifier, 
-            builder: (context, characterData, child){
-              return CustomCharacterDetails(
-                characterData: characterData,
+      body: Builder(
+        builder: (context) {  
+          AsyncValue<CharacterDataClass> viewAnimeDataState = ref.watch(controller.characterDataNotifier);
+          return RefreshIndicator(
+            onRefresh: () => context.read(controller.characterDataNotifier.notifier).refresh(),
+            child: viewAnimeDataState.when(
+              data: (data) => CustomCharacterDetails(
+                characterData: data,
                 skeletonMode: false,
-                key: UniqueKey()
-              );
-            }
+              ),
+              error: (obj, stackTrace) => DisplayErrorWidget(displayText: obj.toString()), 
+              loading: () => ShimmerWidget(
+                child: CustomCharacterDetails(
+                  characterData: CharacterDataClass.fetchNewInstance(-1),
+                  skeletonMode: true,
+                )
+              ),
+            ),
           );
         }
       )

@@ -1,13 +1,11 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:math';
-import 'package:anime_list_app/controllers/shared_preferences/shared_preferences_controller.dart';
 import 'package:anime_list_app/global_files.dart';
-import 'package:anime_list_app/provider/theme_model.dart';
-import 'package:anime_list_app/screens/settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:timezone/data/latest.dart' as tz;
 
@@ -19,7 +17,9 @@ void main() async{
   tz.initializeTimeZones();
   await sharedPreferencesController.initialize();
   themeModel.mode.value = await sharedPreferencesController.getThemeModeData();
-  runApp(const MyApp());
+  runApp(const ProviderScope(
+    child: MyApp(),
+  ));
 }
 
 final _router = GoRouter(
@@ -92,6 +92,11 @@ final _router = GoRouter(
           name: 'view-character-details',
           path: 'view-character-details/:characterID',
           builder: (context, state) => ViewCharacterDetails(characterID: int.parse(state.pathParameters['characterID']!))
+        ),
+        GoRoute(
+          name: 'view-picture',
+          path: 'view-picture',
+          builder: (context, state) => ViewPicturePage(imageData: state.extra)
         )
       ]
     )

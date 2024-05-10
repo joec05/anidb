@@ -1,4 +1,4 @@
-/*import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 
 class NavigationTransition extends PageRouteBuilder {
   final Widget page;
@@ -20,4 +20,4 @@ class NavigationTransition extends PageRouteBuilder {
     }
     
   );
-}*/
+}

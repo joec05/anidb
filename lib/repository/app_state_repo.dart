@@ -1,9 +1,9 @@
 import 'package:anime_list_app/global_files.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class AppStateRepo {
-  Map<int, AnimeDataNotifier> globalAnimeData = {};
-  Map<int, MangaDataNotifier> globalMangaData = {};
-  Map<int, CharacterDataNotifier> globalCharacterData = {};
+  Map<int, NotifierProvider<AnimeStatusNotifier, AnimeMyListStatusClass>?> globalAnimeData = {};
+  Map<int, NotifierProvider<MangaStatusNotifier, MangaMyListStatusClass>?> globalMangaData = {};
 }
 
 final appStateRepo = AppStateRepo();

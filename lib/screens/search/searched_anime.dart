@@ -1,7 +1,8 @@
 import 'package:anime_list_app/global_files.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class SearchedAnimesWidget extends StatelessWidget {
+class SearchedAnimesWidget extends ConsumerWidget {
   final String searchedText;
   final BuildContext absorberContext;
 
@@ -12,7 +13,7 @@ class SearchedAnimesWidget extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return _SearchedAnimesWidgetStateful(
       searchedText: searchedText,
       absorberContext: absorberContext
@@ -20,7 +21,7 @@ class SearchedAnimesWidget extends StatelessWidget {
   }
 }
 
-class _SearchedAnimesWidgetStateful extends StatefulWidget {
+class _SearchedAnimesWidgetStateful extends ConsumerStatefulWidget {
   final String searchedText;
   final BuildContext absorberContext;
   
@@ -30,10 +31,10 @@ class _SearchedAnimesWidgetStateful extends StatefulWidget {
   });
 
   @override
-  State<_SearchedAnimesWidgetStateful> createState() => _SearchedAnimesWidgetStatefulState();
+  ConsumerState<_SearchedAnimesWidgetStateful> createState() => _SearchedAnimesWidgetStatefulState();
 }
 
-class _SearchedAnimesWidgetStatefulState extends State<_SearchedAnimesWidgetStateful> with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin{
+class _SearchedAnimesWidgetStatefulState extends ConsumerState<_SearchedAnimesWidgetStateful> with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin{
   late SearchedAnimeController controller;
 
   @override void initState(){
@@ -51,16 +52,37 @@ class _SearchedAnimesWidgetStatefulState extends State<_SearchedAnimesWidgetStat
         SliverOverlapInjector(
           handle: NestedScrollView.sliverOverlapAbsorberHandleFor(widget.absorberContext)
         ),
-        ValueListenableBuilder(
-          valueListenable: controller.isLoading,
-          builder: (context, isLoadingValue, child) {
-            if(isLoadingValue) {
-              return SliverList(
+        Builder(
+          builder: (context) {
+            if(controller.searchedText.isEmpty) {
+              return const SliverToBoxAdapter();
+            }
+    
+            AsyncValue<List<AnimeDataClass>> viewAnimeDataState = ref.watch(controller.searchedAnimeNotifier);
+            return viewAnimeDataState.when(
+              data: (data) => SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  childCount: data.length, 
+                  (c, i) {
+                    return CustomUserListAnimeDisplay(
+                      animeData: data[i],
+                      displayType: AnimeRowDisplayType.search,
+                      skeletonMode: false,
+                      key: UniqueKey()
+                    );
+                  }
+                )
+              ),
+              error: (obj, stackTrace) => SliverFillRemaining(
+                hasScrollBody: false, 
+                child: DisplayErrorWidget(displayText: obj.toString())
+              ),
+              loading: () => SliverList(
                 delegate: SliverChildBuilderDelegate(
                   childCount: skeletonLoadingDefaultLimit, 
                   (c, i) {
-                    return shimmerSkeletonWidget(
-                      CustomUserListAnimeDisplay(
+                    return ShimmerWidget(
+                      child: CustomUserListAnimeDisplay(
                         animeData: AnimeDataClass.fetchNewInstance(-1),
                         displayType: AnimeRowDisplayType.search,
                         skeletonMode: true,
@@ -69,34 +91,7 @@ class _SearchedAnimesWidgetStatefulState extends State<_SearchedAnimesWidgetStat
                     );
                   }
                 )
-              );
-            }
-
-            return ValueListenableBuilder(
-              valueListenable: controller.animesList,
-              builder: (context, animesList, child) {
-                return SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    childCount: animesList.length, 
-                    (c, i) {
-                      if(appStateRepo.globalAnimeData[animesList[i]] != null){
-                        return ValueListenableBuilder(
-                          valueListenable: appStateRepo.globalAnimeData[animesList[i]]!.notifier, 
-                          builder: (context, animeData, child){
-                            return CustomUserListAnimeDisplay(
-                              animeData: animeData,
-                              displayType: AnimeRowDisplayType.search,
-                              skeletonMode: false,
-                              key: UniqueKey()
-                            );
-                          }
-                        );
-                      }
-                      return Text('${animesList[i]}');
-                    }
-                  )
-                );
-              }
+              )
             );
           }
         )

@@ -1,23 +1,24 @@
 import 'package:anime_list_app/global_files.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends ConsumerWidget {
   const ProfilePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return const _ProfilePageStateful();
   }
 }
 
-class _ProfilePageStateful extends StatefulWidget {
+class _ProfilePageStateful extends ConsumerStatefulWidget {
   const _ProfilePageStateful();
 
   @override
-  State<_ProfilePageStateful> createState() => _ProfilePageStatefulState();
+  ConsumerState<_ProfilePageStateful> createState() => _ProfilePageStatefulState();
 }
 
-class _ProfilePageStatefulState extends State<_ProfilePageStateful> with AutomaticKeepAliveClientMixin{
+class _ProfilePageStatefulState extends ConsumerState<_ProfilePageStateful> with AutomaticKeepAliveClientMixin{
   late ProfileController controller;
 
   @override void initState(){
@@ -34,33 +35,26 @@ class _ProfilePageStatefulState extends State<_ProfilePageStateful> with Automat
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return ValueListenableBuilder(
-      valueListenable: controller.isLoading,
-      builder: (context, isLoadingValue, child) {
-
-        if(isLoadingValue) {
-          return shimmerSkeletonWidget(
-            CustomProfileDisplay(
-              userData: UserDataClass.fetchNewInstance(-1), 
-              skeletonMode: true,
-              key: UniqueKey()
-            )
-          );
-        }
-
-        if(authRepo.currentUserData == null){
-          return Container();
-        }
-
-        return ValueListenableBuilder(
-          valueListenable: authRepo.currentUserData!.notifier, 
-          builder: (context, userData, child){
-            return CustomProfileDisplay(
-              userData: userData, 
+    return Builder(
+      builder: (context) {  
+        AsyncValue<UserDataClass> viewProfileDataState = ref.watch(controller.profileNotifier);
+        return RefreshIndicator(
+          onRefresh: () => context.read(controller.profileNotifier.notifier).refresh(),
+          child: viewProfileDataState.when(
+            data: (data) => CustomProfileDisplay(
+              userData: data, 
               skeletonMode: false,
               key: UniqueKey()
-            );
-          }
+            ),
+            error: (obj, stackTrace) => DisplayErrorWidget(displayText: obj.toString()),
+            loading: () => ShimmerWidget(
+              child: CustomProfileDisplay(
+                userData: UserDataClass.fetchNewInstance(-1), 
+                skeletonMode: true,
+                key: UniqueKey()
+              )
+            )
+          ),
         );
       }
     );

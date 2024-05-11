@@ -39,7 +39,7 @@ class ConnectAccountPageState extends State<ConnectAccountPage> {
       body: Stack(
         children: [
           InAppWebView(
-            initialUrlRequest: URLRequest(url: Uri.parse(widget.url)),
+            initialUrlRequest: URLRequest(url: WebUri.uri(Uri.parse(widget.url))),
             onLoadStop: (controller, uri){
               if(uri == null){return;}
               if(uri.toString().contains('code=') && uri.toString().contains(redirectUrl)){

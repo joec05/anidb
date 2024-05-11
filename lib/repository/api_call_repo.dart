@@ -1,6 +1,7 @@
 import 'package:anime_list_app/global_files.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 class APICallRepository {
 
@@ -64,12 +65,21 @@ class APICallRepository {
           data: data.isEmpty ? null : data
         );
       }
-      
+
       return APIResponseModel(
         res.data,
         null
       );
     } on Exception catch (obj, stackTrace) {
+      await Sentry.captureEvent(
+        SentryEvent(
+          eventId: SentryId.newId(),
+          timestamp: DateTime.now().toLocal(),
+          message: SentryMessage(obj.toString()),
+          request: SentryRequest.fromUri(uri: Uri.parse(url)),
+        ),
+        stackTrace: stackTrace.toString(),
+      );
       return APIResponseModel(
         null, 
         APIErrorModel(obj, stackTrace)

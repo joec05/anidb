@@ -8,8 +8,9 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:timezone/data/latest.dart' as tz;
+import 'package:sentry_flutter/sentry_flutter.dart';
 
-void main() async{
+Future<void> main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   ByteData data = await PlatformAssetBundle().load('assets/certificate/ca.pem');
@@ -17,9 +18,16 @@ void main() async{
   tz.initializeTimeZones();
   await sharedPreferencesController.initialize();
   themeModel.mode.value = await sharedPreferencesController.getThemeModeData();
-  runApp(const ProviderScope(
-    child: MyApp(),
-  ));
+  await SentryFlutter.init(
+    (options) {
+      options.dsn = 'https://5cea0234c6469cf2d0139f5770eaaf2e@o4507234905227264.ingest.us.sentry.io/4507234927312896';
+      options.tracesSampleRate = 1.0;
+      options.profilesSampleRate = 1.0;
+    },
+    appRunner: () => runApp(const ProviderScope(
+      child: MyApp(),
+    ))
+  );
 }
 
 final _router = GoRouter(

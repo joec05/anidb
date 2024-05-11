@@ -11,16 +11,19 @@ class DisplayErrorWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Container(
-        padding: const EdgeInsets.all(10),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [ 
-            const Icon(FontAwesomeIcons.triangleExclamation, size: 45),
-            SizedBox(height: getScreenHeight() * 0.025),
-            Text(displayText)
-          ]
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 7.5),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [ 
+              const Icon(FontAwesomeIcons.triangleExclamation, size: 45),
+              SizedBox(height: getScreenHeight() * 0.025),
+              Text(displayText)
+            ]
+          ),
         ),
       ),
     );

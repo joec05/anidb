@@ -20,7 +20,7 @@ Future<void> main() async {
   themeModel.mode.value = await sharedPreferencesController.getThemeModeData();
   await SentryFlutter.init(
     (options) {
-      options.dsn = 'https://5cea0234c6469cf2d0139f5770eaaf2e@o4507234905227264.ingest.us.sentry.io/4507234927312896';
+      options.dsn = sentryDSN;
       options.tracesSampleRate = 1.0;
       options.profilesSampleRate = 1.0;
     },
@@ -159,10 +159,7 @@ class _MyHomePageState extends State<MyHomePage> {
       authRepo.userTokenData = UserTokenClass.fromMapRetrieve(userTokenMap);
       FlutterNativeSplash.remove();
       if(mounted) {
-        while(context.canPop()) {
-          context.pop();
-        }
-        context.push('/main-page');
+        context.pushReplacement('/main-page');
       }
     }
   }
@@ -180,10 +177,13 @@ class _MyHomePageState extends State<MyHomePage> {
     while(context.canPop()) {
       context.pop();
     }
-    context.pushNamed('connect-account', pathParameters: {
+    var hasSignedIn = await context.pushNamed('connect-account', pathParameters: {
       'url': 'https://myanimelist.net/v1/oauth2/authorize?response_type=code&client_id=$clientID&code_challenge=$codeVerifier&state=RequestIDABC',
       'codeVerifier': codeVerifier
     });
+    if(hasSignedIn == true) {
+      
+    }
   }
 
   @override

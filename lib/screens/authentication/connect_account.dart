@@ -31,27 +31,24 @@ class ConnectAccountPageState extends State<ConnectAccountPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        flexibleSpace: Container(
-          decoration: defaultAppBarDecoration,
+      body: SafeArea(
+        child: Stack(
+          children: [
+            InAppWebView(
+              initialUrlRequest: URLRequest(url: WebUri.uri(Uri.parse(widget.url))),
+              onLoadStop: (controller, uri){
+                if(uri == null){return;}
+                if(uri.toString().contains('code=') && uri.toString().contains(redirectUrl)){
+                  authRepo.getAccessToken(
+                    context,
+                    uri.toString().split('code=')[1].split('&state=')[0],
+                    widget.codeVerifier
+                  );
+                }
+              },
+            ),
+          ]
         ),
-      ),
-      body: Stack(
-        children: [
-          InAppWebView(
-            initialUrlRequest: URLRequest(url: WebUri.uri(Uri.parse(widget.url))),
-            onLoadStop: (controller, uri){
-              if(uri == null){return;}
-              if(uri.toString().contains('code=') && uri.toString().contains(redirectUrl)){
-                authRepo.getAccessToken(
-                  context,
-                  uri.toString().split('code=')[1].split('&state=')[0],
-                  widget.codeVerifier
-                );
-              }
-            },
-          ),
-        ]
       )
     );
   }

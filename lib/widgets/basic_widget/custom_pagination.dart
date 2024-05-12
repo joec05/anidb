@@ -10,7 +10,7 @@ class LoadMoreBottom extends StatefulWidget {
   final Future Function()? refresh;
   final bool addBottomSpace;
 
-  const LoadMoreBottom({Key? key, required this.child, required this.loadMore, required this.status, required this.refresh, required this.addBottomSpace}): super(key: key);
+  const LoadMoreBottom({super.key, required this.child, required this.loadMore, required this.status, required this.refresh, required this.addBottomSpace});
 
   @override
   LoadMoreBottomState createState() => LoadMoreBottomState();

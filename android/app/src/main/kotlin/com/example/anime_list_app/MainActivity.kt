@@ -1,4 +1,4 @@
-package com.example.anime_list_app
+package com.anidb.anime_list_app
 
 import io.flutter.embedding.android.FlutterActivity
 

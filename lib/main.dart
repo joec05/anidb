@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 import 'package:anime_list_app/global_files.dart';
+import 'package:anime_list_app/streams/has_authenticated_stream.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
@@ -111,11 +112,11 @@ final _router = GoRouter(
   ]
 );
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return ValueListenableBuilder(
       valueListenable: themeModel.mode,
       builder: (context, mode, child) => MaterialApp.router(
@@ -129,31 +130,46 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends StatefulWidget {
+class MyHomePage extends ConsumerStatefulWidget {
   const MyHomePage({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  ConsumerState<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends ConsumerState<MyHomePage> {
   AssetImage assetImage = const AssetImage('assets/images/icon.png');
+  late StreamSubscription _updateHasAuthenticated;
+  late AutoDisposeAsyncNotifierProvider<HasAuthenticatedNotifier, void> hasAuthenticatedNotifier;
 
   @override void initState(){
     super.initState();
     Timer(const Duration(milliseconds: 1500), (){
       initializeApp();
-    });  
+    });
+    hasAuthenticatedNotifier = AsyncNotifierProvider.autoDispose<HasAuthenticatedNotifier, void>(
+      () => HasAuthenticatedNotifier()
+    );
+    _updateHasAuthenticated = HasAuthenticatedStreamClass().hasAuthenticatedStream.listen((HasAuthenticatedClass data) {
+      if(mounted){
+        context.read(hasAuthenticatedNotifier.notifier).authenticate(
+          context,
+          data.url,
+          data.codeVerifier
+        );
+      }
+    });
   }
 
   @override void dispose(){
     super.dispose();
+    _updateHasAuthenticated.cancel();
   }
 
   void initializeApp() async{
     Map userTokenMap = await secureStorageController.fetchUserToken();
     if(userTokenMap['token_type'].isEmpty){
-      callLogin();
+      //callLogin();
       FlutterNativeSplash.remove();
     }else{
       authRepo.userTokenData = UserTokenClass.fromMapRetrieve(userTokenMap);
@@ -177,24 +193,123 @@ class _MyHomePageState extends State<MyHomePage> {
     while(context.canPop()) {
       context.pop();
     }
-    var hasSignedIn = await context.pushNamed('connect-account', pathParameters: {
+    await context.pushNamed('connect-account', pathParameters: {
       'url': 'https://myanimelist.net/v1/oauth2/authorize?response_type=code&client_id=$clientID&code_challenge=$codeVerifier&state=RequestIDABC',
       'codeVerifier': codeVerifier
     });
-    if(hasSignedIn == true) {
-      
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     precacheImage(assetImage, context);
     return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: defaultAppBarDecoration
+      body: Center(
+        child: Container(
+          width: double.infinity,
+          height: double.infinity,
+          decoration: defaultAppBarDecoration,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                width: getScreenWidth() * 0.3,
+                height: getScreenWidth() * 0.3,
+                decoration: const BoxDecoration(
+                  image: DecorationImage(image: AssetImage('assets/images/icon.png'))
+                )
+              ),
+              SizedBox(
+                height: getScreenHeight() * 0.02
+              ),
+              const Text('AniDB', style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 19
+              )),
+              SizedBox(
+                height: getScreenHeight() * 0.035
+              ),
+              Builder(
+                builder: (_) {  
+                  AsyncValue<void> viewHasAuthenticatedState = ref.watch(hasAuthenticatedNotifier);
+                  return viewHasAuthenticatedState.when(
+                    data: (data) => ElevatedButton(
+                      style: ButtonStyle(
+                        fixedSize: MaterialStatePropertyAll(Size(
+                          getScreenWidth() * 0.45,
+                          getScreenHeight() * 0.07
+                        ))
+                      ),
+                      onPressed: callLogin,
+                      child: const Text('Sign in with MAL')
+                    ),
+                    loading: () => ElevatedButton(
+                      style: ButtonStyle(
+                        fixedSize: MaterialStatePropertyAll(Size(
+                          getScreenWidth() * 0.45,
+                          getScreenHeight() * 0.07
+                        ))
+                      ),
+                      onPressed: null,
+                      child: const SizedBox(
+                        width: 15,
+                        height: 15,
+                        child: CircularProgressIndicator()
+                      )
+                    ),
+                    error: (obj, stackTrace) {
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        if (mounted) {
+                          handler.displaySnackbar(
+                            context,
+                            SnackbarType.error, 
+                            obj.toString()
+                          );
+                        }
+                      });
+      
+                      return ElevatedButton(
+                        style: ButtonStyle(
+                          fixedSize: MaterialStatePropertyAll(Size(
+                            getScreenWidth() * 0.45,
+                            getScreenHeight() * 0.07
+                          ))
+                        ),
+                        onPressed: callLogin,
+                        child: const Text('Sign in with MAL')
+                      );
+                    }
+                  );
+                }
+              )
+            ]
+          )
+        ),
       )
     );
+  }
+}
+
+class HasAuthenticatedNotifier extends AutoDisposeAsyncNotifier<void>{
+  HasAuthenticatedNotifier();
+
+  @override
+  FutureOr<void> build() async {
+    return;
+  }
+
+  Future<void> authenticate(
+    BuildContext context, 
+    String authCode,
+    String codeVerifier
+  ) async {
+    state = const AsyncLoading();
+    APIResponseModel response = await authRepo.getAccessToken(context, authCode, codeVerifier);
+    if(response.error != null) {
+      state = AsyncError(response.error!.object, response.error!.stackTrace);
+      throw Exception(response.error!.object);
+    } else {
+      state = const AsyncData(null);
+    }
   }
 }

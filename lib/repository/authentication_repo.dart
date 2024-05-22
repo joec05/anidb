@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 class AuthenticationRepository {
   UserTokenClass userTokenData = UserTokenClass('', '', '', '');
 
-  void getAccessToken(
+  Future<APIResponseModel> getAccessToken(
     BuildContext context,
     String authCode, 
     String codeVerifier
@@ -27,16 +27,11 @@ class AuthenticationRepository {
       authRepo.userTokenData = UserTokenClass.fromMapUpdate(res.data);
       secureStorageController.updateUserToken();
       if(context.mounted) {
-        while(context.canPop()) {
-          context.pop();
-        }
         context.push('/main-page');
       }
-    } else {
-      if(context.mounted) {
-        handler.displaySnackbar(context, SnackbarType.error, tErr.response);
-      }
     }
+
+    return res;
   }
 
   Future<String> generateAuthHeader(BuildContext context) async{

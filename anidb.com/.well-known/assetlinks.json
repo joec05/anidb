@@ -1,0 +1,11 @@
+[{
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.anidb.anime_list_app",
+      "sha256_cert_fingerprints": [
+        "DA:B1:75:32:99:22:BA:57:74:A7:58:C6:9F:A5:1A:70:7A:92:DF:02:0E:FD:EB:98:31:03:75:6F:0C:EE:EB:F2",
+        "64:DA:B1:1D:4C:B8:56:F4:CF:7F:07:5F:AC:AB:59:22:A6:26:CB:04:42:35:27:B6:6B:74:95:66:BC:4C:AB:C3"
+      ]
+    }
+  }]

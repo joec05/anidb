@@ -26,7 +26,7 @@ class VerticalBarChartWidget extends StatelessWidget {
       showBackdrop: true,
       legend: legend,
       labelSizeFactor: 0.15,
-      background: Theme.of(context).colorScheme.background,
+      background: Theme.of(context).colorScheme.surface,
     );
   }
 }

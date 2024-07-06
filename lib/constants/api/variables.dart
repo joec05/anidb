@@ -1,9 +1,11 @@
-String redirectUrl = 'https://myanimelist.net/';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-String malApiUrl = 'https://api.myanimelist.net/v2';
+String redirectUrl = dotenv.env['REDIRECT_URL']!;
 
-String jikanApiUrl = 'https://api.jikan.moe/v4';
+String malApiUrl = dotenv.env['MAL_BASE_URL']!;
 
-String fetchAllAnimeFieldsStr = 'fields=id,title,main_picture,alternative_titles,start_date,end_date,synopsis,mean,rank,popularity,num_list_users,num_scoring_users,nsfw,created_at,updated_at,media_type,status,genres,my_list_status,num_episodes,start_season,broadcast,source,average_episode_duration,rating,pictures,background,related_anime,related_manga,recommendations,studios,statistics';
+String jikanApiUrl = dotenv.env['JIKAN_BASE_URL']!;
 
-String fetchAllMangaFieldsStr = 'fields=id,title,main_picture,alternative_titles,start_date,end_date,synopsis,mean,rank,popularity,num_list_users,num_scoring_users,nsfw,created_at,updated_at,media_type,status,genres,my_list_status,num_volumes,num_chapters,authors{first_name,last_name},pictures,background,related_anime,related_manga,recommendations,serialization{name}';
+String fetchAllAnimeFieldsStr = dotenv.env['ANIME_FIELDS_FETCHED']!;
+
+String fetchAllMangaFieldsStr = dotenv.env['MANGA_FIELDS_FETCHED']!;

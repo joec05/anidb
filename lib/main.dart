@@ -8,16 +8,24 @@ import 'package:flutter/services.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:talker_flutter/talker_flutter.dart';
+import 'package:talker_riverpod_logger/talker_riverpod_logger_observer.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:sentry_flutter/sentry_flutter.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+final talker = Talker();
 
 Future<void> main() async {
+  talker.debug('Starting AniDB...');
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  await dotenv.load(fileName: ".env");
   ByteData data = await PlatformAssetBundle().load('assets/certificate/ca.pem');
   SecurityContext.defaultContext.setTrustedCertificatesBytes(data.buffer.asUint8List());
   tz.initializeTimeZones();
   await sharedPreferencesController.initialize();
+  apiCallRepo.initialize();
   themeModel.mode.value = await sharedPreferencesController.getThemeModeData();
   await SentryFlutter.init(
     (options) {
@@ -25,8 +33,11 @@ Future<void> main() async {
       options.tracesSampleRate = 1.0;
       options.profilesSampleRate = 1.0;
     },
-    appRunner: () => runApp(const ProviderScope(
-      child: MyApp(),
+    appRunner: () => runApp(ProviderScope(
+      observers: [
+        TalkerRiverpodObserver(talker: talker)
+      ],
+      child: const MyApp(),
     ))
   );
 }
@@ -235,7 +246,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                   return viewHasAuthenticatedState.when(
                     data: (data) => ElevatedButton(
                       style: ButtonStyle(
-                        fixedSize: MaterialStatePropertyAll(Size(
+                        fixedSize: WidgetStatePropertyAll(Size(
                           getScreenWidth() * 0.45,
                           getScreenHeight() * 0.07
                         ))
@@ -245,7 +256,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                     ),
                     loading: () => ElevatedButton(
                       style: ButtonStyle(
-                        fixedSize: MaterialStatePropertyAll(Size(
+                        fixedSize: WidgetStatePropertyAll(Size(
                           getScreenWidth() * 0.45,
                           getScreenHeight() * 0.07
                         ))
@@ -270,7 +281,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       
                       return ElevatedButton(
                         style: ButtonStyle(
-                          fixedSize: MaterialStatePropertyAll(Size(
+                          fixedSize: WidgetStatePropertyAll(Size(
                             getScreenWidth() * 0.45,
                             getScreenHeight() * 0.07
                           ))

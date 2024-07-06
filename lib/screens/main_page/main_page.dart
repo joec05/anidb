@@ -101,9 +101,9 @@ class __MainPageStatefulState extends State<_MainPageStateful>{
           ),
           bottomNavigationBar: ClipRRect(                                                   
             child: BottomNavigationBar(
-              fixedColor: const Color.fromARGB(255, 153, 108, 54),
-              backgroundColor: const Color.fromARGB(255, 71, 75, 53),
-              unselectedItemColor: const Color.fromARGB(255, 165, 161, 149),
+              backgroundColor: Theme.of(context).bottomNavigationBarTheme.backgroundColor?.withOpacity(0.5),
+              unselectedItemColor: const Color.fromARGB(255, 71, 67, 54),
+              selectedItemColor: Colors.teal,
               key: UniqueKey(),
               items: const [
                 BottomNavigationBarItem(

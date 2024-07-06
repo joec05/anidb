@@ -19,7 +19,6 @@ class CharacterRepository {
       var data = res.data['data'];
       if(context.mounted) {
         for(int i = 0; i < data.length; i++){
-          // updateBasicCharacterData(data[i]);
           topCharactersList.add(CharacterDataClass.fetchNewInstance(-1).fromMapUpdateBasic(data[i]));
         }
       }

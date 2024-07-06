@@ -2,10 +2,30 @@ import 'package:anime_list_app/global_files.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
+import 'package:talker_dio_logger/talker_dio_logger_interceptor.dart';
+import 'package:talker_dio_logger/talker_dio_logger_settings.dart';
 
 class APICallRepository {
 
-  var dio = Dio();
+  var dio = Dio(BaseOptions());
+
+  void initialize() {
+    dio.interceptors.add(
+      TalkerDioLogger(
+        talker: talker,
+        settings: const TalkerDioLoggerSettings(
+          printResponseData: false,
+          printResponseHeaders: false,
+          printResponseMessage: true,
+          printErrorData: true,
+          printErrorHeaders: true,
+          printErrorMessage: true,
+          printRequestData: true,
+          printRequestHeaders: false,
+        ),
+      ),
+    );
+  }
   
   Future<dynamic> runAPICall(
     BuildContext context,

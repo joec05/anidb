@@ -33,12 +33,15 @@ Future<void> main() async {
       options.tracesSampleRate = 1.0;
       options.profilesSampleRate = 1.0;
     },
-    appRunner: () => runApp(ProviderScope(
-      observers: [
-        TalkerRiverpodObserver(talker: talker)
-      ],
-      child: const MyApp(),
-    ))
+    appRunner: () {
+      FlutterNativeSplash.remove();
+      runApp(ProviderScope(
+        observers: [
+          TalkerRiverpodObserver(talker: talker)
+        ],
+        child: const MyApp(),
+      ));
+    }
   );
 }
 
@@ -155,9 +158,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
   @override void initState(){
     super.initState();
-    Timer(const Duration(milliseconds: 1500), (){
-      initializeApp();
-    });
+    initializeApp();
     hasAuthenticatedNotifier = AsyncNotifierProvider.autoDispose<HasAuthenticatedNotifier, void>(
       () => HasAuthenticatedNotifier()
     );
@@ -177,14 +178,12 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     _updateHasAuthenticated.cancel();
   }
 
-  void initializeApp() async{
+  Future<void> initializeApp() async{
     Map userTokenMap = await secureStorageController.fetchUserToken();
     if(userTokenMap['token_type'].isEmpty){
       //callLogin();
-      FlutterNativeSplash.remove();
     }else{
       authRepo.userTokenData = UserTokenClass.fromMapRetrieve(userTokenMap);
-      FlutterNativeSplash.remove();
       if(mounted) {
         context.pushReplacement('/main-page');
       }

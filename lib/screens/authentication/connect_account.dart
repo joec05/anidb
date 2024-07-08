@@ -38,8 +38,7 @@ class ConnectAccountPageState extends State<ConnectAccountPage> {
           children: [
             InAppWebView(
               initialUrlRequest: URLRequest(url: WebUri.uri(Uri.parse(widget.url))),
-              onLoadStart: (controller, uri){
-                if(uri == null){return;}
+              shouldOverrideUrlLoading: (controller, uri) async {
                 if(uri.toString().contains('code=') && uri.toString().contains(redirectUrl)){
                   context.pop();
                   HasAuthenticatedStreamClass().emitData(
@@ -48,6 +47,7 @@ class ConnectAccountPageState extends State<ConnectAccountPage> {
                     )
                   );
                 }
+                return NavigationActionPolicy.ALLOW;
               },
             ),
           ]

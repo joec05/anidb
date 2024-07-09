@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class AuthenticationRepository {
-  UserTokenClass userTokenData = UserTokenClass('', '', '', '');
+  UserTokenClass? userTokenData;
 
   Future<APIResponseModel> getAccessToken(
     BuildContext context,
@@ -35,7 +35,7 @@ class AuthenticationRepository {
   }
 
   Future<String> generateAuthHeader(BuildContext context) async{
-    UserTokenClass tokenData = authRepo.userTokenData;
+    UserTokenClass tokenData = authRepo.userTokenData!;
     DateTime expiryTimeParsed = DateTime.parse(tokenData.expiryTime);
     int differenceInHour = expiryTimeParsed.difference(DateTime.now()).inHours;
     debugPrint('$differenceInHour hours before refreshing token');
@@ -60,7 +60,7 @@ class AuthenticationRepository {
         }
       }
     }
-    return 'Bearer ${authRepo.userTokenData.accessToken}';
+    return 'Bearer ${authRepo.userTokenData?.accessToken}';
   }
 
 }

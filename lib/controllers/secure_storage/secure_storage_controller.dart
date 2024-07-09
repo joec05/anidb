@@ -13,17 +13,17 @@ class SecureStorageController {
   String userTokenClassDataKey = 'user-token-data';
 
   void updateUserToken() async{
-    storage.write(key: userTokenClassDataKey, value: jsonEncode(authRepo.userTokenData.convertToMap()));
+    storage.write(key: userTokenClassDataKey, value: authRepo.userTokenData == null ? null : jsonEncode(authRepo.userTokenData!.convertToMap()));
   }
 
   void resetUserToken() async{
     storage.write(key: userTokenClassDataKey, value: '');
   }
 
-  Future<Map> fetchUserToken() async{
-    String? currentTokenData = await storage.read(key: userTokenClassDataKey); 
+  Future<Map?> fetchUserToken() async{
+    String? currentTokenData = (await storage.readAll())[userTokenClassDataKey]; 
     if(currentTokenData == null || currentTokenData == ''){
-      return UserTokenClass('', '', '', '').convertToMap();
+      return null;
     }else{
       return jsonDecode(currentTokenData); 
     }

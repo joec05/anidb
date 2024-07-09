@@ -27,22 +27,31 @@ Future<void> main() async {
   await sharedPreferencesController.initialize();
   apiCallRepo.initialize();
   themeModel.mode.value = await sharedPreferencesController.getThemeModeData();
-  await SentryFlutter.init(
-    (options) {
-      options.dsn = sentryDSN;
-      options.tracesSampleRate = 1.0;
-      options.profilesSampleRate = 1.0;
-    },
-    appRunner: () {
-      FlutterNativeSplash.remove();
-      runApp(ProviderScope(
-        observers: [
-          TalkerRiverpodObserver(talker: talker)
-        ],
-        child: const MyApp(),
-      ));
-    }
-  );
+  await initializeData().then((_) async {
+    await SentryFlutter.init(
+      (options) {
+        options.dsn = sentryDSN;
+        options.tracesSampleRate = 1.0;
+        options.profilesSampleRate = 1.0;
+      },
+      appRunner: () {
+        runApp(ProviderScope(
+          observers: [
+            TalkerRiverpodObserver(talker: talker)
+          ],
+          child: const MyApp(),
+        ));
+      }
+    );
+  });
+}
+
+Future<void> initializeData() async{
+  Map? userTokenMap = await secureStorageController.fetchUserToken();
+  if(userTokenMap != null){
+    authRepo.userTokenData = UserTokenClass.fromMapRetrieve(userTokenMap);
+  }
+  return;
 }
 
 final _router = GoRouter(
@@ -179,15 +188,14 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   }
 
   Future<void> initializeApp() async{
-    Map userTokenMap = await secureStorageController.fetchUserToken();
-    if(userTokenMap['token_type'].isEmpty){
-      //callLogin();
-    }else{
-      authRepo.userTokenData = UserTokenClass.fromMapRetrieve(userTokenMap);
-      if(mounted) {
+    Future.delayed(const Duration(seconds: 1), (){
+      if(authRepo.userTokenData != null) {
         context.pushReplacement('/main-page');
       }
-    }
+      Future.delayed(const Duration(seconds: 2), (){
+        FlutterNativeSplash.remove();
+      });
+    });
   }
 
   void callLogin() async{

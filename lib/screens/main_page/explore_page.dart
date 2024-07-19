@@ -23,8 +23,8 @@ class _ExplorePageStatefulState extends ConsumerState<_ExplorePageStateful> with
 
   @override void initState(){
     super.initState();
-    controller = ExploreController(context);
-    controller.initializeController();
+    controller = ExploreController();
+    controller.initialize();
   }
 
   @override void dispose(){

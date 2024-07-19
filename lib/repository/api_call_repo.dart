@@ -1,6 +1,5 @@
 import 'package:anime_list_app/global_files.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:talker_dio_logger/talker_dio_logger_interceptor.dart';
 import 'package:talker_dio_logger/talker_dio_logger_settings.dart';
@@ -28,7 +27,6 @@ class APICallRepository {
   }
   
   Future<dynamic> runAPICall(
-    BuildContext context,
     APICallType type,
     String baseUrl,
     String url,
@@ -41,7 +39,7 @@ class APICallRepository {
           url,
           options: Options(
             headers: baseUrl == jikanApiUrl ? {} : {
-              'Authorization': await authRepo.generateAuthHeader(context)
+              'Authorization': await authRepo.generateAuthHeader()
             },
           ),
           data: data.isEmpty ? null : data
@@ -52,7 +50,7 @@ class APICallRepository {
           options: Options(
             headers: baseUrl == jikanApiUrl ? {} : {
               "Content-Type": "application/x-www-form-urlencoded",
-              'Authorization': await authRepo.generateAuthHeader(context)
+              'Authorization': await authRepo.generateAuthHeader()
             },
           ),
           data: data.isEmpty ? null : data
@@ -79,7 +77,7 @@ class APICallRepository {
           options: Options(
             headers: baseUrl == jikanApiUrl ? {} : {
               "Content-Type": "application/x-www-form-urlencoded",
-              'Authorization': await authRepo.generateAuthHeader(context)
+              'Authorization': await authRepo.generateAuthHeader()
             },
           ),
           data: data.isEmpty ? null : data

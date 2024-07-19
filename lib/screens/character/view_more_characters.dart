@@ -39,8 +39,8 @@ class _ViewMoreCharactersStatefulState extends ConsumerState<_ViewMoreCharacters
 
   @override void initState(){
     super.initState();
-    controller = ViewMoreCharactersController(context, widget.displayType);
-    controller.initializeController();
+    controller = ViewMoreCharactersController(widget.displayType);
+    controller.initialize();
   }
 
   @override void dispose(){

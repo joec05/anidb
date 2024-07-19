@@ -25,13 +25,11 @@ class AnimeProgressController {
     episodeStr = episodeStr.isEmpty ? '0' : episodeStr;
     if(int.tryParse(episodeStr) == null){
       handler.displaySnackbar(
-        context, 
         SnackbarType.error, 
         tErr.invalidInput
       );
     }else if(int.parse(episodeStr) > animeData.totalEpisodes && animeData.totalEpisodes > 0){
       handler.displaySnackbar(
-        context, 
         SnackbarType.error, 
         tErr.maxValueReached
       );
@@ -47,7 +45,6 @@ class AnimeProgressController {
         'num_watched_episodes': episodeStr
       };
       APIResponseModel res = await apiCallRepo.runAPICall(
-        context,
         APICallType.patch,
         malApiUrl,
         '$malApiUrl/anime/${animeData.id}/my_list_status',
@@ -60,7 +57,7 @@ class AnimeProgressController {
         updatedListStatus.updatedTime = DateTime.now().toIso8601String();
         updatedListStatus.status = status;
         if(context.mounted) {
-          updateAnimeStatusFromModel(context, animeData.id, updatedListStatus);
+          updateAnimeStatusFromModel(animeData.id, updatedListStatus);
         }
         if(statusChanged) {
           UpdateUserAnimeListStreamClass().emitData(
@@ -71,14 +68,13 @@ class AnimeProgressController {
         }
         if(mounted){
           handler.displaySnackbar(
-            context,
             SnackbarType.successful, 
             tSuccess.savedProgress
           );
         }
       } else {
         if(context.mounted) {
-          handler.displaySnackbar(context, SnackbarType.error, tErr.response);
+          handler.displaySnackbar(SnackbarType.error, tErr.response);
         }
       }
     }
@@ -86,7 +82,6 @@ class AnimeProgressController {
 
   void deleteFromMyAnimeList() async{
     APIResponseModel res = await apiCallRepo.runAPICall(
-      context,
       APICallType.delete,
       malApiUrl,
       '$malApiUrl/anime/${animeData.id}/my_list_status',
@@ -101,14 +96,13 @@ class AnimeProgressController {
           )
         );
         handler.displaySnackbar(
-          context,
           SnackbarType.successful, 
           tSuccess.deleteFromList
         );
       }
     } else {
       if(context.mounted) {
-        handler.displaySnackbar(context, SnackbarType.error, tErr.response);
+        handler.displaySnackbar(SnackbarType.error, tErr.response);
       }
     }
   }

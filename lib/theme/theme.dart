@@ -7,7 +7,8 @@ class AppTheme {
     textTheme: TextDisplayTheme.lightTextTheme,
     inputDecorationTheme: TextFieldTheme.lightInputDecorationTheme,
     dividerColor: Colors.black,
-    cardColor: Colors.grey.withOpacity(0.5)
+    cardColor: Colors.grey.withOpacity(0.5),
+    primaryIconTheme: const IconThemeData(color: Colors.teal) 
   );
 
   ThemeData dark = ThemeData(
@@ -15,7 +16,9 @@ class AppTheme {
     textTheme: TextDisplayTheme.darkTextTheme,
     inputDecorationTheme: TextFieldTheme.darkInputDecorationTheme,
     dividerColor: Colors.white,
-    cardColor: Colors.grey.withOpacity(0.5)
+    cardColor: Colors.grey.withOpacity(0.5),
+    primaryIconTheme: const IconThemeData(color: Colors.teal) ,
+    bottomNavigationBarTheme: const BottomNavigationBarThemeData(backgroundColor: Color.fromARGB(255, 145, 163, 80))
   );
 }
 

@@ -1,15 +1,9 @@
 import 'package:anime_list_app/global_files.dart';
-import 'package:flutter/material.dart';
 
 class CharacterRepository {
-  final BuildContext context;
-
-  CharacterRepository(this.context);
-
   Future<APIResponseModel> fetchTopCharacters() async{
     List<CharacterDataClass> topCharactersList = [];
     APIResponseModel res = await apiCallRepo.runAPICall(
-      context,
       APICallType.get,
       jikanApiUrl,
       '$jikanApiUrl/top/characters?limit=${getAnimeBasicDisplayFetchCount()}',
@@ -17,10 +11,8 @@ class CharacterRepository {
     );
     if(res.error == null) {
       var data = res.data['data'];
-      if(context.mounted) {
-        for(int i = 0; i < data.length; i++){
-          topCharactersList.add(CharacterDataClass.fetchNewInstance(-1).fromMapUpdateBasic(data[i]));
-        }
+      for(int i = 0; i < data.length; i++){
+        topCharactersList.add(CharacterDataClass.fetchNewInstance(-1).fromMapUpdateBasic(data[i]));
       }
       return APIResponseModel(topCharactersList, null);
     } else {
@@ -30,7 +22,6 @@ class CharacterRepository {
 
   Future<APIResponseModel> fetchCharacterDetails(int characterID) async{
     APIResponseModel res = await apiCallRepo.runAPICall(
-      context,
       APICallType.get,
       jikanApiUrl,
       '$jikanApiUrl/characters/$characterID/full',
@@ -48,7 +39,6 @@ class CharacterRepository {
   Future<APIResponseModel> searchCharacters(String searchedText) async{
     List<CharacterDataClass> charactersList = [];
     APIResponseModel res = await apiCallRepo.runAPICall(
-      context,
       APICallType.get,
       jikanApiUrl,
       '$jikanApiUrl/characters?q=$searchedText',
@@ -77,7 +67,6 @@ class CharacterRepository {
     List<CharacterDataClass> charactersList = [];
 
     APIResponseModel res = await apiCallRepo.runAPICall(
-      context,
       APICallType.get,
       jikanApiUrl,
       generateAPIRequestPath(),

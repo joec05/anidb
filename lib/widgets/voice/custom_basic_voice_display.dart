@@ -32,8 +32,8 @@ class CustomBasicVoiceDisplayState extends State<CustomBasicVoiceDisplay>{
       behavior: HitTestBehavior.opaque,
       child: Center(
         child: Container(
-          width: animeGridDisplayWidgetSize.width,
-          height: animeGridDisplayWidgetSize.height,
+          width: basicDisplayWidgetSize.width,
+          height: basicDisplayWidgetSize.height,
           margin: EdgeInsets.symmetric(
             horizontal: defaultHorizontalPadding / 2
           ),
@@ -43,8 +43,8 @@ class CustomBasicVoiceDisplayState extends State<CustomBasicVoiceDisplay>{
               Column(
                 children: [
                   SizedBox(
-                    width: animeGridDisplayCoverSize.width,
-                    height: animeGridDisplayCoverSize.height,
+                    width: basicDisplayCoverSize.width,
+                    height: basicDisplayCoverSize.height,
                     child: CachedImageWidget(imageClass: voiceData.personCover)
                   )
                 ],

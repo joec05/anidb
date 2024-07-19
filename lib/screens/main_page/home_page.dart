@@ -18,13 +18,13 @@ class _HomePageStateful extends ConsumerStatefulWidget {
   ConsumerState<_HomePageStateful> createState() => _HomePageStatefulState();
 }
 
-class _HomePageStatefulState extends ConsumerState<_HomePageStateful> with AutomaticKeepAliveClientMixin{
+class _HomePageStatefulState extends ConsumerState<_HomePageStateful> with AutomaticKeepAliveClientMixin {
   late HomeController controller;
 
   @override void initState(){
     super.initState();
-    controller = HomeController(context);
-    controller.initializeController();
+    controller = HomeController();
+    controller.initialize();
   }
 
   @override void dispose(){

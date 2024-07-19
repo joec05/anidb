@@ -39,8 +39,8 @@ class _ViewMoreAnimeStatefulState extends ConsumerState<_ViewMoreAnimeStateful>{
 
   @override void initState(){
     super.initState();
-    controller = ViewMoreAnimeController(context, widget.displayType);
-    controller.initializeController();
+    controller = ViewMoreAnimeController(widget.displayType);
+    controller.initialize();
   }
 
   @override void dispose(){

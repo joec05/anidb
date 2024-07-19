@@ -17,7 +17,9 @@ class ViewPicturePageState extends State<ViewPicturePage>{
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: const Text('Picture'),
+      ),
       body: InteractiveViewer(
         child: Center(
           child: CachedImageWidget(imageClass: widget.imageData)

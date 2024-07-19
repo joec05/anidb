@@ -45,7 +45,7 @@ class CustomAnimeDetailsState extends ConsumerState<CustomAnimeDetails>{
 
   @override
   Widget build(BuildContext context) {
-    double besideImageWidth = getScreenWidth() - animeDetailDisplayCoverSize.width - (getScreenWidth() * 0.03) - (defaultHorizontalPadding * 2);
+    double besideImageWidth = getScreenWidth() - detailDisplayCoverSize.width - (getScreenWidth() * 0.03) - (defaultHorizontalPadding * 2);
     double fullWidth = getScreenWidth() - (defaultHorizontalPadding * 2);
 
     if(!widget.skeletonMode){
@@ -181,8 +181,8 @@ class CustomAnimeDetailsState extends ConsumerState<CustomAnimeDetails>{
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     SizedBox(
-                      width: animeDetailDisplayCoverSize.width,
-                      height: animeDetailDisplayCoverSize.height,
+                      width: detailDisplayCoverSize.width,
+                      height: detailDisplayCoverSize.height,
                       child: CachedImageWidget(imageClass: animeData.cover)
                     ),
                     SizedBox(
@@ -1057,8 +1057,8 @@ class CustomAnimeDetailsState extends ConsumerState<CustomAnimeDetails>{
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Container(
-                        width: animeDetailDisplayCoverSize.width,
-                        height: animeDetailDisplayCoverSize.height,
+                        width: detailDisplayCoverSize.width,
+                        height: detailDisplayCoverSize.height,
                         color: Colors.grey
                       ),
                       SizedBox(

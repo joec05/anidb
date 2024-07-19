@@ -7,4 +7,4 @@ BoxDecoration defaultAppBarDecoration = const BoxDecoration(
 
 double defaultAppBarTitleSpacing = getScreenWidth() * 0.02;
 
-double defaultHomeAppBarTitleSpacing = getScreenWidth() * 0.06;
+double defaultHomeAppBarTitleSpacing = 10;

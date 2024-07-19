@@ -1,24 +1,15 @@
 import 'dart:async';
 import 'package:anime_list_app/global_files.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class UserMangaController {
-  final BuildContext context;
   late List<AutoDisposeAsyncNotifierProvider<MyMangaListNotifier, UserMangaListStatusClass>> statusNotifiers = [];
   late StreamSubscription updateUserMangaListStreamClassSubscription;
 
-  UserMangaController(
-    this.context
-  );
-
-  bool get mounted => context.mounted;
-
-  void initializeController(){
+  void initialize(){
     statusNotifiers = [
       AsyncNotifierProvider.autoDispose<MyMangaListNotifier, UserMangaListStatusClass>(() => 
         MyMangaListNotifier(
-          context,
           UserMangaListStatusClass(
             [], 'reading', false, PaginationStatus.loaded
           )
@@ -26,7 +17,6 @@ class UserMangaController {
       ),
       AsyncNotifierProvider.autoDispose<MyMangaListNotifier, UserMangaListStatusClass>(() => 
         MyMangaListNotifier(
-          context,
           UserMangaListStatusClass(
             [], 'plan_to_read', false, PaginationStatus.loaded
           )
@@ -34,7 +24,6 @@ class UserMangaController {
       ),
       AsyncNotifierProvider.autoDispose<MyMangaListNotifier, UserMangaListStatusClass>(() => 
         MyMangaListNotifier(
-          context,
           UserMangaListStatusClass(
             [], 'completed', false, PaginationStatus.loaded
           )
@@ -42,7 +31,6 @@ class UserMangaController {
       ),
       AsyncNotifierProvider.autoDispose<MyMangaListNotifier, UserMangaListStatusClass>(() => 
         MyMangaListNotifier(
-          context,
           UserMangaListStatusClass(
             [], 'dropped', false, PaginationStatus.loaded
           )
@@ -50,7 +38,6 @@ class UserMangaController {
       ),
       AsyncNotifierProvider.autoDispose<MyMangaListNotifier, UserMangaListStatusClass>(() => 
         MyMangaListNotifier(
-          context,
           UserMangaListStatusClass(
             [], 'on_hold', false, PaginationStatus.loaded
           )
@@ -58,19 +45,13 @@ class UserMangaController {
       ),
     ];
     updateUserMangaListStreamClassSubscription = UpdateUserMangaListStreamClass().userMangaListStream.listen((UserMangaListStreamControllerClass data) {
-      if(mounted){
-        int id = data.mangaData.id;
-        if(context.mounted) {
-          MangaMyListStatusClass? myMangaStatus = context.read(appStateRepo.globalMangaData[id]!.notifier).getState();
-          String? status = myMangaStatus.status;
-          if(mounted) {
-            for(int i = 0; i < statusNotifiers.length; i++) {
-              context.read(statusNotifiers[i].notifier).removeByIDAndAddByStatus(
-                id, status, data.mangaData
-              );
-            }
-          }
-        }
+      int id = data.mangaData.id;
+      MangaMyListStatusClass? myMangaStatus = navigatorKey.currentContext?.read(appStateRepo.globalMangaData[id]!.notifier).getState();
+      String? status = myMangaStatus?.status;
+      for(int i = 0; i < statusNotifiers.length; i++) {
+        navigatorKey.currentContext?.read(statusNotifiers[i].notifier).removeByIDAndAddByStatus(
+          id, status, data.mangaData
+        );
       }
     });
   }
@@ -81,19 +62,17 @@ class UserMangaController {
 }
 
 class MyMangaListNotifier extends AutoDisposeAsyncNotifier<UserMangaListStatusClass> {
-  final BuildContext context;
   UserMangaListStatusClass statusClass;
   late MangaRepository mangaRepository;
 
   MyMangaListNotifier(
-    this.context,
     this.statusClass
   );
 
   @override
   FutureOr<UserMangaListStatusClass> build() async {
     state = const AsyncLoading();
-    mangaRepository = MangaRepository(context);
+    mangaRepository = MangaRepository();
     APIResponseModel response = await mangaRepository.fetchMyMangasList(statusClass);
     if(response.error != null) {
       state = AsyncError(response.error!.object, response.error!.stackTrace);

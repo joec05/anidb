@@ -1,17 +1,14 @@
 import 'package:anime_list_app/global_files.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 class AuthenticationRepository {
   UserTokenClass? userTokenData;
 
   Future<APIResponseModel> getAccessToken(
-    BuildContext context,
     String authCode, 
     String codeVerifier
   ) async{
     APIResponseModel res = await apiCallRepo.runAPICall(
-      context,
       APICallType.post,
       malApiUrl,
       'https://myanimelist.net/v1/oauth2/token',
@@ -26,22 +23,19 @@ class AuthenticationRepository {
     if(res.error == null) {
       authRepo.userTokenData = UserTokenClass.fromMapUpdate(res.data);
       secureStorageController.updateUserToken();
-      if(context.mounted) {
-        context.push('/main-page');
-      }
+      router.push('/main-page');
     }
 
     return res;
   }
 
-  Future<String> generateAuthHeader(BuildContext context) async{
+  Future<String> generateAuthHeader() async{
     UserTokenClass tokenData = authRepo.userTokenData!;
     DateTime expiryTimeParsed = DateTime.parse(tokenData.expiryTime);
     int differenceInHour = expiryTimeParsed.difference(DateTime.now()).inHours;
     debugPrint('$differenceInHour hours before refreshing token');
     if(differenceInHour <= 36) {
       APIResponseModel res = await apiCallRepo.runAPICall(
-        context,
         APICallType.post,
         malApiUrl,
         'https://myanimelist.net/v1/oauth2/token',
@@ -55,9 +49,7 @@ class AuthenticationRepository {
         authRepo.userTokenData = UserTokenClass.fromMapUpdate(res.data);
         secureStorageController.updateUserToken();
       } else {
-        if(context.mounted) {
-          handler.displaySnackbar(context, SnackbarType.error, tErr.response);
-        }
+        handler.displaySnackbar(SnackbarType.error, tErr.response);
       }
     }
     return 'Bearer ${authRepo.userTokenData?.accessToken}';

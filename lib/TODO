@@ -1,0 +1,1 @@
+Reproduce issue by changing data of anime/manga in user list or even some random anime/manga, click save and immediately move to another tab. The snackbar will not appear and the state will not be changed. If the user did not move to another tab, the snackbar appears and the state is changed.

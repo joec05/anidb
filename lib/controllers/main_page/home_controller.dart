@@ -1,21 +1,13 @@
 import 'dart:async';
 import 'package:anime_list_app/global_files.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class HomeController {
-  final BuildContext context;
   late AutoDisposeAsyncNotifierProvider<HomeNotifier, List<HomeFrontDisplayModel>> homeNotifier;
 
-  HomeController (
-    this.context
-  );
-
-  bool get mounted => context.mounted;
-
-  void initializeController(){
+  void initialize(){
     homeNotifier = AsyncNotifierProvider.autoDispose<HomeNotifier, List<HomeFrontDisplayModel>>(
-      () => HomeNotifier(context)
+      () => HomeNotifier()
     );
   }
 
@@ -24,7 +16,6 @@ class HomeController {
 }
 
 class HomeNotifier extends AutoDisposeAsyncNotifier<List<HomeFrontDisplayModel>> {
-  final BuildContext context;
   late AnimeRepository animeRepository;
   late MangaRepository mangaRepository;
   late CharacterRepository characterRepository;
@@ -44,6 +35,7 @@ class HomeNotifier extends AutoDisposeAsyncNotifier<List<HomeFrontDisplayModel>>
       AnimeBasicDisplayType.upcoming, 
       []
     ),
+    /*
     HomeFrontDisplayModel(
       'Top scoring anime', 
       AnimeBasicDisplayType.top, 
@@ -79,16 +71,15 @@ class HomeNotifier extends AutoDisposeAsyncNotifier<List<HomeFrontDisplayModel>>
       CharacterBasicDisplayType.top, 
       []
     ),
+    */
   ];
-
-  HomeNotifier(this.context);
 
   @override
   FutureOr<List<HomeFrontDisplayModel>> build() async {
     state = const AsyncLoading();
-    animeRepository = AnimeRepository(context);
-    mangaRepository = MangaRepository(context);
-    characterRepository = CharacterRepository(context);
+    animeRepository = AnimeRepository();
+    mangaRepository = MangaRepository();
+    characterRepository = CharacterRepository();
     APIResponseModel response = await animeRepository.fetchSeasonAnime();
     if(response.error != null) {
       state = AsyncError(response.error!.object, response.error!.stackTrace);
@@ -107,6 +98,8 @@ class HomeNotifier extends AutoDisposeAsyncNotifier<List<HomeFrontDisplayModel>>
           throw Exception(response.error!.object);
         } else {
           displayed[2].dataList = response3.data;
+          state = AsyncData(displayed);
+          /*
           APIResponseModel response4 = await animeRepository.fetchTopAnime();
           if(response4.error != null) {
             state = AsyncError(response4.error!.object, response4.error!.stackTrace);
@@ -149,7 +142,7 @@ class HomeNotifier extends AutoDisposeAsyncNotifier<List<HomeFrontDisplayModel>>
                         throw Exception(response.error!.object);
                       } else {
                         displayed[9].dataList = response10.data;
-                        state = AsyncData(displayed);
+                        
                       }
                     }
                   }
@@ -157,6 +150,7 @@ class HomeNotifier extends AutoDisposeAsyncNotifier<List<HomeFrontDisplayModel>>
               }
             }
           }
+          */
         }
       }
     }

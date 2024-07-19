@@ -34,9 +34,8 @@ class SettingsPageState extends State<SettingsPage>{
                     width: getScreenWidth() * 0.25, height: getScreenHeight() * 0.06, 
                     buttonColor: Colors.red, buttonText: 'Yes', 
                     onTapped: (){
-                      authRepo.userTokenData = UserTokenClass(
-                        '', '', '', ''
-                      );
+                      authRepo.userTokenData = null;
+                      profileRepository.userData = null;
                       secureStorageController.updateUserToken();
                       while(context.canPop()) {
                         context.pop();

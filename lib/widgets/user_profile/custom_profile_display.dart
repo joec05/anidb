@@ -1,7 +1,6 @@
 import 'package:anime_list_app/global_files.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:go_router/go_router.dart';
 
 class CustomProfileDisplay extends StatefulWidget {
   final UserDataClass userData;
@@ -33,7 +32,7 @@ class CustomProfileDisplayState extends State<CustomProfileDisplay>{
           padding: EdgeInsets.symmetric(
             horizontal: defaultHorizontalPadding,
           ),
-          child: ListView(
+          child: Column(
             children: [
               SizedBox(
                 height: defaultVerticalPadding * 2
@@ -154,30 +153,6 @@ class CustomProfileDisplayState extends State<CustomProfileDisplay>{
                   ]
                 )
               ),
-              SizedBox(height: getScreenHeight() * 0.025),
-              CustomButton(
-                width: getScreenWidth() * 0.6, height: getScreenHeight() * 0.07, 
-                buttonColor: Colors.teal.withOpacity(0.35), 
-                buttonText: 'Statistics', 
-                onTapped: () => context.push('/view-user-statistics'), 
-                setBorderRadius: true
-              ),
-              SizedBox(height: getScreenHeight() * 0.02),
-              CustomButton(
-                width: getScreenWidth() * 0.6, height: getScreenHeight() * 0.07, 
-                buttonColor: Colors.teal.withOpacity(0.35), 
-                buttonText: 'Anime list', 
-                onTapped: () => context.push('/view-user-anime-lists'), 
-                setBorderRadius: true
-              ),
-              SizedBox(height: getScreenHeight() * 0.02),
-              CustomButton(
-                width: getScreenWidth() * 0.6, height: getScreenHeight() * 0.07, 
-                buttonColor: Colors.teal.withOpacity(0.35), 
-                buttonText: 'Manga list', 
-                onTapped: () => context.push('/view-user-manga-lists'), 
-                setBorderRadius: true
-              ),
               SizedBox(
                 height: defaultVerticalPadding * 2
               ),
@@ -191,7 +166,7 @@ class CustomProfileDisplayState extends State<CustomProfileDisplay>{
           padding: EdgeInsets.symmetric(
             horizontal: defaultHorizontalPadding,
           ),
-          child: ListView(
+          child: Column(
             children: [
               SizedBox(
                 height: defaultVerticalPadding * 2
@@ -209,7 +184,7 @@ class CustomProfileDisplayState extends State<CustomProfileDisplay>{
                   Card(
                     child: Container(
                       color: Colors.grey,
-                      width: getScreenWidth() * 0.7,
+                      width: getScreenWidth() * 0.65,
                       height:  getScreenWidth() * 0.1,
                     )
                   ),
@@ -274,42 +249,6 @@ class CustomProfileDisplayState extends State<CustomProfileDisplay>{
                     ),
                   ]
                 )
-              ),
-              SizedBox(height: getScreenHeight() * 0.0125),
-              CustomButton(
-                width: getScreenWidth() * 0.6, 
-                height: getScreenHeight() * 0.07, 
-                buttonColor: Colors.grey,
-                buttonText: '',
-                onTapped: (){},
-                setBorderRadius: true
-              ),
-              SizedBox(height: getScreenHeight() * 0.01),
-              CustomButton(
-                width: getScreenWidth() * 0.6, 
-                height: getScreenHeight() * 0.07, 
-                buttonColor: Colors.grey,
-                buttonText: '',
-                onTapped: (){},
-                setBorderRadius: true
-              ),
-              SizedBox(height: getScreenHeight() * 0.01),
-              CustomButton(
-                width: getScreenWidth() * 0.6, 
-                height: getScreenHeight() * 0.07, 
-                buttonColor: Colors.grey,
-                buttonText: '',
-                onTapped: (){},
-                setBorderRadius: true
-              ),
-              SizedBox(height: getScreenHeight() * 0.01),
-              CustomButton(
-                width: getScreenWidth() * 0.6, 
-                height: getScreenHeight() * 0.07, 
-                buttonColor: Colors.grey,
-                buttonText: '',
-                onTapped: (){},
-                setBorderRadius: true
               ),
               SizedBox(
                 height: defaultVerticalPadding * 2

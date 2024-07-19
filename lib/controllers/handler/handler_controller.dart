@@ -36,11 +36,10 @@ class HandlerController {
 
   /// Displays the snackbar
   void displaySnackbar(
-    BuildContext context, 
     SnackbarType type,
     String text
   ){
-    ScaffoldMessenger.of(context).showSnackBar(
+    scaffoldKey.currentState?.showSnackBar(
       SnackBar(
         backgroundColor: getHandlerColor(type),
         duration: duration,

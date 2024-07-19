@@ -4,15 +4,15 @@ import 'package:timezone/timezone.dart' as tz;
 import 'package:intl/intl.dart' as intl;
 
 int getAnimeBasicDisplayFetchCount(){
-  return (getScreenWidth() / animeGridDisplayWidgetSize.width).floor() * 5;
+  return (getScreenWidth() / basicDisplayWidgetSize.width).floor() * 5;
 }
 
 int getAnimeBasicDisplayTotalFetchCount(){
-  return (getScreenWidth() / animeGridDisplayWidgetSize.width).floor() * 25;
+  return (getScreenWidth() / basicDisplayWidgetSize.width).floor() * 25;
 }
 
 int getAnimeBasicDisplayCrossAxis(){
-  return (getScreenWidth() / animeGridDisplayWidgetSize.width).floor();
+  return (getScreenWidth() / basicDisplayWidgetSize.width).floor();
 }
 
 String getCurrentSeason(){

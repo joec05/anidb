@@ -22,13 +22,11 @@ class MangaProgressController {
     chapterStr = chapterStr.isEmpty ? '0' : chapterStr;
     if(int.tryParse(volumeStr) == null || int.tryParse(chapterStr) == null){
       handler.displaySnackbar(
-        context, 
         SnackbarType.error, 
         tErr.invalidInput
       );
     }else if((int.parse(volumeStr) > mangaData.totalVolumes && mangaData.totalVolumes > 0) || (int.parse(chapterStr) > mangaData.totalChapters && mangaData.totalChapters > 0)){
       handler.displaySnackbar(
-        context, 
         SnackbarType.error, 
         tErr.maxValueReached
       );
@@ -47,7 +45,6 @@ class MangaProgressController {
         'num_chapters_read': chapterStr
       };
       APIResponseModel res = await apiCallRepo.runAPICall(
-        context,
         APICallType.patch,
         malApiUrl,
         '$malApiUrl/manga/${mangaData.id}/my_list_status',
@@ -61,7 +58,7 @@ class MangaProgressController {
         updatedListStatus.updatedTime = DateTime.now().toIso8601String();
         updatedListStatus.status = status;
         if(context.mounted) {
-          updateMangaStatusFromModel(context, mangaData.id, updatedListStatus);
+          updateMangaStatusFromModel(mangaData.id, updatedListStatus);
         }
         if(statusChanged) {
           UpdateUserMangaListStreamClass().emitData(
@@ -72,14 +69,13 @@ class MangaProgressController {
         }
         if(context.mounted){
           handler.displaySnackbar(
-            context,
             SnackbarType.successful, 
             tSuccess.savedProgress
           );
         }
       } else {
         if(context.mounted) {
-          handler.displaySnackbar(context, SnackbarType.error, tErr.response);
+          handler.displaySnackbar(SnackbarType.error, tErr.response);
         }
       }
     }
@@ -87,7 +83,6 @@ class MangaProgressController {
 
   void deleteFromMyMangaList() async{
     APIResponseModel res = await apiCallRepo.runAPICall(
-      context,
       APICallType.delete,
       malApiUrl,
       '$malApiUrl/manga/${mangaData.id}/my_list_status',
@@ -102,14 +97,13 @@ class MangaProgressController {
       );
       if(mounted){
         handler.displaySnackbar(
-          context,
           SnackbarType.successful, 
           tSuccess.deleteFromList
         );
       }
     } else {
       if(context.mounted) {
-        handler.displaySnackbar(context, SnackbarType.error, tErr.response);
+        handler.displaySnackbar(SnackbarType.error, tErr.response);
       }
     }
   }

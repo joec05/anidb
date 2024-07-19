@@ -39,8 +39,8 @@ class _ViewMoreMangaStatefulState extends ConsumerState<_ViewMoreMangaStateful>{
 
   @override void initState(){
     super.initState();
-    controller = ViewMoreMangaController(context, widget.displayType);
-    controller.initializeController();
+    controller = ViewMoreMangaController(widget.displayType);
+    controller.initialize();
   }
 
   @override void dispose(){

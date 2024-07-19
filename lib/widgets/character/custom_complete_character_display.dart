@@ -47,8 +47,8 @@ class CustomRowCharacterDisplayState extends State<CustomRowCharacterDisplay>{
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(
-                      width: animeDisplayCoverSize.width,
-                      height: animeDisplayCoverSize.height,
+                      width: completeDisplayCoverSize.width,
+                      height: completeDisplayCoverSize.height,
                       child: CachedImageWidget(imageClass: characterData.cover)
                     ),
                     SizedBox(
@@ -56,8 +56,8 @@ class CustomRowCharacterDisplayState extends State<CustomRowCharacterDisplay>{
                     ),
                     Flexible(
                       child: Container(
-                        width: getScreenWidth() - animeDisplayCoverSize.width - defaultHorizontalPadding * 2,
-                        height: animeDisplayCoverSize.height,
+                        width: getScreenWidth() - completeDisplayCoverSize.width - defaultHorizontalPadding * 2,
+                        height: completeDisplayCoverSize.height,
                         padding: EdgeInsets.symmetric(
                           vertical: defaultVerticalPadding * 2.5
                         ),
@@ -111,8 +111,8 @@ class CustomRowCharacterDisplayState extends State<CustomRowCharacterDisplay>{
               horizontal: defaultHorizontalPadding,
               vertical: defaultVerticalPadding
             ),
-            width: animeDisplayCoverSize.width,
-            height: animeDisplayCoverSize.height,
+            width: completeDisplayCoverSize.width,
+            height: completeDisplayCoverSize.height,
           ),
         )
       ); 

@@ -11,32 +11,22 @@ import 'package:anime_list_app/models/manga/manga_statistics_class.dart';
 import 'package:anime_list_app/models/user/user_manga_list_status_class.dart';
 import 'package:anime_list_app/repository/api_call_repo.dart';
 import 'package:anime_list_app/repository/update_state_repo.dart';
-import 'package:flutter/material.dart';
 
 class MangaRepository {
-  final BuildContext context;
-
-  MangaRepository(this.context);
-  
   Future<APIResponseModel> fetchTopManga() async{
     List<MangaDataClass> topMangaList = [];
     APIResponseModel res = await apiCallRepo.runAPICall(
-      context,
       APICallType.get,
       malApiUrl,
-      '$malApiUrl/manga/ranking?$fetchAllMangaFieldsStr&ranking_type=manga&limit=${getAnimeBasicDisplayFetchCount()}',
+      '$malApiUrl/manga/ranking?$fetchAllMangaFieldsStr&ranking_type=manga&limit=50}',
       {}
     );
     if(res.error == null) {
       var data = res.data['data'];
-      if(context.mounted) {
-        for(int i = 0; i < data.length; i++){
-          if(context.mounted) {
-            MangaDataClass mangaDataModel = MangaDataClass.fetchNewInstance(-1).fromMapUpdateAll(data[i]['node']);
-            updateMangaStatusFromMap(context, mangaDataModel.id, data[i]['node']['my_list_status']);
-            topMangaList.add(mangaDataModel);
-          }
-        }
+      for(int i = 0; i < data.length; i++){
+        MangaDataClass mangaDataModel = MangaDataClass.fetchNewInstance(-1).fromMapUpdateAll(data[i]['node']);
+        updateMangaStatusFromMap(mangaDataModel.id, data[i]['node']['my_list_status']);
+        topMangaList.add(mangaDataModel);
       }  
       return APIResponseModel(topMangaList, null);
     } else {
@@ -47,22 +37,17 @@ class MangaRepository {
   Future<APIResponseModel> fetchTopFavouritedManga() async{
     List<MangaDataClass> topMangaList = [];
     APIResponseModel res = await apiCallRepo.runAPICall(
-      context,
       APICallType.get,
       malApiUrl,
-      '$malApiUrl/manga/ranking?$fetchAllMangaFieldsStr&ranking_type=favorite&limit=${getAnimeBasicDisplayFetchCount()}',
+      '$malApiUrl/manga/ranking?$fetchAllMangaFieldsStr&ranking_type=favorite&limit=50}',
       {}
     );
     if(res.error == null) {
       var data = res.data['data'];
-      if(context.mounted) {
-        for(int i = 0; i < data.length; i++){
-          if(context.mounted) {
-            MangaDataClass mangaDataModel = MangaDataClass.fetchNewInstance(-1).fromMapUpdateAll(data[i]['node']);
-            updateMangaStatusFromMap(context, mangaDataModel.id, data[i]['node']['my_list_status']);
-            topMangaList.add(mangaDataModel);
-          }
-        }
+      for(int i = 0; i < data.length; i++){
+        MangaDataClass mangaDataModel = MangaDataClass.fetchNewInstance(-1).fromMapUpdateAll(data[i]['node']);
+        updateMangaStatusFromMap(mangaDataModel.id, data[i]['node']['my_list_status']);
+        topMangaList.add(mangaDataModel);
       }  
       return APIResponseModel(topMangaList, null);
     } else {
@@ -73,22 +58,17 @@ class MangaRepository {
   Future<APIResponseModel> fetchMostPopularManga() async{
     List<MangaDataClass> mostPopularMangaList = [];
     APIResponseModel res = await apiCallRepo.runAPICall(
-      context,
       APICallType.get,
       malApiUrl,
-      '$malApiUrl/manga/ranking?$fetchAllMangaFieldsStr&ranking_type=bypopularity&limit=${getAnimeBasicDisplayFetchCount()}',
+      '$malApiUrl/manga/ranking?$fetchAllMangaFieldsStr&ranking_type=bypopularity&limit=50}',
       {}
     );
     if(res.error == null) {
       var data = res.data['data'];
-      if(context.mounted) {
-        for(int i = 0; i < data.length; i++){
-          if(context.mounted) {
-            MangaDataClass mangaDataModel = MangaDataClass.fetchNewInstance(-1).fromMapUpdateAll(data[i]['node']);
-            updateMangaStatusFromMap(context, mangaDataModel.id, data[i]['node']['my_list_status']);
-            mostPopularMangaList.add(mangaDataModel);
-          }
-        }
+      for(int i = 0; i < data.length; i++){
+        MangaDataClass mangaDataModel = MangaDataClass.fetchNewInstance(-1).fromMapUpdateAll(data[i]['node']);
+        updateMangaStatusFromMap(mangaDataModel.id, data[i]['node']['my_list_status']);
+        mostPopularMangaList.add(mangaDataModel);
       }  
       return APIResponseModel(mostPopularMangaList, null);
     } else {
@@ -98,7 +78,6 @@ class MangaRepository {
 
   Future<APIResponseModel> fetchMangaDetails(int mangaID) async{
     APIResponseModel res = await apiCallRepo.runAPICall(
-      context,
       APICallType.get,
       malApiUrl,
       '$malApiUrl/manga/$mangaID?$fetchAllMangaFieldsStr',
@@ -106,9 +85,7 @@ class MangaRepository {
     );
     if(res.error == null) {
       MangaDataClass mangaDataModel = MangaDataClass.fetchNewInstance(-1).fromMapUpdateAll(res.data);
-      if(context.mounted) {
-        updateMangaStatusFromMap(context, mangaDataModel.id, res.data['my_list_status']);
-      }
+      updateMangaStatusFromMap(mangaDataModel.id, res.data['my_list_status']);
       return APIResponseModel(mangaDataModel, null);
     } else {
       return res;
@@ -117,7 +94,6 @@ class MangaRepository {
 
   Future<APIResponseModel> fetchMangaStatistics(int mangaID) async{
     APIResponseModel res = await apiCallRepo.runAPICall(
-      context,
       APICallType.get,
       jikanApiUrl,
       '$jikanApiUrl/manga/$mangaID/statistics',
@@ -140,7 +116,6 @@ class MangaRepository {
   
   Future<APIResponseModel> fetchMangaCharacters(int mangaID) async{
     APIResponseModel res = await apiCallRepo.runAPICall(
-      context,
       APICallType.get,
       jikanApiUrl,
       '$jikanApiUrl/manga/$mangaID/characters',
@@ -165,7 +140,6 @@ class MangaRepository {
 
   Future<APIResponseModel> fetchMyMangasList(UserMangaListStatusClass statusClass) async{
     APIResponseModel res = await apiCallRepo.runAPICall(
-      context,
       APICallType.get,
       malApiUrl,
       '$malApiUrl/users/@me/mangalist?status=${statusClass.status}&offset=${statusClass.mangaList.length}&limit=$userDisplayFetchLimit&$fetchAllMangaFieldsStr',
@@ -177,9 +151,7 @@ class MangaRepository {
       for(int i = 0; i < data.length; i++){
         MangaDataClass mangaData = MangaDataClass.fetchNewInstance(-1).fromMapUpdateAll(data[i]['node']);
         int id = data[i]['node']['id'];
-        if(context.mounted) {
-          updateMangaStatusFromMap(context, id, data[i]['node']['my_list_status']);
-        }
+        updateMangaStatusFromMap(id, data[i]['node']['my_list_status']);
         statusClass.mangaList.add(mangaData);
       }
       return APIResponseModel(statusClass, null); 
@@ -191,7 +163,6 @@ class MangaRepository {
   Future<APIResponseModel> searchManga(String searchedText) async{
     List<MangaDataClass> mangaList = [];
     APIResponseModel res = await apiCallRepo.runAPICall(
-      context,
       APICallType.get,
       malApiUrl,
       '$malApiUrl/manga?$fetchAllMangaFieldsStr&q=$searchedText&limit=$searchFetchLimit',
@@ -201,9 +172,7 @@ class MangaRepository {
       var data = res.data['data'];
       for(int i = 0; i < data.length; i++){
         MangaDataClass mangaDataModel = MangaDataClass.fetchNewInstance(-1).fromMapUpdateAll(data[i]['node']);
-        if(context.mounted) {
-          updateMangaStatusFromMap(context, mangaDataModel.id, data[i]['node']['my_list_status']);
-        }
+        updateMangaStatusFromMap(mangaDataModel.id, data[i]['node']['my_list_status']);
         mangaList.add(mangaDataModel);
       }
       return APIResponseModel(mangaList, null);
@@ -227,7 +196,6 @@ class MangaRepository {
     List<MangaDataClass> mangaList = [];
     
     APIResponseModel res = await apiCallRepo.runAPICall(
-      context,
       APICallType.get,
       malApiUrl,
       generateAPIRequestPath(),
@@ -237,9 +205,7 @@ class MangaRepository {
       var data = res.data['data'];
       for(int i = 0; i < data.length; i++){
         MangaDataClass mangaDataModel = MangaDataClass.fetchNewInstance(-1).fromMapUpdateAll(data[i]['node']);
-        if(context.mounted) {
-          updateMangaStatusFromMap(context, mangaDataModel.id, data[i]['node']['my_list_status']);
-        }
+        updateMangaStatusFromMap(mangaDataModel.id, data[i]['node']['my_list_status']);
         mangaList.add(mangaDataModel);
       }
       return APIResponseModel(mangaList, null);

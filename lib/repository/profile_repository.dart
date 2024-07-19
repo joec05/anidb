@@ -5,24 +5,21 @@ import 'package:vertical_barchart/vertical-barchartmodel.dart';
 import 'package:vertical_barchart/vertical-legend.dart';
 
 class ProfileRepository {
-  final BuildContext context;
+  UserDataClass? userData;
 
-  ProfileRepository(
-    this.context
-  );
-  
   Future<APIResponseModel> fetchMyProfileData() async{
     APIResponseModel res = await apiCallRepo.runAPICall(
-      context,
       APICallType.get,
       malApiUrl,
       '$malApiUrl/users/@me',
       {}
     );
+    talker.debug(res.data);
     if(res.error == null) {
-      UserDataClass myUserData = UserDataClass.fromMap(res.data);
-      return APIResponseModel(myUserData, null);
+      userData = UserDataClass.fromMap(res.data);
+      return APIResponseModel(userData, null);
     } else {
+      userData = null;
       return res;
     }
   }
@@ -48,7 +45,6 @@ class ProfileRepository {
 
     Future<void> fetchAndCalculateAnimeStatistics() async {
       res = await apiCallRepo.runAPICall(
-        context,
         APICallType.get,
         malApiUrl,
         '$malApiUrl/users/@me/animelist?offset=${userAnimeStatistics.total}&limit=$statsFetchLimit&fields=my_list_status',
@@ -173,7 +169,6 @@ class ProfileRepository {
 
     Future<void> fetchAndCalculateMangaStatistics() async {
       res = await apiCallRepo.runAPICall(
-        context,
         APICallType.get,
         malApiUrl,
         '$malApiUrl/users/@me/mangalist?offset=${userMangaStatistics.total}limit=$statsFetchLimit&fields=my_list_status',
@@ -278,3 +273,5 @@ class ProfileRepository {
     return APIResponseModel(userMangaStatistics, data2: mangaBarChartData, null);
   }
 }
+
+final ProfileRepository profileRepository = ProfileRepository();

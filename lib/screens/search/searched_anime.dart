@@ -39,8 +39,8 @@ class _SearchedAnimesWidgetStatefulState extends ConsumerState<_SearchedAnimesWi
 
   @override void initState(){
     super.initState();
-    controller = SearchedAnimeController(context, widget.searchedText);
-    controller.initializeController();
+    controller = SearchedAnimeController(widget.searchedText);
+    controller.initialize();
   }
   
   @override

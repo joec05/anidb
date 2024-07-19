@@ -1,26 +1,18 @@
 import 'dart:async';
 import 'package:anime_list_app/models/api/api_response_model.dart';
 import 'package:anime_list_app/repository/profile_repository.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class UserStatisticsController {
-  BuildContext context;
   late List<AutoDisposeAsyncNotifierProvider<MyStatisticsNotifier, APIResponseModel>> myStatisticsNotifiers = [];
 
-  UserStatisticsController(
-    this.context
-  );
-
-  bool get mounted => context.mounted;
-
-  void initializeController() {
+  void initialize() {
     myStatisticsNotifiers = [
       AsyncNotifierProvider.autoDispose<MyStatisticsNotifier, APIResponseModel>(
-        () => MyStatisticsNotifier(context, 'anime')
+        () => MyStatisticsNotifier('anime')
       ),
       AsyncNotifierProvider.autoDispose<MyStatisticsNotifier, APIResponseModel>(
-        () => MyStatisticsNotifier(context, 'manga')
+        () => MyStatisticsNotifier('manga')
       )
     ];
   }
@@ -31,17 +23,14 @@ class UserStatisticsController {
 }
 
 class MyStatisticsNotifier extends AutoDisposeAsyncNotifier<APIResponseModel>{
-  final BuildContext context;
   final String dataType;
-  late ProfileRepository profileRepository;
   APIResponseModel statsData = APIResponseModel(null, null);
 
-  MyStatisticsNotifier(this.context, this.dataType);
+  MyStatisticsNotifier(this.dataType);
 
   @override
   FutureOr<APIResponseModel> build() async {
     state = const AsyncLoading();
-    profileRepository = ProfileRepository(context);
     APIResponseModel response;
     if(dataType == 'anime') {
       response = await profileRepository.fetchMyAnimeStatistics();

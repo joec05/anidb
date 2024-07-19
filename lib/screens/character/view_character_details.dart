@@ -34,8 +34,8 @@ class _ViewCharacterDetailsStatefulState extends ConsumerState<_ViewCharacterDet
 
   @override void initState(){
     super.initState();
-    controller = CharacterDetailsController(context, widget.characterID);
-    controller.initializeController();
+    controller = CharacterDetailsController(widget.characterID);
+    controller.initialize();
   }
 
   @override void dispose(){

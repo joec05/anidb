@@ -34,8 +34,8 @@ class _ViewAnimeDetailsStatefulState extends ConsumerState<_ViewAnimeDetailsStat
 
   @override void initState(){
     super.initState();
-    controller = AnimeDetailsController(context, widget.animeID);
-    controller.initializeController();
+    controller = AnimeDetailsController(widget.animeID);
+    controller.initialize();
   }
 
   @override void dispose(){

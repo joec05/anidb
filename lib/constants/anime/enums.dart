@@ -3,5 +3,5 @@ enum AnimeBasicDisplayType{
 }
 
 enum AnimeRowDisplayType{
-  myUserList, search, viewMore, explore
+  myUserList, search, viewMore, explore, ranking
 }

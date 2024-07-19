@@ -38,8 +38,8 @@ class CustomBasicCharacterDisplayState extends State<CustomBasicCharacterDisplay
         behavior: HitTestBehavior.opaque,
         child: Center(
           child: Container(
-            width: animeGridDisplayWidgetSize.width,
-            height: animeGridDisplayWidgetSize.height,
+            width: basicDisplayWidgetSize.width,
+            height: basicDisplayWidgetSize.height,
             margin: EdgeInsets.symmetric(
               horizontal: defaultHorizontalPadding / 2
             ),
@@ -47,8 +47,8 @@ class CustomBasicCharacterDisplayState extends State<CustomBasicCharacterDisplay
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 SizedBox(
-                  width: animeGridDisplayCoverSize.width,
-                  height: animeGridDisplayCoverSize.height,
+                  width: basicDisplayCoverSize.width,
+                  height: basicDisplayCoverSize.height,
                   child: CachedImageWidget(imageClass: characterData.cover)
                 ),
                 SizedBox(
@@ -70,13 +70,13 @@ class CustomBasicCharacterDisplayState extends State<CustomBasicCharacterDisplay
       );
     }else{
       return Card(
+        margin: EdgeInsets.symmetric(
+          horizontal: defaultHorizontalPadding / 2
+        ),
         child: Center(
-          child: Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: defaultHorizontalPadding / 2
-            ),
-            width: animeGridDisplayWidgetSize.width,
-            height: animeGridDisplayWidgetSize.height,
+          child: SizedBox(
+            width: basicDisplayCoverSize.width,
+            height: basicDisplayCoverSize.height,
           ),
         )
       );

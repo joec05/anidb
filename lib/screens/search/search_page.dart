@@ -48,7 +48,6 @@ class __SearchPageStatefulState extends State<_SearchPageStateful> with SingleTi
           onEditingComplete: () {
             if(searchController.text.length < 4){
               handler.displaySnackbar(
-                context,
                 SnackbarType.error,
                 tErr.searchTextMin
               );

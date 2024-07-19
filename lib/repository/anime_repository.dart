@@ -10,16 +10,10 @@ import 'package:anime_list_app/models/character/character_image_class.dart';
 import 'package:anime_list_app/models/user/user_anime_list_status_class.dart';
 import 'package:anime_list_app/repository/api_call_repo.dart';
 import 'package:anime_list_app/repository/update_state_repo.dart';
-import 'package:flutter/material.dart';
 
 class AnimeRepository {
-  final BuildContext context;
-
-  AnimeRepository(this.context);
-  
   Future<APIResponseModel> fetchAnimeDetails(int animeID) async{
     APIResponseModel res = await apiCallRepo.runAPICall(
-      context,
       APICallType.get,
       malApiUrl,
       '$malApiUrl/anime/$animeID?$fetchAllAnimeFieldsStr',
@@ -27,9 +21,7 @@ class AnimeRepository {
     );
     if(res.error == null) {
       AnimeDataClass animeDataModel = AnimeDataClass.fetchNewInstance(-1).fromMapUpdateAll(res.data);
-      if(context.mounted) {
-        updateAnimeStatusFromMap(context, animeDataModel.id, res.data['my_list_status']);
-      }
+      updateAnimeStatusFromMap(animeDataModel.id, res.data['my_list_status']);
       return APIResponseModel(animeDataModel, null);
     } else {
       return res;
@@ -38,7 +30,6 @@ class AnimeRepository {
 
   Future<APIResponseModel> fetchAnimeCharacters(int animeID) async{
     APIResponseModel res = await apiCallRepo.runAPICall(
-      context,
       APICallType.get,
       jikanApiUrl,
       '$jikanApiUrl/anime/$animeID/characters',
@@ -64,20 +55,17 @@ class AnimeRepository {
   Future<APIResponseModel> fetchSeasonAnime() async{
     List<AnimeDataClass> animeList = [];
     APIResponseModel res = await apiCallRepo.runAPICall(
-      context,
       APICallType.get,
       malApiUrl,
-      '$malApiUrl/anime/season/${DateTime.now().year}/${getCurrentSeason()}?fields=$fetchAllAnimeFieldsStr&limit=${getAnimeBasicDisplayFetchCount()}',
+      '$malApiUrl/anime/season/${DateTime.now().year}/${getCurrentSeason()}?fields=$fetchAllAnimeFieldsStr&limit=50',
       {}
     );
     if(res.error == null) {
       var data = res.data['data'];
       for(int i = 0; i < data.length; i++){
-        if(context.mounted) {
-          AnimeDataClass animeDataModel = AnimeDataClass.fetchNewInstance(-1).fromMapUpdateAll(data[i]['node']);
-          updateAnimeStatusFromMap(context, animeDataModel.id, data[i]['node']['my_list_status']);
-          animeList.add(animeDataModel);
-        }
+        AnimeDataClass animeDataModel = AnimeDataClass.fetchNewInstance(-1).fromMapUpdateAll(data[i]['node']);
+        updateAnimeStatusFromMap(animeDataModel.id, data[i]['node']['my_list_status']);
+        animeList.add(animeDataModel);
       }
       return APIResponseModel(animeList, null);
     } else {
@@ -88,20 +76,17 @@ class AnimeRepository {
   Future<APIResponseModel> fetchTopAnime() async{
     List<AnimeDataClass> animeList = [];
     APIResponseModel res = await apiCallRepo.runAPICall(
-      context,
       APICallType.get,
       malApiUrl,
-      '$malApiUrl/anime/ranking?$fetchAllAnimeFieldsStr&$fetchAllAnimeFieldsStr&ranking_type=all&limit=${getAnimeBasicDisplayFetchCount()}',
+      '$malApiUrl/anime/ranking?$fetchAllAnimeFieldsStr&$fetchAllAnimeFieldsStr&ranking_type=all&limit=50',
       {}
     );
     if(res.error == null) {
       var data = res.data['data'];
       for(int i = 0; i < data.length; i++){
-        if(context.mounted) {
-          AnimeDataClass animeDataModel = AnimeDataClass.fetchNewInstance(-1).fromMapUpdateAll(data[i]['node']);
-          updateAnimeStatusFromMap(context, animeDataModel.id, data[i]['node']['my_list_status']);
-          animeList.add(animeDataModel);
-        }
+        AnimeDataClass animeDataModel = AnimeDataClass.fetchNewInstance(-1).fromMapUpdateAll(data[i]['node']);
+        updateAnimeStatusFromMap(animeDataModel.id, data[i]['node']['my_list_status']);
+        animeList.add(animeDataModel);
       }
       return APIResponseModel(animeList, null);
     } else {
@@ -112,20 +97,17 @@ class AnimeRepository {
   Future<APIResponseModel> fetchTopAiringAnime() async{
     List<AnimeDataClass> animeList = [];
     APIResponseModel res = await apiCallRepo.runAPICall(
-      context,
       APICallType.get,
       malApiUrl,
-      '$malApiUrl/anime/ranking?$fetchAllAnimeFieldsStr&ranking_type=airing&limit=${getAnimeBasicDisplayFetchCount()}',
+      '$malApiUrl/anime/ranking?$fetchAllAnimeFieldsStr&ranking_type=airing&limit=50',
       {}
     );
     if(res.error == null) {
       var data = res.data['data'];
       for(int i = 0; i < data.length; i++){
-        if(context.mounted) {
-          AnimeDataClass animeDataModel = AnimeDataClass.fetchNewInstance(-1).fromMapUpdateAll(data[i]['node']);
-          updateAnimeStatusFromMap(context, animeDataModel.id, data[i]['node']['my_list_status']);
-          animeList.add(animeDataModel);
-        }
+        AnimeDataClass animeDataModel = AnimeDataClass.fetchNewInstance(-1).fromMapUpdateAll(data[i]['node']);
+        updateAnimeStatusFromMap(animeDataModel.id, data[i]['node']['my_list_status']);
+        animeList.add(animeDataModel);
       }
       return APIResponseModel(animeList, null);
     } else {
@@ -136,20 +118,17 @@ class AnimeRepository {
   Future<APIResponseModel> fetchTopUpcomingAnime() async{
     List<AnimeDataClass> animeList = [];
     APIResponseModel res = await apiCallRepo.runAPICall(
-      context,
       APICallType.get,
       malApiUrl,
-      '$malApiUrl/anime/ranking?$fetchAllAnimeFieldsStr&ranking_type=upcoming&limit=${getAnimeBasicDisplayFetchCount()}',
+      '$malApiUrl/anime/ranking?$fetchAllAnimeFieldsStr&ranking_type=upcoming&limit=50',
       {}
     );
     if(res.error == null) {
       var data = res.data['data'];
       for(int i = 0; i < data.length; i++){
-        if(context.mounted) {
-          AnimeDataClass animeDataModel = AnimeDataClass.fetchNewInstance(-1).fromMapUpdateAll(data[i]['node']);
-          updateAnimeStatusFromMap(context, animeDataModel.id, data[i]['node']['my_list_status']);
-          animeList.add(animeDataModel);
-        }
+        AnimeDataClass animeDataModel = AnimeDataClass.fetchNewInstance(-1).fromMapUpdateAll(data[i]['node']);
+        updateAnimeStatusFromMap(animeDataModel.id, data[i]['node']['my_list_status']);
+        animeList.add(animeDataModel);
       }
       return APIResponseModel(animeList, null);
     } else {
@@ -160,20 +139,17 @@ class AnimeRepository {
   Future<APIResponseModel> fetchMostPopularAnime() async{
     List<AnimeDataClass> animeList = [];
     APIResponseModel res = await apiCallRepo.runAPICall(
-      context,
       APICallType.get,
       malApiUrl,
-      '$malApiUrl/anime/ranking?$fetchAllAnimeFieldsStr&ranking_type=bypopularity&limit=${getAnimeBasicDisplayFetchCount()}',
+      '$malApiUrl/anime/ranking?$fetchAllAnimeFieldsStr&ranking_type=bypopularity&limit=50',
       {}
     );
     if(res.error == null) {
       var data = res.data['data'];
       for(int i = 0; i < data.length; i++){
-        if(context.mounted) {
-          AnimeDataClass animeDataModel = AnimeDataClass.fetchNewInstance(-1).fromMapUpdateAll(data[i]['node']);
-          updateAnimeStatusFromMap(context, animeDataModel.id, data[i]['node']['my_list_status']);
-          animeList.add(animeDataModel);
-        }
+        AnimeDataClass animeDataModel = AnimeDataClass.fetchNewInstance(-1).fromMapUpdateAll(data[i]['node']);
+        updateAnimeStatusFromMap(animeDataModel.id, data[i]['node']['my_list_status']);
+        animeList.add(animeDataModel);
       }
       return APIResponseModel(animeList, null);
     } else {
@@ -184,20 +160,17 @@ class AnimeRepository {
   Future<APIResponseModel> fetchTopFavouritedAnime() async{
     List<AnimeDataClass> animeList = [];
     APIResponseModel res = await apiCallRepo.runAPICall(
-      context,
       APICallType.get,
       malApiUrl,
-      '$malApiUrl/anime/ranking?$fetchAllAnimeFieldsStr&ranking_type=favorite&limit=${getAnimeBasicDisplayFetchCount()}',
+      '$malApiUrl/anime/ranking?$fetchAllAnimeFieldsStr&ranking_type=favorite&limit=50',
       {}
     );
     if(res.error == null) {
       var data = res.data['data'];
       for(int i = 0; i < data.length; i++){
-        if(context.mounted) {
-          AnimeDataClass animeDataModel = AnimeDataClass.fetchNewInstance(-1).fromMapUpdateAll(data[i]['node']);
-          updateAnimeStatusFromMap(context, animeDataModel.id, data[i]['node']['my_list_status']);
-          animeList.add(animeDataModel);
-        }
+        AnimeDataClass animeDataModel = AnimeDataClass.fetchNewInstance(-1).fromMapUpdateAll(data[i]['node']);
+        updateAnimeStatusFromMap(animeDataModel.id, data[i]['node']['my_list_status']);
+        animeList.add(animeDataModel);
       }
       return APIResponseModel(animeList, null);
     } else {
@@ -208,7 +181,6 @@ class AnimeRepository {
   Future<APIResponseModel> fetchSuggestedAnime() async{
     List<AnimeDataClass> animeList = [];
     APIResponseModel res = await apiCallRepo.runAPICall(
-      context,
       APICallType.get,
       malApiUrl,
       '$malApiUrl/anime/suggestions?$fetchAllAnimeFieldsStr&limit=${getAnimeBasicDisplayTotalFetchCount()}',
@@ -216,14 +188,10 @@ class AnimeRepository {
     );
     if(res.error == null) {
       var data = res.data['data'];
-      if(context.mounted) {
-        for(int i = 0; i < data.length; i++){
-          if(context.mounted) {
-            AnimeDataClass animeDataModel = AnimeDataClass.fetchNewInstance(-1).fromMapUpdateAll(data[i]['node']);
-            updateAnimeStatusFromMap(context, animeDataModel.id, data[i]['node']['my_list_status']);
-            animeList.add(animeDataModel);
-          }
-        }
+      for(int i = 0; i < data.length; i++){
+        AnimeDataClass animeDataModel = AnimeDataClass.fetchNewInstance(-1).fromMapUpdateAll(data[i]['node']);
+        updateAnimeStatusFromMap(animeDataModel.id, data[i]['node']['my_list_status']);
+        animeList.add(animeDataModel);
       }
       return APIResponseModel(animeList, null);
     } else {
@@ -233,7 +201,6 @@ class AnimeRepository {
 
   Future<APIResponseModel> fetchMyAnimesList(UserAnimeListStatusClass statusClass) async{
     APIResponseModel res = await apiCallRepo.runAPICall(
-      context,
       APICallType.get,
       malApiUrl,
       '$malApiUrl/users/@me/animelist?status=${statusClass.status}&offset=${statusClass.animeList.length}&limit=$userDisplayFetchLimit&$fetchAllAnimeFieldsStr',
@@ -245,9 +212,7 @@ class AnimeRepository {
       for(int i = 0; i < data.length; i++){
         AnimeDataClass animeData = AnimeDataClass.fetchNewInstance(-1).fromMapUpdateAll(data[i]['node']);
         int id = animeData.id;
-        if(context.mounted) {
-          updateAnimeStatusFromMap(context, id, data[i]['node']['my_list_status']);
-        }
+        updateAnimeStatusFromMap(id, data[i]['node']['my_list_status']);
         statusClass.animeList.add(animeData);
       }
       return APIResponseModel(statusClass, null); 
@@ -259,7 +224,6 @@ class AnimeRepository {
   Future<APIResponseModel> searchAnime(String searchedText) async{
     List<AnimeDataClass> animeList = [];
     APIResponseModel res = await apiCallRepo.runAPICall(
-      context,
       APICallType.get,
       malApiUrl,
       '$malApiUrl/anime?$fetchAllAnimeFieldsStr&q=$searchedText&limit=$searchFetchLimit',
@@ -269,9 +233,7 @@ class AnimeRepository {
       var data = res.data['data'];
       for(int i = 0; i < data.length; i++){
         AnimeDataClass animeDataModel = AnimeDataClass.fetchNewInstance(-1).fromMapUpdateAll(data[i]['node']);
-        if(context.mounted) {
-          updateAnimeStatusFromMap(context, animeDataModel.id, data[i]['node']['my_list_status']);
-        }
+        updateAnimeStatusFromMap(animeDataModel.id, data[i]['node']['my_list_status']);
         animeList.add(animeDataModel);
       }
       return APIResponseModel(animeList, null);
@@ -301,7 +263,6 @@ class AnimeRepository {
     List<AnimeDataClass> animeList = [];
 
     APIResponseModel res = await apiCallRepo.runAPICall(
-      context,
       APICallType.get,
       malApiUrl,
       generateAPIRequestPath(),
@@ -311,9 +272,7 @@ class AnimeRepository {
       var data = res.data['data'];
       for(int i = 0; i < data.length; i++){
         AnimeDataClass animeDataModel = AnimeDataClass.fetchNewInstance(-1).fromMapUpdateAll(data[i]['node']);
-        if(context.mounted) {
-          updateAnimeStatusFromMap(context, animeDataModel.id, data[i]['node']['my_list_status']);
-        }
+        updateAnimeStatusFromMap(animeDataModel.id, data[i]['node']['my_list_status']);
         animeList.add(animeDataModel);
       }
       return APIResponseModel(animeList, null);

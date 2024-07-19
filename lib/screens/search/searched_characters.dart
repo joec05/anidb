@@ -40,8 +40,8 @@ class _SearchedCharactersWidgetStatefulState extends ConsumerState<_SearchedChar
 
   @override void initState() {
     super.initState();
-    controller = SearchedCharactersController(context, widget.searchedText);
-    controller.initializeController();
+    controller = SearchedCharactersController(widget.searchedText);
+    controller.initialize();
   }
 
   @override void dispose() {

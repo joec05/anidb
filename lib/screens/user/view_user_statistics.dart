@@ -27,8 +27,8 @@ class _ViewUserStatisticsStatefulState extends ConsumerState<_ViewUserStatistics
   @override void initState(){
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    controller = UserStatisticsController(context);
-    controller.initializeController();
+    controller = UserStatisticsController();
+    controller.initialize();
   }
 
   @override void dispose(){

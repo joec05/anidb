@@ -33,8 +33,8 @@ class PictureWidgetState extends State<PictureWidget>{
         ),
         child: CachedImageWidget(
           imageClass: widget.imageData,
-          width: animeGridDisplayCoverSize.width,
-          height: animeGridDisplayCoverSize.height
+          width: basicDisplayCoverSize.width,
+          height: basicDisplayCoverSize.height
         ),
       ),
     );

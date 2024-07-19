@@ -38,7 +38,7 @@ class CustomMangaDetailsState extends State<CustomMangaDetails>{
 
   @override
   Widget build(BuildContext context) {
-    double besideImageWidth = getScreenWidth() - animeDetailDisplayCoverSize.width - (getScreenWidth() * 0.03) - (defaultHorizontalPadding * 2);
+    double besideImageWidth = getScreenWidth() - detailDisplayCoverSize.width - (getScreenWidth() * 0.03) - (defaultHorizontalPadding * 2);
     double fullWidth = getScreenWidth() - (defaultHorizontalPadding * 2);
     if(!widget.skeletonMode){
       MangaStatisticsClass statusStats = mangaData.statistics;
@@ -173,8 +173,8 @@ class CustomMangaDetailsState extends State<CustomMangaDetails>{
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     SizedBox(
-                      width: animeDetailDisplayCoverSize.width,
-                      height: animeDetailDisplayCoverSize.height,
+                      width: detailDisplayCoverSize.width,
+                      height: detailDisplayCoverSize.height,
                       child: CachedImageWidget(imageClass: mangaData.cover)
                     ),
                     SizedBox(
@@ -943,8 +943,8 @@ class CustomMangaDetailsState extends State<CustomMangaDetails>{
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Container(
-                      width: animeDetailDisplayCoverSize.width,
-                      height: animeDetailDisplayCoverSize.height,
+                      width: detailDisplayCoverSize.width,
+                      height: detailDisplayCoverSize.height,
                       color: Colors.grey
                     ),
                     SizedBox(

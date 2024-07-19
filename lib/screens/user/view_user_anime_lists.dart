@@ -25,8 +25,8 @@ class _ViewUserAnimeListsStatefulState extends ConsumerState<_ViewUserAnimeLists
   @override void initState(){
     super.initState();
     _tabController = TabController(length: 5, vsync: this);
-    controller = UserAnimeController(context);
-    controller.initializeController();
+    controller = UserAnimeController();
+    controller.initialize();
   }
 
   @override void dispose(){
@@ -42,13 +42,6 @@ class _ViewUserAnimeListsStatefulState extends ConsumerState<_ViewUserAnimeLists
     List<AsyncValue<UserAnimeListStatusClass>> watchProviders = List.generate(statusNotifiers.length, (i) => ref.watch(statusNotifiers[i]));
 
     return Scaffold(
-      appBar: AppBar(
-        leading: const AppBarWidget(),
-        flexibleSpace: Container(
-          decoration: defaultAppBarDecoration
-        ),
-        title: const Text('Anime List'), titleSpacing: defaultAppBarTitleSpacing,
-      ),
       body: NestedScrollView(
         headerSliverBuilder: (context, bool f) {
           return <Widget>[

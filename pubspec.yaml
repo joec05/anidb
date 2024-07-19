@@ -58,6 +58,7 @@ dependencies:
   talker_dio_logger: ^4.3.2
   talker_riverpod_logger: ^1.1.2
   talker_flutter: ^4.3.2
+  salomon_bottom_bar: ^3.3.2
 
 dev_dependencies:
   flutter_test:

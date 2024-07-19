@@ -2,24 +2,19 @@ import 'dart:async';
 import 'package:anime_list_app/models/api/api_response_model.dart';
 import 'package:anime_list_app/models/manga/manga_data_class.dart';
 import 'package:anime_list_app/repository/manga_repository.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class MangaDetailsController {
-  final BuildContext context;
   final int mangaID;
   late AutoDisposeAsyncNotifierProvider<MangaDetailsNotifier, MangaDataClass> mangaDataNotifier;
 
   MangaDetailsController(
-    this.context,
     this.mangaID
   );
 
-  bool get mounted => context.mounted;
-
-  void initializeController() async {
+  void initialize() async {
     mangaDataNotifier = AsyncNotifierProvider.autoDispose<MangaDetailsNotifier, MangaDataClass>(
-      () => MangaDetailsNotifier(context, mangaID)
+      () => MangaDetailsNotifier(mangaID)
     );
   }
 
@@ -28,17 +23,16 @@ class MangaDetailsController {
 }
 
 class MangaDetailsNotifier extends AutoDisposeAsyncNotifier<MangaDataClass>{
-  final BuildContext context;
   final int mangaID;
   late MangaRepository mangaRepository;
   MangaDataClass mangaData = MangaDataClass.fetchNewInstance(-1);
 
-  MangaDetailsNotifier(this.context, this.mangaID);
+  MangaDetailsNotifier(this.mangaID);
 
   @override
   FutureOr<MangaDataClass> build() async {
     state = const AsyncLoading();
-    mangaRepository = MangaRepository(context);
+    mangaRepository = MangaRepository();
     APIResponseModel response = await mangaRepository.fetchMangaDetails(mangaID);
     if(response.error != null) {
       state = AsyncError(response.error!.object, response.error!.stackTrace);

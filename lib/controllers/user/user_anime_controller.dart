@@ -1,24 +1,15 @@
 import 'dart:async';
 import 'package:anime_list_app/global_files.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class UserAnimeController {
-  BuildContext context;
   late List<AutoDisposeAsyncNotifierProvider<MyAnimeListNotifier, UserAnimeListStatusClass>> statusNotifiers = [];
   late StreamSubscription updateUserAnimeListStreamClassSubscription;
 
-  UserAnimeController(
-    this.context
-  );
-
-  bool get mounted => context.mounted;
-
-  void initializeController() {
+  void initialize() {
     statusNotifiers = [
       AsyncNotifierProvider.autoDispose<MyAnimeListNotifier, UserAnimeListStatusClass>(() => 
         MyAnimeListNotifier(
-          context,
           UserAnimeListStatusClass(
             [], 'watching', false, PaginationStatus.loaded
           )
@@ -26,7 +17,6 @@ class UserAnimeController {
       ),
       AsyncNotifierProvider.autoDispose<MyAnimeListNotifier, UserAnimeListStatusClass>(() => 
         MyAnimeListNotifier(
-          context,
           UserAnimeListStatusClass(
             [], 'plan_to_watch', false, PaginationStatus.loaded
           )
@@ -34,7 +24,6 @@ class UserAnimeController {
       ),
       AsyncNotifierProvider.autoDispose<MyAnimeListNotifier, UserAnimeListStatusClass>(() => 
         MyAnimeListNotifier(
-          context,
           UserAnimeListStatusClass(
             [], 'completed', false, PaginationStatus.loaded
           )
@@ -42,7 +31,6 @@ class UserAnimeController {
       ),
       AsyncNotifierProvider.autoDispose<MyAnimeListNotifier, UserAnimeListStatusClass>(() => 
         MyAnimeListNotifier(
-          context,
           UserAnimeListStatusClass(
             [], 'dropped', false, PaginationStatus.loaded
           )
@@ -50,7 +38,6 @@ class UserAnimeController {
       ),
       AsyncNotifierProvider.autoDispose<MyAnimeListNotifier, UserAnimeListStatusClass>(() => 
         MyAnimeListNotifier(
-          context,
           UserAnimeListStatusClass(
             [], 'on_hold', false, PaginationStatus.loaded
           )
@@ -58,20 +45,14 @@ class UserAnimeController {
       ),
     ];
     updateUserAnimeListStreamClassSubscription = UpdateUserAnimeListStreamClass().userAnimeListStream.listen((UserAnimeListStreamControllerClass data) {
-      if(mounted){
-        AnimeDataClass animeData = data.animeData;
-        int id = animeData.id;
-        if(context.mounted) {
-          AnimeMyListStatusClass? myAnimeStatus = context.read(appStateRepo.globalAnimeData[id]!.notifier).getState();
-          String? status = myAnimeStatus.status;
-          if(mounted) {
-            for(int i = 0; i < statusNotifiers.length; i++) {
-              context.read(statusNotifiers[i].notifier).removeByIDAndAddByStatus(
-                id, status, data.animeData
-              );
-            }
-          }
-        }
+      AnimeDataClass animeData = data.animeData;
+      int id = animeData.id;
+      AnimeMyListStatusClass? myAnimeStatus = navigatorKey.currentContext?.read(appStateRepo.globalAnimeData[id]!.notifier).getState();
+      String? status = myAnimeStatus?.status;
+      for(int i = 0; i < statusNotifiers.length; i++) {
+        navigatorKey.currentContext?.read(statusNotifiers[i].notifier).removeByIDAndAddByStatus(
+          id, status, data.animeData
+        );
       }
     });
   }
@@ -82,19 +63,17 @@ class UserAnimeController {
 }
 
 class MyAnimeListNotifier extends AutoDisposeAsyncNotifier<UserAnimeListStatusClass> {
-  final BuildContext context;
   UserAnimeListStatusClass statusClass;
   late AnimeRepository animeRepository;
 
   MyAnimeListNotifier(
-    this.context,
     this.statusClass
   );
 
   @override
   FutureOr<UserAnimeListStatusClass> build() async {
     state = const AsyncLoading();
-    animeRepository = AnimeRepository(context);
+    animeRepository = AnimeRepository();
     APIResponseModel response = await animeRepository.fetchMyAnimesList(statusClass);
     if(response.error != null) {
       state = AsyncError(response.error!.object, response.error!.stackTrace);

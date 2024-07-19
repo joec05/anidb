@@ -49,8 +49,8 @@ class CustomUserListAnimeDisplayState extends State<CustomUserListAnimeDisplay>{
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SizedBox(
-                  width: animeDisplayCoverSize.width,
-                  height: animeDisplayCoverSize.height,
+                  width: completeDisplayCoverSize.width,
+                  height: completeDisplayCoverSize.height,
                   child: CachedImageWidget(imageClass: animeData.cover)
                 ),
                 SizedBox(
@@ -58,8 +58,8 @@ class CustomUserListAnimeDisplayState extends State<CustomUserListAnimeDisplay>{
                 ),
                 Flexible(
                   child: Container(
-                    width: getScreenWidth() - animeDisplayCoverSize.width - defaultHorizontalPadding * 2,
-                    height: animeDisplayCoverSize.height,
+                    width: getScreenWidth() - completeDisplayCoverSize.width - defaultHorizontalPadding * 2,
+                    height: completeDisplayCoverSize.height,
                     padding: EdgeInsets.symmetric(
                       vertical: defaultVerticalPadding * 2.5
                     ),
@@ -109,7 +109,7 @@ class CustomUserListAnimeDisplayState extends State<CustomUserListAnimeDisplay>{
                           ]
                         ),
                         CustomButton(
-                          width: getScreenWidth() - animeDisplayCoverSize.width - defaultHorizontalPadding * 2, 
+                          width: getScreenWidth() - completeDisplayCoverSize.width - defaultHorizontalPadding * 2, 
                           height: getScreenHeight() * 0.06, 
                           buttonColor: Colors.brown.withOpacity(0.4), 
                           buttonText: 'Edit in list', 
@@ -133,8 +133,8 @@ class CustomUserListAnimeDisplayState extends State<CustomUserListAnimeDisplay>{
               horizontal: defaultHorizontalPadding,
               vertical: defaultVerticalPadding
             ),
-            width: animeDisplayCoverSize.width,
-            height: animeDisplayCoverSize.height,
+            width: completeDisplayCoverSize.width,
+            height: completeDisplayCoverSize.height,
           ),
         )
       ); 

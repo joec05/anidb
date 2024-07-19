@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 import 'package:anime_list_app/global_files.dart';
+import 'package:anime_list_app/screens/anime/view_anime_ranking.dart';
+import 'package:anime_list_app/screens/manga/view_manga_ranking.dart';
 import 'package:anime_list_app/streams/has_authenticated_stream.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -15,6 +17,8 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 final talker = Talker();
+final scaffoldKey = GlobalKey<ScaffoldMessengerState>();
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 Future<void> main() async {
   talker.debug('Starting AniDB...');
@@ -50,11 +54,12 @@ Future<void> initializeData() async{
   Map? userTokenMap = await secureStorageController.fetchUserToken();
   if(userTokenMap != null){
     authRepo.userTokenData = UserTokenClass.fromMapRetrieve(userTokenMap);
+    await profileRepository.fetchMyProfileData();
   }
   return;
 }
 
-final _router = GoRouter(
+final router = GoRouter(
   routes: [
     GoRoute(
       path: '/',
@@ -79,11 +84,6 @@ final _router = GoRouter(
           name: 'search-page',
           path: 'search-page',
           builder: (context, state) => const SearchPage()
-        ),
-        GoRoute(
-          name: 'view-user-statistics',
-          path: 'view-user-statistics',
-          builder: (context, state) => const ViewUserStatistics()
         ),
         GoRoute(
           name: 'view-user-anime-lists',
@@ -129,6 +129,21 @@ final _router = GoRouter(
           name: 'view-picture',
           path: 'view-picture',
           builder: (context, state) => ViewPicturePage(imageData: state.extra)
+        ),
+        GoRoute(
+          name: 'view-anime-ranking',
+          path: 'view-anime-ranking',
+          builder: (context, state) => const ViewAnimeRanking()
+        ),
+        GoRoute(
+          name: 'view-manga-ranking',
+          path: 'view-manga-ranking',
+          builder: (context, state) => const ViewMangaRanking()
+        ),
+        GoRoute(
+          name: 'profile-page',
+          path: 'profile-page',
+          builder: (context, state) => const ProfilePage()
         )
       ]
     )
@@ -143,11 +158,13 @@ class MyApp extends ConsumerWidget {
     return ValueListenableBuilder(
       valueListenable: themeModel.mode,
       builder: (context, mode, child) => MaterialApp.router(
+        key: navigatorKey,
+        scaffoldMessengerKey: scaffoldKey,
         title: 'AniDB',
         theme: globalTheme.light,
         darkTheme: globalTheme.dark,
         themeMode: mode,
-        routerConfig: _router
+        routerConfig: router
       )
     );
   }
@@ -279,7 +296,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                       WidgetsBinding.instance.addPostFrameCallback((_) {
                         if (mounted) {
                           handler.displaySnackbar(
-                            context,
                             SnackbarType.error, 
                             obj.toString()
                           );
@@ -322,7 +338,7 @@ class HasAuthenticatedNotifier extends AutoDisposeAsyncNotifier<void>{
     String codeVerifier
   ) async {
     state = const AsyncLoading();
-    APIResponseModel response = await authRepo.getAccessToken(context, authCode, codeVerifier);
+    APIResponseModel response = await authRepo.getAccessToken(authCode, codeVerifier);
     if(response.error != null) {
       state = AsyncError(response.error!.object, response.error!.stackTrace);
       throw Exception(response.error!.object);

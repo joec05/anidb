@@ -39,7 +39,7 @@ class CustomHomeFrontDisplayState extends ConsumerState<CustomHomeFrontDisplay>{
       children: [
         Container(
           margin: EdgeInsets.symmetric(
-            horizontal: defaultHorizontalPadding * 0.75,
+            horizontal: defaultHorizontalPadding * 0.25,
             vertical: defaultVerticalPadding,
           ),
           child: InkWell(
@@ -62,8 +62,8 @@ class CustomHomeFrontDisplayState extends ConsumerState<CustomHomeFrontDisplay>{
                 children: [
                   Text(
                     widget.label,
-                    style: TextStyle(
-                      fontSize: defaultTextFontSize * 1.25,
+                    style: const TextStyle(
+                      fontSize: 18,
                       fontWeight: FontWeight.bold
                     )
                   ),
@@ -77,7 +77,7 @@ class CustomHomeFrontDisplayState extends ConsumerState<CustomHomeFrontDisplay>{
           padding: EdgeInsets.symmetric(
             horizontal: defaultHorizontalPadding / 2,
           ),
-          height: animeGridDisplayWidgetSize.height,
+          height: basicDisplayWidgetSize.height,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             itemCount: getAnimeBasicDisplayFetchCount(),

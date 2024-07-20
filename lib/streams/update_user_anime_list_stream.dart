@@ -3,8 +3,10 @@ import 'package:anime_list_app/global_files.dart';
 
 class UserAnimeListStreamControllerClass{
   final AnimeDataClass animeData;
+  final String? oldStatus;
+  final String? newStatus;
 
-  UserAnimeListStreamControllerClass(this.animeData);
+  UserAnimeListStreamControllerClass(this.animeData, this.oldStatus, this.newStatus);
 }
 
 class UpdateUserAnimeListStreamClass {

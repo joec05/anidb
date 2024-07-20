@@ -67,8 +67,8 @@ class _ViewUserAnimeListsStatefulState extends ConsumerState<_ViewUserAnimeLists
                     Tab(text: 'Watching'),
                     Tab(text: 'Planning'),
                     Tab(text: 'Completed'),
-                    Tab(text: 'On Hold'),
-                    Tab(text: 'Dropped')
+                    Tab(text: 'Dropped'),
+                    Tab(text: 'On Hold')
                   ],                           
                 )
               ),

@@ -4,24 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class AnimeProgressController {
-  final BuildContext context;
-  final AnimeDataClass animeData;
-
-  AnimeProgressController(
-    this.context,
-    this.animeData
-  );
-
-  bool get mounted => context.mounted;
-
-  AnimeMyListStatusClass? get myListStatus => appStateRepo.globalAnimeData[animeData.id] == null ? null : context.read(appStateRepo.globalAnimeData[animeData.id]!.notifier).getState();
-
+  
   void editMyAnimeList(
+    AnimeDataClass animeData,
     String status, 
     int score, 
     String episodeStr
   ) async{
-    bool statusChanged = status != myListStatus?.status;
+    final AnimeMyListStatusClass? myListStatus = appStateRepo.globalAnimeData[animeData.id] == null ? null : navigatorKey.currentContext?.read(appStateRepo.globalAnimeData[animeData.id]!.notifier).getState();
+    String? oldStatus = myListStatus?.status;
     episodeStr = episodeStr.isEmpty ? '0' : episodeStr;
     if(int.tryParse(episodeStr) == null){
       handler.displaySnackbar(
@@ -50,37 +41,31 @@ class AnimeProgressController {
         '$malApiUrl/anime/${animeData.id}/my_list_status',
         map
       );
-      if(res.error == null && context.mounted) {
+      if(res.error == null) {
         AnimeMyListStatusClass updatedListStatus = AnimeMyListStatusClass.generateNewCopy(myListStatus);
         updatedListStatus.episodesWatched = int.parse(episodeStr);
         updatedListStatus.score = score;
         updatedListStatus.updatedTime = DateTime.now().toIso8601String();
         updatedListStatus.status = status;
-        if(context.mounted) {
-          updateAnimeStatusFromModel(animeData.id, updatedListStatus);
-        }
-        if(statusChanged) {
-          UpdateUserAnimeListStreamClass().emitData(
-            UserAnimeListStreamControllerClass(
-              animeData
-            )
-          );
-        }
-        if(mounted){
-          handler.displaySnackbar(
-            SnackbarType.successful, 
-            tSuccess.savedProgress
-          );
-        }
+        updateAnimeStatusFromModel(animeData.id, updatedListStatus);
+        UpdateUserAnimeListStreamClass().emitData(
+          UserAnimeListStreamControllerClass(
+            animeData,
+            oldStatus,
+            status
+          )
+        );
+        handler.displaySnackbar(
+          SnackbarType.successful, 
+          tSuccess.savedProgress
+        );
       } else {
-        if(context.mounted) {
-          handler.displaySnackbar(SnackbarType.error, tErr.response);
-        }
+        handler.displaySnackbar(SnackbarType.error, tErr.response);
       }
     }
   }
 
-  void deleteFromMyAnimeList() async{
+  void deleteFromMyAnimeList(AnimeDataClass animeData) async{
     APIResponseModel res = await apiCallRepo.runAPICall(
       APICallType.delete,
       malApiUrl,
@@ -88,33 +73,34 @@ class AnimeProgressController {
       {}
     );
     if(res.error == null) {
-      if(context.mounted){
-        context.read(appStateRepo.globalAnimeData[animeData.id]!.notifier).update(AnimeMyListStatusClass.generateNewInstance());
-        UpdateUserAnimeListStreamClass().emitData(
-          UserAnimeListStreamControllerClass(
-            animeData
-          )
-        );
-        handler.displaySnackbar(
-          SnackbarType.successful, 
-          tSuccess.deleteFromList
-        );
-      }
+      final AnimeMyListStatusClass? myListStatus = appStateRepo.globalAnimeData[animeData.id] == null ? null : navigatorKey.currentContext?.read(appStateRepo.globalAnimeData[animeData.id]!.notifier).getState();
+      String? oldStatus = myListStatus?.status;
+      navigatorKey.currentContext?.read(appStateRepo.globalAnimeData[animeData.id]!.notifier).update(AnimeMyListStatusClass.generateNewInstance());
+      UpdateUserAnimeListStreamClass().emitData(
+        UserAnimeListStreamControllerClass(
+          animeData,
+          oldStatus,
+          null
+        )
+      );
+      handler.displaySnackbar(
+        SnackbarType.successful, 
+        tSuccess.deleteFromList
+      );
     } else {
-      if(context.mounted) {
-        handler.displaySnackbar(SnackbarType.error, tErr.response);
-      }
+      handler.displaySnackbar(SnackbarType.error, tErr.response);
     }
   }
 
-  void openActionDrawer(){
+  void openActionDrawer(BuildContext context, AnimeDataClass animeData) {
     String selectedStatus = '';
     int selectedScore = 0;
     TextEditingController episodeController = TextEditingController();
+    final AnimeMyListStatusClass? myListStatus = appStateRepo.globalAnimeData[animeData.id] == null ? null : navigatorKey.currentContext?.read(appStateRepo.globalAnimeData[animeData.id]!.notifier).getState();
     if(myListStatus != null){
-      selectedStatus = myListStatus!.status ?? '';
-      selectedScore = myListStatus!.score;
-      episodeController.text = myListStatus!.episodesWatched.toString();
+      selectedStatus = myListStatus.status ?? '';
+      selectedScore = myListStatus.score;
+      episodeController.text = myListStatus.episodesWatched.toString();
     }
 
     showModalBottomSheet(
@@ -203,11 +189,9 @@ class AnimeProgressController {
                                     )
                                   ],
                                   onChanged: (dynamic item) {
-                                    if(mounted){
-                                      setState((){
-                                        selectedStatus = item as String;
-                                      });
-                                    }
+                                    setState((){
+                                      selectedStatus = item as String;
+                                    });
                                   }
                                 ),
                               ],
@@ -228,11 +212,9 @@ class AnimeProgressController {
                                     child: Text('${index + 1}')
                                   )),
                                   onChanged: (dynamic item) {
-                                    if(mounted){
-                                      setState((){
-                                        selectedScore = item as int;
-                                      });
-                                    }
+                                    setState((){
+                                      selectedScore = item as int;
+                                    });
                                   }
                                 ),
                               ],
@@ -260,17 +242,15 @@ class AnimeProgressController {
                               hintText: '',
                               prefixIcon: TextButton(
                                 onPressed: (){
-                                  if(mounted){
-                                    setState((){
-                                      if(episodeController.text.isEmpty){
-                                        episodeController.text = '0';
-                                      }else if(animeData.totalEpisodes == 0){
-                                        episodeController.text = '${int.parse(episodeController.text) + 1}';
-                                      }else{
-                                        episodeController.text = '${min(animeData.totalEpisodes, int.parse(episodeController.text) + 1)}';
-                                      }
-                                    });
-                                  }
+                                  setState((){
+                                    if(episodeController.text.isEmpty){
+                                      episodeController.text = '0';
+                                    }else if(animeData.totalEpisodes == 0){
+                                      episodeController.text = '${int.parse(episodeController.text) + 1}';
+                                    }else{
+                                      episodeController.text = '${min(animeData.totalEpisodes, int.parse(episodeController.text) + 1)}';
+                                    }
+                                  });
                                 },
                                 child: Icon(
                                   FontAwesomeIcons.plus,
@@ -311,7 +291,7 @@ class AnimeProgressController {
                           buttonText: 'Save', 
                           onTapped: (){
                             Navigator.pop(context);
-                            editMyAnimeList(selectedStatus, selectedScore, episodeController.text);
+                            editMyAnimeList(animeData, selectedStatus, selectedScore, episodeController.text);
                           }, 
                           setBorderRadius: true
                         ),
@@ -326,7 +306,7 @@ class AnimeProgressController {
                                 buttonText: 'Delete from list', 
                                 onTapped: (){
                                   Navigator.pop(context);
-                                  deleteFromMyAnimeList();
+                                  deleteFromMyAnimeList(animeData);
                                 }, 
                                 setBorderRadius: true
                               ),
@@ -346,3 +326,5 @@ class AnimeProgressController {
     );
   }
 }
+
+final animeProgress = AnimeProgressController();

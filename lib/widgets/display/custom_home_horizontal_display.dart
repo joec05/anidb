@@ -1,4 +1,5 @@
 import 'package:anime_list_app/global_files.dart';
+import 'package:anime_list_app/styles/splash.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -42,8 +43,7 @@ class CustomHomeFrontDisplayState extends ConsumerState<CustomHomeFrontDisplay>{
             horizontal: defaultHorizontalPadding * 0.25,
             vertical: defaultVerticalPadding,
           ),
-          child: InkWell(
-            splashFactory: InkSplash.splashFactory,
+          child: splashWidget(
             onTap: () => context.pushNamed(
               widget.displayType is AnimeBasicDisplayType ? 'view-more-anime'
               : widget.displayType is MangaBasicDisplayType ? 'view-more-manga'

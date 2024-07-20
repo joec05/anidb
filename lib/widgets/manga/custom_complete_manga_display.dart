@@ -20,12 +20,10 @@ class CustomUserListMangaDisplay extends StatefulWidget {
 
 class CustomUserListMangaDisplayState extends State<CustomUserListMangaDisplay>{
   late MangaDataClass mangaData;
-  late MangaProgressController progressController;
 
   @override void initState(){
     super.initState();
     mangaData = widget.mangaData;
-    progressController = MangaProgressController(context, mangaData);
   }
 
   @override void dispose(){
@@ -35,9 +33,6 @@ class CustomUserListMangaDisplayState extends State<CustomUserListMangaDisplay>{
   @override
   Widget build(BuildContext context) {
     if(!widget.skeletonMode){
-      if(mangaData.myListStatus == null && widget.displayType == MangaRowDisplayType.myUserList){
-        return Container();
-      }
       return GestureDetector(
         onTap: () => context.pushNamed('view-manga-details', pathParameters: {'mangaID': '${mangaData.id}'}),
         behavior: HitTestBehavior.opaque,
@@ -120,7 +115,7 @@ class CustomUserListMangaDisplayState extends State<CustomUserListMangaDisplay>{
                                 height: getScreenHeight() * 0.06, 
                                 buttonColor: Colors.brown.withOpacity(0.4), 
                                 buttonText: 'Edit in list', 
-                                onTapped: () => progressController.openActionDrawer(), 
+                                onTapped: () => mangaProgress.openActionDrawer(context, mangaData), 
                                 setBorderRadius: true
                               )
                             : 
@@ -129,7 +124,7 @@ class CustomUserListMangaDisplayState extends State<CustomUserListMangaDisplay>{
                                 height: getScreenHeight() * 0.06, 
                                 buttonColor: Colors.brown.withOpacity(0.4), 
                                 buttonText: 'Add to list', 
-                                onTapped: () => progressController.openActionDrawer(), 
+                                onTapped: () => mangaProgress.openActionDrawer(context, mangaData), 
                                 setBorderRadius: true
                               )
                           ]

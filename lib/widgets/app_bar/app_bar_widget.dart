@@ -1,4 +1,5 @@
 import 'package:anime_list_app/constants/delay/functions.dart';
+import 'package:anime_list_app/styles/splash.dart';
 import 'package:flutter/material.dart';
 
 class AppBarWidget extends StatelessWidget {
@@ -9,8 +10,8 @@ class AppBarWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      splashFactory: InkRipple.splashFactory,
+    return splashWidget(
+      circularBorder: true,
       onTap: () => context.mounted ? runDelay(() => Navigator.pop(context), 0) : (){},
       child: const Icon(Icons.arrow_back_ios_new, size: 20)
     );

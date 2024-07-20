@@ -21,7 +21,7 @@ class HomeNotifier extends AutoDisposeAsyncNotifier<List<HomeFrontDisplayModel>>
   late CharacterRepository characterRepository;
   List<HomeFrontDisplayModel> displayed = [
     HomeFrontDisplayModel(
-      'Animes this season', 
+      'This season', 
       AnimeBasicDisplayType.season, 
       []
     ),
@@ -31,7 +31,7 @@ class HomeNotifier extends AutoDisposeAsyncNotifier<List<HomeFrontDisplayModel>>
       []
     ),
     HomeFrontDisplayModel(
-      'Upcoming anime', 
+      'Upcoming', 
       AnimeBasicDisplayType.upcoming, 
       []
     ),

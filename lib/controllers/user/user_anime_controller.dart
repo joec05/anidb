@@ -45,14 +45,15 @@ class UserAnimeController {
       ),
     ];
     updateUserAnimeListStreamClassSubscription = UpdateUserAnimeListStreamClass().userAnimeListStream.listen((UserAnimeListStreamControllerClass data) {
-      AnimeDataClass animeData = data.animeData;
-      int id = animeData.id;
-      AnimeMyListStatusClass? myAnimeStatus = navigatorKey.currentContext?.read(appStateRepo.globalAnimeData[id]!.notifier).getState();
-      String? status = myAnimeStatus?.status;
-      for(int i = 0; i < statusNotifiers.length; i++) {
-        navigatorKey.currentContext?.read(statusNotifiers[i].notifier).removeByIDAndAddByStatus(
-          id, status, data.animeData
-        );
+      if(data.oldStatus != data.newStatus) {
+        AnimeDataClass animeData = data.animeData;
+        for(int i = 0; i < statusNotifiers.length; i++) {
+          final UserAnimeListStatusClass? statusClass = navigatorKey.currentContext?.read(statusNotifiers[i].notifier).statusClass;
+          String? status = statusClass?.status;
+          navigatorKey.currentContext?.read(statusNotifiers[i].notifier).removeByIDAndAdd(
+            status, data.oldStatus, data.newStatus, animeData
+          );
+        }
       }
     });
   }
@@ -99,15 +100,15 @@ class MyAnimeListNotifier extends AutoDisposeAsyncNotifier<UserAnimeListStatusCl
     return statusClass;
   }
 
-  void removeByIDAndAddByStatus(int id, String? status, AnimeDataClass animeData) {
-    int index = statusClass.animeList.indexWhere((e) => e.id == id);
-    if(index > -1) {
-      statusClass.animeList.removeAt(index);
+  void removeByIDAndAdd(String? status, String? oldStatus, String? newStatus, AnimeDataClass animeData) {
+    if(oldStatus == status) {
+      statusClass.animeList.removeWhere((e) => e.id == animeData.id);
       state = AsyncData(statusClass);
     }
-    if(status == statusClass.status) {
+    if(newStatus == status) {
       statusClass.animeList.insert(0, animeData);
       statusClass.animeList.sort((a, b) => a.title.compareTo(b.title));
+      state = AsyncData(statusClass);
     }
   }
 

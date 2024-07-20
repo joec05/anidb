@@ -20,12 +20,10 @@ class CustomUserListAnimeDisplay extends StatefulWidget {
 
 class CustomUserListAnimeDisplayState extends State<CustomUserListAnimeDisplay>{
   late AnimeDataClass animeData;
-  late AnimeProgressController progressController;
 
   @override void initState(){
     super.initState();
     animeData = widget.animeData;
-    progressController = AnimeProgressController(context, animeData);
   }
 
   @override void dispose(){
@@ -113,7 +111,7 @@ class CustomUserListAnimeDisplayState extends State<CustomUserListAnimeDisplay>{
                           height: getScreenHeight() * 0.06, 
                           buttonColor: Colors.brown.withOpacity(0.4), 
                           buttonText: 'Edit in list', 
-                          onTapped: () => progressController.openActionDrawer(), 
+                          onTapped: () => animeProgress.openActionDrawer(context, animeData), 
                           setBorderRadius: true
                         )
                       ]

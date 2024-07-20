@@ -21,7 +21,6 @@ class CustomAnimeDetails extends ConsumerStatefulWidget {
 
 class CustomAnimeDetailsState extends ConsumerState<CustomAnimeDetails>{
   late AnimeDataClass animeData;
-  late AnimeProgressController progressController;
   ValueNotifier<SelectedTitle> selectedTitle = ValueNotifier(SelectedTitle.main);
   List<AnimeDataClass> relatedAnimesData = [];
 
@@ -29,7 +28,6 @@ class CustomAnimeDetailsState extends ConsumerState<CustomAnimeDetails>{
   @override void initState(){
     super.initState();
     animeData = widget.animeData;
-    progressController = AnimeProgressController(context, animeData);
     relatedAnimesData = List.generate(animeData.relatedAnimes.length, (i){
       AnimeDataClass newAnimeData = AnimeDataClass.fetchNewInstance(animeData.relatedAnimes[i].id);
       newAnimeData.title = animeData.relatedAnimes[i].title;
@@ -653,7 +651,7 @@ class CustomAnimeDetailsState extends ConsumerState<CustomAnimeDetails>{
                   height: getScreenHeight() * 0.075, 
                   buttonColor: Colors.brown.withOpacity(0.4), 
                   buttonText: 'Edit in list', 
-                  onTapped: () => progressController.openActionDrawer(), 
+                  onTapped: () => animeProgress.openActionDrawer(context, animeData), 
                   setBorderRadius: true
                 ),
                 SizedBox(

@@ -1,4 +1,5 @@
 import 'package:anime_list_app/global_files.dart';
+import 'package:anime_list_app/styles/splash.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
@@ -23,6 +24,7 @@ class _MainPageStateful extends StatefulWidget {
 class __MainPageStatefulState extends State<_MainPageStateful>{
   ValueNotifier<int> selectedIndexValue = ValueNotifier(0);
   final PageController _pageController = PageController(initialPage: 0, keepPage: true);
+  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey(); // Create a key
 
   @override void initState(){
     super.initState();
@@ -54,7 +56,13 @@ class __MainPageStatefulState extends State<_MainPageStateful>{
       valueListenable: selectedIndexValue,
       builder: (BuildContext context, int selectedIndexValue, Widget? child) {
         return Scaffold(
+          key: scaffoldKey,
           appBar: AppBar(
+            leading: splashWidget(
+              circularBorder: true,
+              onTap: () => scaffoldKey.currentState?.openDrawer(),
+              child: const Icon(Icons.menu, size: 25)
+            ),
             flexibleSpace: Container(
               decoration: defaultAppBarDecoration
             ),
@@ -107,8 +115,7 @@ class __MainPageStatefulState extends State<_MainPageStateful>{
                     decoration: const BoxDecoration(
                       color: Colors.teal,
                     ),
-                    child: InkWell(
-                      splashFactory: InkSplash.splashFactory,
+                    child: splashWidget(
                       onTap: () {
                         context.push('/profile-page');
                         router.pop();
@@ -142,18 +149,20 @@ class __MainPageStatefulState extends State<_MainPageStateful>{
                     ),
                   ),
                 ),
-                ListTile(
+                splashTileWidget(
+                  onTap: () {
+                    Future.delayed(const Duration(milliseconds: 250), () {
+                      context.push('/search-page');
+                      router.pop();
+                    });
+                  },
                   leading: const Icon(
                     FontAwesomeIcons.magnifyingGlass,
                     size: 16.5
                   ),
                   title: const Text('Search', style: TextStyle(fontSize: 16)),
-                  onTap: () {
-                    context.push('/search-page');
-                    router.pop();
-                  },
                 ),
-                ListTile(
+                splashTileWidget(
                   leading: const Icon(
                     FontAwesomeIcons.film,
                     size: 18
@@ -164,7 +173,7 @@ class __MainPageStatefulState extends State<_MainPageStateful>{
                     router.pop();
                   },
                 ),
-                ListTile(
+                splashTileWidget(
                   leading: const Icon(
                     FontAwesomeIcons.book,
                     size: 18
@@ -175,7 +184,7 @@ class __MainPageStatefulState extends State<_MainPageStateful>{
                     router.pop();
                   },
                 ),
-                ListTile(
+                splashTileWidget(
                   leading: const Icon(
                     FontAwesomeIcons.gear,
                     size: 18

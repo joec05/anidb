@@ -1,4 +1,5 @@
 import 'package:anime_list_app/global_files.dart';
+import 'package:anime_list_app/styles/splash.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
@@ -63,7 +64,7 @@ class SettingsPageState extends State<SettingsPage>{
   }
 
   Widget settingWidget(Widget leading, String title, Function() onTap, {subtitle}) {
-    return ListTile(
+    return splashTileWidget(
       leading: leading,
       title: Text(title, style: const TextStyle(fontSize: 15.5)),
       subtitle: subtitle == null ? null : Text(subtitle, style: const TextStyle(fontSize: 12.5)),
@@ -75,7 +76,8 @@ class SettingsPageState extends State<SettingsPage>{
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Settings')
+        title: const Text('Settings'),
+        leading: const AppBarWidget(),
       ),
       body: ListView(
         children: [

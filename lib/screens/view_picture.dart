@@ -1,4 +1,4 @@
-import 'package:anime_list_app/widgets/cached_image/cached_image_widget.dart';
+import 'package:anime_list_app/global_files.dart';
 import 'package:flutter/material.dart';
 
 class ViewPicturePage extends StatefulWidget {
@@ -19,6 +19,7 @@ class ViewPicturePageState extends State<ViewPicturePage>{
     return Scaffold(
       appBar: AppBar(
         title: const Text('Picture'),
+        leading: const AppBarWidget(),
       ),
       body: InteractiveViewer(
         child: Center(

@@ -45,13 +45,17 @@ class UserMangaController {
       ),
     ];
     updateUserMangaListStreamClassSubscription = UpdateUserMangaListStreamClass().userMangaListStream.listen((UserMangaListStreamControllerClass data) {
-      int id = data.mangaData.id;
-      MangaMyListStatusClass? myMangaStatus = navigatorKey.currentContext?.read(appStateRepo.globalMangaData[id]!.notifier).getState();
-      String? status = myMangaStatus?.status;
-      for(int i = 0; i < statusNotifiers.length; i++) {
-        navigatorKey.currentContext?.read(statusNotifiers[i].notifier).removeByIDAndAddByStatus(
-          id, status, data.mangaData
-        );
+      talker.debug(data.oldStatus);
+      talker.debug(data.newStatus);
+      if(data.oldStatus != data.newStatus) {
+        MangaDataClass mangaData = data.mangaData;
+        for(int i = 0; i < statusNotifiers.length; i++) {
+          final UserMangaListStatusClass? statusClass = navigatorKey.currentContext?.read(statusNotifiers[i].notifier).statusClass;
+          String? status = statusClass?.status;
+          navigatorKey.currentContext?.read(statusNotifiers[i].notifier).removeByIDAndAdd(
+            status, data.oldStatus, data.newStatus, mangaData
+          );
+        }
       }
     });
   }
@@ -98,16 +102,16 @@ class MyMangaListNotifier extends AutoDisposeAsyncNotifier<UserMangaListStatusCl
     return statusClass;
   }
 
-  void removeByIDAndAddByStatus(int id, String? status, MangaDataClass mangaData) {
-    int index = statusClass.mangaList.indexWhere((e) => e.id == id);
-    if(index > -1) {
-      statusClass.mangaList.removeAt(index);
-      state = AsyncData(statusClass.copy());
+  void removeByIDAndAdd(String? status, String? oldStatus, String? newStatus, MangaDataClass mangaData) {
+    if(oldStatus == status) {
+      statusClass.mangaList.removeWhere((e) => e.id == mangaData.id);
+      state = AsyncData(statusClass);
     }
-    if(status == statusClass.status) {
+    if(newStatus == status) {
+      talker.debug(status);
       statusClass.mangaList.insert(0, mangaData);
       statusClass.mangaList.sort((a, b) => a.title.compareTo(b.title));
-      state = AsyncData(statusClass.copy());
+      state = AsyncData(statusClass);
     }
   }
 

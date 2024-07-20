@@ -1,4 +1,4 @@
-import 'package:anime_list_app/global_files.dart';
+import 'package:anime_list_app/styles/splash.dart';
 import 'package:flutter/material.dart';
 
 class CustomButton extends StatefulWidget {
@@ -40,10 +40,9 @@ class CustomButtonState extends State<CustomButton> {
         ),
         child: Material(
           color: Colors.transparent,
-          child: InkWell(
-            splashFactory: InkRipple.splashFactory,
+          child: splashWidget(
             onTap: (){
-              Future.delayed(Duration(milliseconds: navigatorDelayTime), (){}).then((value) => widget.onTapped!());
+              widget.onTapped!();
             },
             child: Center(
               child: Text(widget.buttonText, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15))

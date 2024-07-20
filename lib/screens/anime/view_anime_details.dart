@@ -50,6 +50,7 @@ class _ViewAnimeDetailsStatefulState extends ConsumerState<_ViewAnimeDetailsStat
         flexibleSpace: Container(
           decoration: defaultAppBarDecoration
         ),
+        leading: const AppBarWidget(),
         title: const Text('Anime Details'), titleSpacing: defaultAppBarTitleSpacing,
       ),
       body: Builder(

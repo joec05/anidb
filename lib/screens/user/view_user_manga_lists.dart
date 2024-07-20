@@ -38,10 +38,8 @@ class _ViewUserMangaListsStatefulState extends ConsumerState<_ViewUserMangaLists
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    
     final statusNotifiers = controller.statusNotifiers;
     List<AsyncValue<UserMangaListStatusClass>> watchProviders = List.generate(statusNotifiers.length, (i) => ref.watch(statusNotifiers[i]));
-
     return Scaffold(
       body: NestedScrollView(
         headerSliverBuilder: (context, bool f) {
@@ -68,11 +66,11 @@ class _ViewUserMangaListsStatefulState extends ConsumerState<_ViewUserMangaLists
                     Tab(text: 'Reading'),
                     Tab(text: 'Planning'),
                     Tab(text: 'Completed'),
-                    Tab(text: 'On Hold'),
-                    Tab(text: 'Dropped')
+                    Tab(text: 'Dropped'),
+                    Tab(text: 'On Hold')
                   ],                           
                 )
-              )
+              ),
             )
           ];
         },

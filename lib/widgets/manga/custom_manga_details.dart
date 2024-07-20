@@ -20,14 +20,12 @@ class CustomMangaDetails extends StatefulWidget {
 
 class CustomMangaDetailsState extends State<CustomMangaDetails>{
   late MangaDataClass mangaData;
-  late MangaProgressController progressController;
   ValueNotifier<SelectedTitle> selectedTitle = ValueNotifier(SelectedTitle.main);
   List<MangaDataClass> relatedMangasData = [];
 
   @override void initState(){
     super.initState();
     mangaData = widget.mangaData;
-    progressController = MangaProgressController(context, mangaData);
     relatedMangasData = List.generate(mangaData.relatedMangas.length, (i){
       MangaDataClass newMangaData = MangaDataClass.fetchNewInstance(mangaData.relatedMangas[i].id);
       newMangaData.title = mangaData.relatedMangas[i].title;
@@ -549,7 +547,7 @@ class CustomMangaDetailsState extends State<CustomMangaDetails>{
                     height: getScreenHeight() * 0.075, 
                     buttonColor: Colors.brown.withOpacity(0.4), 
                     buttonText: 'Edit in list', 
-                    onTapped: () => progressController.openActionDrawer(), 
+                    onTapped: () => mangaProgress.openActionDrawer(context, mangaData), 
                     setBorderRadius: true
                   )
                 : 
@@ -558,7 +556,7 @@ class CustomMangaDetailsState extends State<CustomMangaDetails>{
                     height: getScreenHeight() * 0.075, 
                     buttonColor: Colors.brown.withOpacity(0.4), 
                     buttonText: 'Add to list', 
-                    onTapped: () => progressController.openActionDrawer(), 
+                    onTapped: () => mangaProgress.openActionDrawer(context, mangaData), 
                     setBorderRadius: true
                   ),
                 SizedBox(

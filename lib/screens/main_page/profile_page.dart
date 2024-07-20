@@ -44,6 +44,7 @@ class _ProfilePageStatefulState extends ConsumerState<_ProfilePageStateful> with
     return Scaffold(
       appBar: AppBar(
         title: const Text('Profile'),
+        leading: const AppBarWidget(),
       ),
       body: NestedScrollView(
         headerSliverBuilder: (context, bool f) {

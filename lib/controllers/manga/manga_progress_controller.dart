@@ -4,20 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class MangaProgressController {
-  final BuildContext context;
-  final MangaDataClass mangaData;
 
-  MangaProgressController(
-    this.context,
-    this.mangaData
-  );
-
-  bool get mounted => context.mounted;
-
-  MangaMyListStatusClass? get myListStatus => appStateRepo.globalMangaData[mangaData.id] == null ? null : context.read(appStateRepo.globalMangaData[mangaData.id]!.notifier).getState();
-
-  void editMyMangaList(String status, int score, String volumeStr, String chapterStr) async{
-    bool statusChanged = status != myListStatus?.status;
+  void editMyMangaList(
+    MangaDataClass mangaData, 
+    String status, 
+    int score, 
+    String volumeStr, 
+    String chapterStr
+  ) async{
+    final MangaMyListStatusClass? myListStatus = appStateRepo.globalMangaData[mangaData.id] == null ? null : navigatorKey.currentContext?.read(appStateRepo.globalMangaData[mangaData.id]!.notifier).getState();
+    String? oldStatus = myListStatus?.status;
     volumeStr = volumeStr.isEmpty ? '0' : volumeStr;
     chapterStr = chapterStr.isEmpty ? '0' : chapterStr;
     if(int.tryParse(volumeStr) == null || int.tryParse(chapterStr) == null){
@@ -57,67 +53,62 @@ class MangaProgressController {
         updatedListStatus.score = score;
         updatedListStatus.updatedTime = DateTime.now().toIso8601String();
         updatedListStatus.status = status;
-        if(context.mounted) {
-          updateMangaStatusFromModel(mangaData.id, updatedListStatus);
-        }
-        if(statusChanged) {
-          UpdateUserMangaListStreamClass().emitData(
-            UserMangaListStreamControllerClass(
-              mangaData
-            )
-          );
-        }
-        if(context.mounted){
-          handler.displaySnackbar(
-            SnackbarType.successful, 
-            tSuccess.savedProgress
-          );
-        }
+        updateMangaStatusFromModel(mangaData.id, updatedListStatus);
+        UpdateUserMangaListStreamClass().emitData(
+          UserMangaListStreamControllerClass(
+            mangaData,
+            oldStatus,
+            status
+          )
+        );
+        handler.displaySnackbar(
+          SnackbarType.successful, 
+          tSuccess.savedProgress
+        );
       } else {
-        if(context.mounted) {
-          handler.displaySnackbar(SnackbarType.error, tErr.response);
-        }
+        handler.displaySnackbar(SnackbarType.error, tErr.response);
       }
     }
   }
 
-  void deleteFromMyMangaList() async{
+  void deleteFromMyMangaList(MangaDataClass mangaData) async{
     APIResponseModel res = await apiCallRepo.runAPICall(
       APICallType.delete,
       malApiUrl,
       '$malApiUrl/manga/${mangaData.id}/my_list_status',
       {}
     );
-    if(res.error == null && context.mounted) {
-      context.read(appStateRepo.globalMangaData[mangaData.id]!.notifier).update(MangaMyListStatusClass.generateNewInstance());
+    if(res.error == null) {
+      final MangaMyListStatusClass? myListStatus = appStateRepo.globalMangaData[mangaData.id] == null ? null : navigatorKey.currentContext?.read(appStateRepo.globalMangaData[mangaData.id]!.notifier).getState();
+      String? oldStatus = myListStatus?.status;
+      navigatorKey.currentContext?.read(appStateRepo.globalMangaData[mangaData.id]!.notifier).update(MangaMyListStatusClass.generateNewInstance());
       UpdateUserMangaListStreamClass().emitData(
         UserMangaListStreamControllerClass(
-          mangaData
+          mangaData,
+          oldStatus,
+          null
         )
       );
-      if(mounted){
-        handler.displaySnackbar(
-          SnackbarType.successful, 
-          tSuccess.deleteFromList
-        );
-      }
+      handler.displaySnackbar(
+        SnackbarType.successful, 
+        tSuccess.deleteFromList
+      );
     } else {
-      if(context.mounted) {
-        handler.displaySnackbar(SnackbarType.error, tErr.response);
-      }
+      handler.displaySnackbar(SnackbarType.error, tErr.response);
     }
   }
 
-  void openActionDrawer(){
+  void openActionDrawer(BuildContext context, MangaDataClass mangaData) {
     String selectedStatus = '';
     int selectedScore = 0;
     TextEditingController volumeController = TextEditingController();
     TextEditingController chapterController = TextEditingController();
+    final MangaMyListStatusClass? myListStatus = appStateRepo.globalMangaData[mangaData.id] == null ? null : navigatorKey.currentContext?.read(appStateRepo.globalMangaData[mangaData.id]!.notifier).getState();
     if(myListStatus != null){
-      selectedStatus = myListStatus!.status ?? '';
-      selectedScore = myListStatus!.score;
-      volumeController.text = myListStatus!.volumesRead.toString();
-      chapterController.text = myListStatus!.chaptersRead.toString();
+      selectedStatus = myListStatus.status ?? '';
+      selectedScore = myListStatus.score;
+      volumeController.text = myListStatus.volumesRead.toString();
+      chapterController.text = myListStatus.chaptersRead.toString();
     }
     showModalBottomSheet(
       isScrollControlled: true,
@@ -204,11 +195,9 @@ class MangaProgressController {
                                     )
                                   ],
                                   onChanged: (dynamic item) {
-                                    if(mounted){
-                                      setState((){
-                                        selectedStatus = item as String;
-                                      });
-                                    }
+                                    setState((){
+                                      selectedStatus = item as String;
+                                    });
                                   }
                                 ),
                               ],
@@ -229,11 +218,9 @@ class MangaProgressController {
                                     child: Text('${index + 1}')
                                   )),
                                   onChanged: (dynamic item) {
-                                    if(mounted){
-                                      setState((){
-                                        selectedScore = item as int;
-                                      });
-                                    }
+                                    setState((){
+                                      selectedScore = item as int;
+                                    });
                                   }
                                 ),
                               ],
@@ -261,17 +248,15 @@ class MangaProgressController {
                               hintText: '',
                               prefixIcon: TextButton(
                                 onPressed: (){
-                                  if(mounted){
-                                    setState((){
-                                      if(volumeController.text.isEmpty){
-                                        volumeController.text = '0';
-                                      }else if(mangaData.totalVolumes == 0){
-                                        volumeController.text = '${int.parse(volumeController.text) + 1}';
-                                      }else{
-                                        volumeController.text = '${min(mangaData.totalVolumes, int.parse(volumeController.text) + 1)}';
-                                      }
-                                    });
-                                  }
+                                  setState((){
+                                    if(volumeController.text.isEmpty){
+                                      volumeController.text = '0';
+                                    }else if(mangaData.totalVolumes == 0){
+                                      volumeController.text = '${int.parse(volumeController.text) + 1}';
+                                    }else{
+                                      volumeController.text = '${min(mangaData.totalVolumes, int.parse(volumeController.text) + 1)}';
+                                    }
+                                  });
                                 },
                                 child: Icon(
                                   FontAwesomeIcons.plus,
@@ -325,17 +310,15 @@ class MangaProgressController {
                               hintText: '',
                               prefixIcon: TextButton(
                                 onPressed: (){
-                                  if(mounted){
-                                    setState((){
-                                      if(chapterController.text.isEmpty){
-                                        chapterController.text = '0';
-                                      }else if(mangaData.totalChapters == 0){
-                                        chapterController.text = '${int.parse(chapterController.text) + 1}';
-                                      }else{
-                                        chapterController.text = '${min(mangaData.totalChapters, int.parse(chapterController.text) + 1)}';
-                                      }
-                                    });
-                                  }
+                                  setState((){
+                                    if(chapterController.text.isEmpty){
+                                      chapterController.text = '0';
+                                    }else if(mangaData.totalChapters == 0){
+                                      chapterController.text = '${int.parse(chapterController.text) + 1}';
+                                    }else{
+                                      chapterController.text = '${min(mangaData.totalChapters, int.parse(chapterController.text) + 1)}';
+                                    }
+                                  });
                                 },
                                 child: Icon(
                                   FontAwesomeIcons.plus,
@@ -376,7 +359,7 @@ class MangaProgressController {
                           buttonText: 'Save', 
                           onTapped: (){
                             Navigator.pop(context);
-                            editMyMangaList(selectedStatus, selectedScore, volumeController.text, chapterController.text);
+                            editMyMangaList(mangaData, selectedStatus, selectedScore, volumeController.text, chapterController.text);
                           }, 
                           setBorderRadius: true
                         ),
@@ -391,7 +374,7 @@ class MangaProgressController {
                                 buttonText: 'Delete from list', 
                                 onTapped: (){
                                   Navigator.pop(context);
-                                  deleteFromMyMangaList();
+                                  deleteFromMyMangaList(mangaData);
                                 }, 
                                 setBorderRadius: true
                               ),
@@ -411,3 +394,5 @@ class MangaProgressController {
     );
   }
 }
+
+final mangaProgress = MangaProgressController();

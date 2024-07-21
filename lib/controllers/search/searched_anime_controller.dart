@@ -19,7 +19,6 @@ class SearchedAnimeController {
 
 class SearchedAnimeNotifier extends AutoDisposeAsyncNotifier<List<AnimeDataClass>>{
   final String searchedText;
-  late AnimeRepository animeRepository;
   List<AnimeDataClass> animeList = [];
 
   SearchedAnimeNotifier(this.searchedText);
@@ -27,7 +26,6 @@ class SearchedAnimeNotifier extends AutoDisposeAsyncNotifier<List<AnimeDataClass
   @override
   FutureOr<List<AnimeDataClass>> build() async {
     state = const AsyncLoading();
-    animeRepository = AnimeRepository();
     APIResponseModel response = await animeRepository.searchAnime(searchedText);
     if(response.error != null) {
       state = AsyncError(response.error!.object, response.error!.stackTrace);

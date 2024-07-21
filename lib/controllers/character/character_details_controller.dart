@@ -25,7 +25,6 @@ class CharacterDetailsController {
 
 class CharacterDetailsNotifier extends AutoDisposeAsyncNotifier<CharacterDataClass>{
   final int characterID;
-  late CharacterRepository characterRepository;
   CharacterDataClass characterData = CharacterDataClass.fetchNewInstance(-1);
 
   CharacterDetailsNotifier(this.characterID);
@@ -33,7 +32,6 @@ class CharacterDetailsNotifier extends AutoDisposeAsyncNotifier<CharacterDataCla
   @override
   FutureOr<CharacterDataClass> build() async {
     state = const AsyncLoading();
-    characterRepository = CharacterRepository();
     APIResponseModel response = await characterRepository.fetchCharacterDetails(characterID);
     if(response.error != null) {
       state = AsyncError(response.error!.object, response.error!.stackTrace);

@@ -84,3 +84,5 @@ class CharacterRepository {
     }
   }
 }
+
+final characterRepository = CharacterRepository();

@@ -3,65 +3,73 @@ import 'package:anime_list_app/global_files.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class AnimeRankingController {
-  late AutoDisposeAsyncNotifierProvider<AnimeRankingNotifier, List<HomeFrontDisplayModel>> animeDataNotifier;
+  AutoDisposeAsyncNotifierProvider<AnimeRankingNotifier, HomeFrontDisplayModel> animeScoreNotifier = AsyncNotifierProvider.autoDispose<AnimeRankingNotifier, HomeFrontDisplayModel>(
+    () => AnimeRankingNotifier(AnimeBasicDisplayType.top)
+  );
+  AutoDisposeAsyncNotifierProvider<AnimeRankingNotifier, HomeFrontDisplayModel> animePopularityNotifier = AsyncNotifierProvider.autoDispose<AnimeRankingNotifier, HomeFrontDisplayModel>(
+    () => AnimeRankingNotifier(AnimeBasicDisplayType.mostPopular)
+  );
+  AutoDisposeAsyncNotifierProvider<AnimeRankingNotifier, HomeFrontDisplayModel> animeFavouritesNotifier = AsyncNotifierProvider.autoDispose<AnimeRankingNotifier, HomeFrontDisplayModel>(
+    () => AnimeRankingNotifier(AnimeBasicDisplayType.favourites)
+  );
+  late List<AutoDisposeAsyncNotifierProvider<AnimeRankingNotifier, HomeFrontDisplayModel>> notifiers;
 
   void initialize() async {
-    animeDataNotifier = AsyncNotifierProvider.autoDispose<AnimeRankingNotifier, List<HomeFrontDisplayModel>>(
-      () => AnimeRankingNotifier()
-    );
+    notifiers = [animeScoreNotifier, animePopularityNotifier, animeFavouritesNotifier];
   }
 
   void dispose(){
   }
 }
 
-class AnimeRankingNotifier extends AutoDisposeAsyncNotifier<List<HomeFrontDisplayModel>>{
-  late AnimeRepository animeRepository;
-  List<HomeFrontDisplayModel> displayed = [
-    HomeFrontDisplayModel(
-      'Score', 
-      AnimeBasicDisplayType.top, 
-      []
-    ),
-    HomeFrontDisplayModel(
-      'Popularity', 
-      AnimeBasicDisplayType.mostPopular, 
-      []
-    ),
-    HomeFrontDisplayModel(
-      'Favourites', 
-      AnimeBasicDisplayType.favourites, 
-      []
-    ),
-  ];
+class AnimeRankingNotifier extends AutoDisposeAsyncNotifier<HomeFrontDisplayModel>{
+  final AnimeBasicDisplayType type;
+  late HomeFrontDisplayModel displayModel;
+
+  AnimeRankingNotifier(this.type);
 
   @override
-  FutureOr<List<HomeFrontDisplayModel>> build() async {
+  FutureOr<HomeFrontDisplayModel> build() async {
     state = const AsyncLoading();
-    animeRepository = AnimeRepository();
-    APIResponseModel response1 = await animeRepository.fetchTopAnime();
-    if(response1.error != null) {
-      state = AsyncError(response1.error!.object, response1.error!.stackTrace);
-      throw Exception(response1.error!.object);
-    } else {
-      displayed[0].dataList = response1.data;
-      APIResponseModel response2 = await animeRepository.fetchMostPopularAnime();
-      if(response2.error != null) {
-        state = AsyncError(response2.error!.object, response2.error!.stackTrace);
-        throw Exception(response2.error!.object);
-      } else {
-        displayed[1].dataList = response2.data;
-        APIResponseModel response3 = await animeRepository.fetchTopFavouritedAnime();
-        if(response3.error != null) {
-          state = AsyncError(response3.error!.object, response3.error!.stackTrace);
-          throw Exception(response3.error!.object);
-        } else {
-          displayed[2].dataList = response3.data;
-          state = AsyncData(displayed);
-        }
-      }
+    if(type == AnimeBasicDisplayType.top) {
+      displayModel = HomeFrontDisplayModel(
+        'Score', 
+        AnimeBasicDisplayType.top, 
+        []
+      );
+    } else if(type == AnimeBasicDisplayType.mostPopular) {
+      displayModel = HomeFrontDisplayModel(
+        'Popularity', 
+        AnimeBasicDisplayType.mostPopular, 
+        []
+      );
+    } else if(type == AnimeBasicDisplayType.favourites) {
+      displayModel = HomeFrontDisplayModel(
+        'Favourites', 
+        AnimeBasicDisplayType.favourites, 
+        []
+      );
     }
-    return displayed;
+
+    late APIResponseModel response;
+
+    if(type == AnimeBasicDisplayType.top) {
+      response = await animeRepository.fetchTopAnime();
+    } else if(type == AnimeBasicDisplayType.mostPopular) {
+      response = await animeRepository.fetchMostPopularAnime();
+    } else if(type == AnimeBasicDisplayType.favourites) {
+      response = await animeRepository.fetchTopFavouritedAnime();
+    }
+
+    if(response.error != null) {
+      state = AsyncError(response.error!.object, response.error!.stackTrace);
+      throw Exception(response.error!.object);
+    } else {
+      displayModel.dataList = response.data;
+      state = AsyncData(displayModel);
+    }
+    
+    return displayModel;
   }
 
   Future<void> refresh() async => await build();

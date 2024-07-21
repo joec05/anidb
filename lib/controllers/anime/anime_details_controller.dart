@@ -22,7 +22,6 @@ class AnimeDetailsController {
 
 class AnimeDetailsNotifier extends AutoDisposeAsyncNotifier<AnimeDataClass>{
   final int animeID;
-  late AnimeRepository animeRepository;
   AnimeDataClass animeData = AnimeDataClass.fetchNewInstance(-1);
 
   AnimeDetailsNotifier(this.animeID);
@@ -30,7 +29,6 @@ class AnimeDetailsNotifier extends AutoDisposeAsyncNotifier<AnimeDataClass>{
   @override
   FutureOr<AnimeDataClass> build() async {
     state = const AsyncLoading();
-    animeRepository = AnimeRepository();
     APIResponseModel response = await animeRepository.fetchAnimeDetails(animeID);
     if(response.error != null) {
       state = AsyncError(response.error!.object, response.error!.stackTrace);

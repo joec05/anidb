@@ -3,65 +3,73 @@ import 'package:anime_list_app/global_files.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class MangaRankingController {
-  late AutoDisposeAsyncNotifierProvider<MangaRankingNotifier, List<HomeFrontDisplayModel>> mangaDataNotifier;
+  AutoDisposeAsyncNotifierProvider<MangaRankingNotifier, HomeFrontDisplayModel> mangaScoreNotifier = AsyncNotifierProvider.autoDispose<MangaRankingNotifier, HomeFrontDisplayModel>(
+    () => MangaRankingNotifier(MangaBasicDisplayType.top)
+  );
+  AutoDisposeAsyncNotifierProvider<MangaRankingNotifier, HomeFrontDisplayModel> mangaPopularityNotifier = AsyncNotifierProvider.autoDispose<MangaRankingNotifier, HomeFrontDisplayModel>(
+    () => MangaRankingNotifier(MangaBasicDisplayType.mostPopular)
+  );
+  AutoDisposeAsyncNotifierProvider<MangaRankingNotifier, HomeFrontDisplayModel> mangaFavouritesNotifier = AsyncNotifierProvider.autoDispose<MangaRankingNotifier, HomeFrontDisplayModel>(
+    () => MangaRankingNotifier(MangaBasicDisplayType.favourites)
+  );
+  late List<AutoDisposeAsyncNotifierProvider<MangaRankingNotifier, HomeFrontDisplayModel>> notifiers;
 
   void initialize() async {
-    mangaDataNotifier = AsyncNotifierProvider.autoDispose<MangaRankingNotifier, List<HomeFrontDisplayModel>>(
-      () => MangaRankingNotifier()
-    );
+    notifiers = [mangaScoreNotifier, mangaPopularityNotifier, mangaFavouritesNotifier];
   }
 
   void dispose(){
   }
 }
 
-class MangaRankingNotifier extends AutoDisposeAsyncNotifier<List<HomeFrontDisplayModel>>{
-  late MangaRepository mangaRepository;
-  List<HomeFrontDisplayModel> displayed = [
-    HomeFrontDisplayModel(
-      'Score', 
-      MangaBasicDisplayType.top, 
-      []
-    ),
-    HomeFrontDisplayModel(
-      'Popularity', 
-      MangaBasicDisplayType.mostPopular, 
-      []
-    ),
-    HomeFrontDisplayModel(
-      'Favourites', 
-      MangaBasicDisplayType.favourites, 
-      []
-    ),
-  ];
+class MangaRankingNotifier extends AutoDisposeAsyncNotifier<HomeFrontDisplayModel>{
+  final MangaBasicDisplayType type;
+  late HomeFrontDisplayModel displayModel;
+
+  MangaRankingNotifier(this.type);
 
   @override
-  FutureOr<List<HomeFrontDisplayModel>> build() async {
+  FutureOr<HomeFrontDisplayModel> build() async {
     state = const AsyncLoading();
-    mangaRepository = MangaRepository();
-    APIResponseModel response1 = await mangaRepository.fetchTopManga();
-    if(response1.error != null) {
-      state = AsyncError(response1.error!.object, response1.error!.stackTrace);
-      throw Exception(response1.error!.object);
-    } else {
-      displayed[0].dataList = response1.data;
-      APIResponseModel response2 = await mangaRepository.fetchMostPopularManga();
-      if(response2.error != null) {
-        state = AsyncError(response2.error!.object, response2.error!.stackTrace);
-        throw Exception(response2.error!.object);
-      } else {
-        displayed[1].dataList = response2.data;
-        APIResponseModel response3 = await mangaRepository.fetchTopFavouritedManga();
-        if(response3.error != null) {
-          state = AsyncError(response3.error!.object, response3.error!.stackTrace);
-          throw Exception(response3.error!.object);
-        } else {
-          displayed[2].dataList = response3.data;
-          state = AsyncData(displayed);
-        }
-      }
+    if(type == MangaBasicDisplayType.top) {
+      displayModel = HomeFrontDisplayModel(
+        'Score', 
+        MangaBasicDisplayType.top, 
+        []
+      );
+    } else if(type == MangaBasicDisplayType.mostPopular) {
+      displayModel = HomeFrontDisplayModel(
+        'Popularity', 
+        MangaBasicDisplayType.mostPopular, 
+        []
+      );
+    } else if(type == MangaBasicDisplayType.favourites) {
+      displayModel = HomeFrontDisplayModel(
+        'Favourites', 
+        MangaBasicDisplayType.favourites, 
+        []
+      );
     }
-    return displayed;
+
+    late APIResponseModel response;
+
+    if(type == MangaBasicDisplayType.top) {
+      response = await mangaRepository.fetchTopManga();
+    } else if(type == MangaBasicDisplayType.mostPopular) {
+      response = await mangaRepository.fetchMostPopularManga();
+    } else if(type == MangaBasicDisplayType.favourites) {
+      response = await mangaRepository.fetchTopFavouritedManga();
+    }
+
+    if(response.error != null) {
+      state = AsyncError(response.error!.object, response.error!.stackTrace);
+      throw Exception(response.error!.object);
+    } else {
+      displayModel.dataList = response.data;
+      state = AsyncData(displayModel);
+    }
+
+    return displayModel;
   }
 
   Future<void> refresh() async => await build();

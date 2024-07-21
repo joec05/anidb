@@ -21,7 +21,6 @@ class ViewMoreAnimeController {
 
 class ViewMoreAnimeNotifier extends AutoDisposeAsyncNotifier<List<AnimeDataClass>>{
   final AnimeBasicDisplayType type;
-  late AnimeRepository animeRepository;
   List<AnimeDataClass> animeList = [];
 
   ViewMoreAnimeNotifier(this.type);
@@ -29,7 +28,6 @@ class ViewMoreAnimeNotifier extends AutoDisposeAsyncNotifier<List<AnimeDataClass
   @override
   FutureOr<List<AnimeDataClass>> build() async {
     state = const AsyncLoading();
-    animeRepository = AnimeRepository();
     APIResponseModel response = await animeRepository.fetchAnimeListFromType(type);
     if(response.error != null) {
       state = AsyncError(response.error!.object, response.error!.stackTrace);

@@ -35,36 +35,36 @@ class _HomePageStatefulState extends ConsumerState<_HomePageStateful> with Autom
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    AsyncValue<List<HomeFrontDisplayModel>> viewAnimeDataState = ref.watch(controller.homeNotifier);
 
     return RefreshIndicator(
-      onRefresh: () => context.read(controller.homeNotifier.notifier).refresh(),
-      child: viewAnimeDataState.when(
-        data: (data) => ListView.builder(
-          itemCount: data.length,
-          itemBuilder: (context, i) => CustomHomeFrontDisplay(
-            label: data[i].label,
-            displayType: data[i].displayType, 
-            dataList: data[i].dataList,
-            isLoading: false,
-            key: UniqueKey(),
-          ),
-        ) ,
-        error: (obj, stackTrace) => DisplayErrorWidget(displayText: obj.toString()), 
-        loading: () => ListView.builder(
-          itemCount: context.read(controller.homeNotifier.notifier).displayed.length,
-          itemBuilder: (context, i) {
-            HomeFrontDisplayModel data = context.read(controller.homeNotifier.notifier).displayed[i];
-            return CustomHomeFrontDisplay(
+      onRefresh: () => controller.refresh(),
+      child: ListView(
+        children: [
+          for(int i = 0; i < controller.notifiers.length; i++)
+          ref.watch(controller.notifiers[i]).when(
+            data: (data) => CustomHomeFrontDisplay(
               label: data.label,
               displayType: data.displayType, 
               dataList: data.dataList,
-              isLoading: true,
+              isLoading: false,
               key: UniqueKey(),
-            );
-          }
-        )
-      ),
+            ),
+            error: (obj, stackTrace) => DisplayErrorWidget(displayText: obj.toString()), 
+            loading: () => Builder(
+              builder: (context) {
+                HomeFrontDisplayModel data = context.read(controller.notifiers[i]).value ?? HomeFrontDisplayModel(description[i], AnimeBasicDisplayType.season, List.filled(10, AnimeDataClass.fetchNewInstance(-1)));
+                return CustomHomeFrontDisplay(
+                  label: data.label,
+                  displayType: data.displayType, 
+                  dataList: data.dataList,
+                  isLoading: true,
+                  key: UniqueKey(),
+                );
+              }
+            )
+          ),
+        ]
+      )
     );
   }
   

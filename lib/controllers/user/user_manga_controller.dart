@@ -67,7 +67,6 @@ class UserMangaController {
 
 class MyMangaListNotifier extends AutoDisposeAsyncNotifier<UserMangaListStatusClass> {
   UserMangaListStatusClass statusClass;
-  late MangaRepository mangaRepository;
 
   MyMangaListNotifier(
     this.statusClass
@@ -76,7 +75,6 @@ class MyMangaListNotifier extends AutoDisposeAsyncNotifier<UserMangaListStatusCl
   @override
   FutureOr<UserMangaListStatusClass> build() async {
     state = const AsyncLoading();
-    mangaRepository = MangaRepository();
     APIResponseModel response = await mangaRepository.fetchMyMangasList(statusClass);
     if(response.error != null) {
       state = AsyncError(response.error!.object, response.error!.stackTrace);

@@ -214,3 +214,5 @@ class MangaRepository {
     }
   }
 }
+
+final mangaRepository = MangaRepository();

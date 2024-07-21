@@ -24,14 +24,13 @@ class _ViewAnimeRankingStateful extends ConsumerStatefulWidget {
 }
 
 class _ViewAnimeRankingStatefulState extends ConsumerState<_ViewAnimeRankingStateful> with SingleTickerProviderStateMixin {
-  late AnimeRankingController controller;
+  final AnimeRankingController controller = AnimeRankingController();
   late TabController _tabController;
 
-  @override void initState(){
+  @override void initState() {
+    controller.initialize();
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
-    controller = AnimeRankingController();
-    controller.initialize();
   }
 
   @override void dispose(){
@@ -41,7 +40,6 @@ class _ViewAnimeRankingStatefulState extends ConsumerState<_ViewAnimeRankingStat
 
   @override
   Widget build(BuildContext context){
-    AsyncValue<List<HomeFrontDisplayModel>> viewAnimeDataState = ref.watch(controller.animeDataNotifier);
     return Scaffold(
       appBar: AppBar(
         leading: const AppBarWidget(),
@@ -83,8 +81,8 @@ class _ViewAnimeRankingStatefulState extends ConsumerState<_ViewAnimeRankingStat
         body: TabBarView(
           controller: _tabController,
           children: [
-            for(int x = 0; x < _tabController.length; x++)
-            viewAnimeDataState.when(
+            for(int x = 0; x < controller.notifiers.length; x++)
+            ref.watch(controller.notifiers[x]).when(
               loading: () => Builder(
                 builder: (context) {
                   return CustomScrollView(
@@ -137,10 +135,10 @@ class _ViewAnimeRankingStatefulState extends ConsumerState<_ViewAnimeRankingStat
                         ),
                         SliverList(
                           delegate: SliverChildBuilderDelegate(
-                            childCount: data[x].dataList.length, 
+                            childCount: data.dataList.length, 
                             (c, i) {
                               return CustomUserListAnimeDisplay(
-                                animeData: data[x].dataList[i],
+                                animeData: data.dataList[i],
                                 displayType: AnimeRowDisplayType.ranking,
                                 skeletonMode: false,
                                 key: UniqueKey()

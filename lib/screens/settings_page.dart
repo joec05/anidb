@@ -1,6 +1,7 @@
 import 'package:anime_list_app/global_files.dart';
 import 'package:anime_list_app/styles/splash.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -34,15 +35,7 @@ class SettingsPageState extends State<SettingsPage>{
                   CustomButton(
                     width: getScreenWidth() * 0.25, height: getScreenHeight() * 0.06, 
                     buttonColor: Colors.red, buttonText: 'Yes', 
-                    onTapped: (){
-                      authRepo.userTokenData = null;
-                      profileRepository.userData = null;
-                      secureStorageController.updateUserToken();
-                      while(context.canPop()) {
-                        context.pop();
-                      }
-                      context.push('/');
-                    }, 
+                    onTapped: logOut, 
                     setBorderRadius: true
                   ),
                   CustomButton(
@@ -72,6 +65,16 @@ class SettingsPageState extends State<SettingsPage>{
     );
   }
 
+  void logOut() {
+    authRepo.userTokenData = null;
+    profileRepository.userData = null;
+    secureStorageController.updateUserToken();
+    while(context.canPop()) {
+      context.pop();
+    }
+    context.pushReplacementNamed('main');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -85,7 +88,7 @@ class SettingsPageState extends State<SettingsPage>{
             Image.asset('assets/images/icon.png', width: 30, height: 30),
             'Version',
             () {},
-            subtitle: '1.0.0',
+            subtitle: dotenv.env['APP_VERSION']
           ),
           ValueListenableBuilder(
             valueListenable: themeModel.mode,
@@ -117,7 +120,7 @@ class SettingsPageState extends State<SettingsPage>{
           settingWidget(
             const SizedBox(width: 30, child: Icon(FontAwesomeIcons.arrowRightFromBracket, size: 20)),
             'Log Out',
-            askLogOut,
+            logOut,
           )
         ]
       ),

@@ -24,7 +24,6 @@ class MangaDetailsController {
 
 class MangaDetailsNotifier extends AutoDisposeAsyncNotifier<MangaDataClass>{
   final int mangaID;
-  late MangaRepository mangaRepository;
   MangaDataClass mangaData = MangaDataClass.fetchNewInstance(-1);
 
   MangaDetailsNotifier(this.mangaID);
@@ -32,7 +31,6 @@ class MangaDetailsNotifier extends AutoDisposeAsyncNotifier<MangaDataClass>{
   @override
   FutureOr<MangaDataClass> build() async {
     state = const AsyncLoading();
-    mangaRepository = MangaRepository();
     APIResponseModel response = await mangaRepository.fetchMangaDetails(mangaID);
     if(response.error != null) {
       state = AsyncError(response.error!.object, response.error!.stackTrace);

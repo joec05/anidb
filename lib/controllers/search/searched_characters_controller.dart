@@ -23,7 +23,6 @@ class SearchedCharactersController {
 
 class SearchedCharactersNotifier extends AutoDisposeAsyncNotifier<List<CharacterDataClass>>{
   final String searchedText;
-  late CharacterRepository characterRepository;
   List<CharacterDataClass> characterList = [];
 
   SearchedCharactersNotifier(this.searchedText);
@@ -31,7 +30,6 @@ class SearchedCharactersNotifier extends AutoDisposeAsyncNotifier<List<Character
   @override
   FutureOr<List<CharacterDataClass>> build() async {
     state = const AsyncLoading();
-    characterRepository = CharacterRepository();
     APIResponseModel response = await characterRepository.searchCharacters(searchedText);
     if(response.error != null) {
       state = AsyncError(response.error!.object, response.error!.stackTrace);

@@ -22,7 +22,6 @@ class ViewMoreCharactersController {
 
 class ViewMoreCharactersNotifier extends AutoDisposeAsyncNotifier<List<CharacterDataClass>>{
   final CharacterBasicDisplayType type;
-  late CharacterRepository characterRepository;
   List<CharacterDataClass> charactersList = [];
 
   ViewMoreCharactersNotifier(this.type);
@@ -30,7 +29,6 @@ class ViewMoreCharactersNotifier extends AutoDisposeAsyncNotifier<List<Character
   @override
   FutureOr<List<CharacterDataClass>> build() async {
     state = const AsyncLoading();
-    characterRepository = CharacterRepository();
     APIResponseModel response = await characterRepository.fetchCharactersListFromType(type);
     if(response.error != null) {
       state = AsyncError(response.error!.object, response.error!.stackTrace);

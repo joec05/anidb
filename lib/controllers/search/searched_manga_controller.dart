@@ -22,7 +22,6 @@ class SearchedMangaController {
 
 class SearchedMangaNotifier extends AutoDisposeAsyncNotifier<List<MangaDataClass>>{
   final String searchedText;
-  late MangaRepository mangaRepository;
   List<MangaDataClass> mangaList = [];
 
   SearchedMangaNotifier(this.searchedText);
@@ -30,7 +29,6 @@ class SearchedMangaNotifier extends AutoDisposeAsyncNotifier<List<MangaDataClass
   @override
   FutureOr<List<MangaDataClass>> build() async {
     state = const AsyncLoading();
-    mangaRepository = MangaRepository();
     APIResponseModel response = await mangaRepository.searchManga(searchedText);
     if(response.error != null) {
       state = AsyncError(response.error!.object, response.error!.stackTrace);

@@ -17,6 +17,7 @@ class ProfileRepository {
     talker.debug(res.data);
     if(res.error == null) {
       userData = UserDataClass.fromMap(res.data);
+      talker.debug(userData);
       return APIResponseModel(userData, null);
     } else {
       userData = null;

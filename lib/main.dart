@@ -52,9 +52,10 @@ Future<void> main() async {
 
 Future<void> initializeData() async{
   Map? userTokenMap = await secureStorageController.fetchUserToken();
-  if(userTokenMap != null){
+  talker.debug(userTokenMap);
+  if(userTokenMap != null) {
     authRepo.userTokenData = UserTokenClass.fromMapRetrieve(userTokenMap);
-    await profileRepository.fetchMyProfileData();
+    final _ = await profileRepository.fetchMyProfileData();
   }
   return;
 }
@@ -65,6 +66,11 @@ final router = GoRouter(
       path: '/',
       builder: (context, state) => const MyHomePage(),
       routes: [
+        GoRoute(
+          name: 'main',
+          path: 'main',
+          builder: (context, state) => const MyHomePage()
+        ),
         GoRoute(
           name: 'connect-account',
           path: 'connect-account/:url/:codeVerifier',
@@ -188,9 +194,9 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     hasAuthenticatedNotifier = AsyncNotifierProvider.autoDispose<HasAuthenticatedNotifier, void>(
       () => HasAuthenticatedNotifier()
     );
-    _updateHasAuthenticated = HasAuthenticatedStreamClass().hasAuthenticatedStream.listen((HasAuthenticatedClass data) {
-      if(mounted){
-        context.read(hasAuthenticatedNotifier.notifier).authenticate(
+    _updateHasAuthenticated = HasAuthenticatedStreamClass().hasAuthenticatedStream.listen((HasAuthenticatedClass data) async {
+      if(mounted) {
+        await context.read(hasAuthenticatedNotifier.notifier).authenticate(
           context,
           data.url,
           data.codeVerifier
@@ -228,7 +234,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     while(context.canPop()) {
       context.pop();
     }
-    await context.pushNamed('connect-account', pathParameters: {
+    final _ = await context.pushNamed('connect-account', pathParameters: {
       'url': 'https://myanimelist.net/v1/oauth2/authorize?response_type=code&client_id=$clientID&code_challenge=$codeVerifier&state=RequestIDABC',
       'codeVerifier': codeVerifier
     });

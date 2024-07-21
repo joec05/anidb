@@ -16,13 +16,11 @@ class ExploreController {
 }
 
 class ExploreNotifier extends AutoDisposeAsyncNotifier<List<AnimeDataClass>> {
-  late AnimeRepository animeRepository;
   List<AnimeDataClass> animeList = [];
 
   @override
   FutureOr<List<AnimeDataClass>> build() async {
     state = const AsyncLoading();
-    animeRepository = AnimeRepository();
     APIResponseModel response = await animeRepository.fetchSuggestedAnime();
     if(response.error != null) {
       state = AsyncError(response.error!.object, response.error!.stackTrace);

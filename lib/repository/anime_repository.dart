@@ -282,3 +282,5 @@ class AnimeRepository {
   }
   
 }
+
+final animeRepository = AnimeRepository();

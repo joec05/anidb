@@ -41,7 +41,6 @@ class _ViewMangaRankingStatefulState extends ConsumerState<_ViewMangaRankingStat
 
   @override
   Widget build(BuildContext context){
-    AsyncValue<List<HomeFrontDisplayModel>> viewMangaDataState = ref.watch(controller.mangaDataNotifier);
     return Scaffold(
       appBar: AppBar(
         leading: const AppBarWidget(),
@@ -83,8 +82,8 @@ class _ViewMangaRankingStatefulState extends ConsumerState<_ViewMangaRankingStat
         body: TabBarView(
           controller: _tabController,
           children: [
-            for(int x = 0; x < _tabController.length; x++)
-            viewMangaDataState.when(
+            for(int x = 0; x < controller.notifiers.length; x++)
+            ref.watch(controller.notifiers[x]).when(
               loading: () => Builder(
                 builder: (context) {
                   return CustomScrollView(
@@ -137,10 +136,10 @@ class _ViewMangaRankingStatefulState extends ConsumerState<_ViewMangaRankingStat
                         ),
                         SliverList(
                           delegate: SliverChildBuilderDelegate(
-                            childCount: data[x].dataList.length, 
+                            childCount: data.dataList.length, 
                             (c, i) {
                               return CustomUserListMangaDisplay(
-                                mangaData: data[x].dataList[i],
+                                mangaData: data.dataList[i],
                                 displayType: MangaRowDisplayType.ranking,
                                 skeletonMode: false,
                                 key: UniqueKey()

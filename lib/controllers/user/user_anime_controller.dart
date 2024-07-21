@@ -65,7 +65,6 @@ class UserAnimeController {
 
 class MyAnimeListNotifier extends AutoDisposeAsyncNotifier<UserAnimeListStatusClass> {
   UserAnimeListStatusClass statusClass;
-  late AnimeRepository animeRepository;
 
   MyAnimeListNotifier(
     this.statusClass
@@ -74,7 +73,6 @@ class MyAnimeListNotifier extends AutoDisposeAsyncNotifier<UserAnimeListStatusCl
   @override
   FutureOr<UserAnimeListStatusClass> build() async {
     state = const AsyncLoading();
-    animeRepository = AnimeRepository();
     APIResponseModel response = await animeRepository.fetchMyAnimesList(statusClass);
     if(response.error != null) {
       state = AsyncError(response.error!.object, response.error!.stackTrace);

@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:anidb/global_files.dart';
+import 'package:anidb_app/global_files.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class UserMangaController {
@@ -45,8 +45,6 @@ class UserMangaController {
       ),
     ];
     updateUserMangaListStreamClassSubscription = UpdateUserMangaListStreamClass().userMangaListStream.listen((UserMangaListStreamControllerClass data) {
-      talker.debug(data.oldStatus);
-      talker.debug(data.newStatus);
       if(data.oldStatus != data.newStatus) {
         MangaDataClass mangaData = data.mangaData;
         for(int i = 0; i < statusNotifiers.length; i++) {
@@ -106,7 +104,6 @@ class MyMangaListNotifier extends AutoDisposeAsyncNotifier<UserMangaListStatusCl
       state = AsyncData(statusClass);
     }
     if(newStatus == status) {
-      talker.debug(status);
       statusClass.mangaList.insert(0, mangaData);
       statusClass.mangaList.sort((a, b) => a.title.compareTo(b.title));
       state = AsyncData(statusClass);

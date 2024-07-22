@@ -1,4 +1,4 @@
-import 'package:anidb/global_files.dart';
+import 'package:anidb_app/global_files.dart';
 import 'package:flutter/material.dart';
 
 class CharacterDataNotifier{

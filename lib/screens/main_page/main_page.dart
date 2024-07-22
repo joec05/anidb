@@ -1,5 +1,5 @@
-import 'package:anidb/global_files.dart';
-import 'package:anidb/styles/splash.dart';
+import 'package:anidb_app/global_files.dart';
+import 'package:anidb_app/styles/splash.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';

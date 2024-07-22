@@ -1,4 +1,4 @@
-import 'package:anidb/controllers/shared_preferences/shared_preferences_controller.dart';
+import 'package:anidb_app/controllers/shared_preferences/shared_preferences_controller.dart';
 import 'package:flutter/material.dart';
 
 class ThemeModel {

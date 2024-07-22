@@ -1,5 +1,5 @@
-import 'package:anidb/global_files.dart';
-import 'package:anidb/streams/has_authenticated_stream.dart';
+import 'package:anidb_app/global_files.dart';
+import 'package:anidb_app/streams/has_authenticated_stream.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:go_router/go_router.dart';

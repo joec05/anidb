@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'package:anidb/models/api/api_response_model.dart';
-import 'package:anidb/repository/profile_repository.dart';
+import 'package:anidb_app/models/api/api_response_model.dart';
+import 'package:anidb_app/repository/profile_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class UserStatisticsController {

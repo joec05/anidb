@@ -1,7 +1,7 @@
 import 'dart:async';
-import 'package:anidb/models/api/api_response_model.dart';
-import 'package:anidb/models/manga/manga_data_class.dart';
-import 'package:anidb/repository/manga_repository.dart';
+import 'package:anidb_app/models/api/api_response_model.dart';
+import 'package:anidb_app/models/manga/manga_data_class.dart';
+import 'package:anidb_app/repository/manga_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class MangaDetailsController {
@@ -37,21 +37,23 @@ class MangaDetailsNotifier extends AutoDisposeAsyncNotifier<MangaDataClass>{
       throw Exception(response.error!.object);
     } else {
       mangaData = response.data;
-      APIResponseModel response2 = await mangaRepository.fetchMangaCharacters(mangaID);
-      if(response2.error != null) {
-        state = AsyncError(response2.error!.object, response2.error!.stackTrace);
-        throw Exception(response.error!.object);
-      } else {
-        mangaData.characters = response2.data;
-        APIResponseModel response3 = await mangaRepository.fetchMangaStatistics(mangaID);
-        if(response3.error != null) {
-          state = AsyncError(response3.error!.object, response3.error!.stackTrace);
-          throw Exception(response.error!.object);
-        } else {
-          mangaData.statistics = response3.data;
-          state = AsyncData(mangaData);
-        }
-      }
+      state = AsyncData(mangaData); 
+    }
+    APIResponseModel response2 = await mangaRepository.fetchMangaCharacters(mangaID);
+    if(response2.error != null) {
+      state = AsyncError(response2.error!.object, response2.error!.stackTrace);
+      throw Exception(response.error!.object);
+    } else {
+      mangaData.characters = response2.data;
+      state = AsyncData(mangaData); 
+    }
+    APIResponseModel response3 = await mangaRepository.fetchMangaStatistics(mangaID);
+    if(response3.error != null) {
+      state = AsyncError(response3.error!.object, response3.error!.stackTrace);
+      throw Exception(response.error!.object);
+    } else {
+      mangaData.statistics = response3.data;
+      state = AsyncData(mangaData);
     }
     return mangaData;
   }

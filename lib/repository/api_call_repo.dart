@@ -1,4 +1,4 @@
-import 'package:anidb/global_files.dart';
+import 'package:anidb_app/global_files.dart';
 import 'package:dio/dio.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:talker_dio_logger/talker_dio_logger_interceptor.dart';

@@ -1,15 +1,15 @@
-import 'package:anidb/constants/anime/enums.dart';
-import 'package:anidb/constants/anime/functions.dart';
-import 'package:anidb/constants/api/enums.dart';
-import 'package:anidb/constants/api/variables.dart';
-import 'package:anidb/constants/limit/variables.dart';
-import 'package:anidb/models/anime/anime_data_class.dart';
-import 'package:anidb/models/api/api_response_model.dart';
-import 'package:anidb/models/character/character_data_class.dart';
-import 'package:anidb/models/character/character_image_class.dart';
-import 'package:anidb/models/user/user_anime_list_status_class.dart';
-import 'package:anidb/repository/api_call_repo.dart';
-import 'package:anidb/repository/update_state_repo.dart';
+import 'package:anidb_app/constants/anime/enums.dart';
+import 'package:anidb_app/constants/anime/functions.dart';
+import 'package:anidb_app/constants/api/enums.dart';
+import 'package:anidb_app/constants/api/variables.dart';
+import 'package:anidb_app/constants/limit/variables.dart';
+import 'package:anidb_app/models/anime/anime_data_class.dart';
+import 'package:anidb_app/models/api/api_response_model.dart';
+import 'package:anidb_app/models/character/character_data_class.dart';
+import 'package:anidb_app/models/character/character_image_class.dart';
+import 'package:anidb_app/models/user/user_anime_list_status_class.dart';
+import 'package:anidb_app/repository/api_call_repo.dart';
+import 'package:anidb_app/repository/update_state_repo.dart';
 
 class AnimeRepository {
   Future<APIResponseModel> fetchAnimeDetails(int animeID) async{

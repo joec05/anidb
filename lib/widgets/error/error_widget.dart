@@ -1,4 +1,4 @@
-import 'package:anidb/constants/ui/screen_size/screen_size.dart';
+import 'package:anidb_app/constants/ui/screen_size/screen_size.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 

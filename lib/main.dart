@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:math';
-import 'package:anidb/global_files.dart';
-import 'package:anidb/screens/anime/view_anime_ranking.dart';
-import 'package:anidb/screens/manga/view_manga_ranking.dart';
-import 'package:anidb/streams/has_authenticated_stream.dart';
+import 'package:anidb_app/global_files.dart';
+import 'package:anidb_app/screens/anime/view_anime_ranking.dart';
+import 'package:anidb_app/screens/manga/view_manga_ranking.dart';
+import 'package:anidb_app/streams/has_authenticated_stream.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
@@ -52,7 +52,6 @@ Future<void> main() async {
 
 Future<void> initializeData() async{
   Map? userTokenMap = await secureStorageController.fetchUserToken();
-  talker.debug(userTokenMap);
   if(userTokenMap != null) {
     authRepo.userTokenData = UserTokenClass.fromMapRetrieve(userTokenMap);
     final _ = await profileRepository.fetchMyProfileData();

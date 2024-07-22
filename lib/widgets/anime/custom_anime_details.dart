@@ -1,5 +1,5 @@
 import 'dart:math';
-import 'package:anidb/global_files.dart';
+import 'package:anidb_app/global_files.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vertical_barchart/vertical-barchartmodel.dart';
@@ -890,7 +890,7 @@ class CustomAnimeDetailsState extends ConsumerState<CustomAnimeDetails>{
                         horizontal: getScreenWidth() * 0.025,
                         vertical: getScreenHeight() * 0.02,
                       ),
-                      child: VerticalBarChartWidget( 
+                      child: totalActivitiesCount == 0 ? Container() : VerticalBarChartWidget( 
                         bardata: [
                           VBarChartModel(
                             index: 0,

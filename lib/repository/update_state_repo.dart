@@ -1,4 +1,4 @@
-import 'package:anidb/global_files.dart';
+import 'package:anidb_app/global_files.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void updateAnimeStatusFromMap(int id, Map? map) {

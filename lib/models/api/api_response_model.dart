@@ -1,4 +1,4 @@
-import 'package:anime_list_app/models/api/api_error_model.dart';
+import 'package:anidb/models/api/api_error_model.dart';
 
 class APIResponseModel {
   final dynamic data;

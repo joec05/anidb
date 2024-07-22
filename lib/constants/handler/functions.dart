@@ -1,4 +1,4 @@
-import 'package:anime_list_app/global_files.dart';
+import 'package:anidb/global_files.dart';
 import 'package:flutter/material.dart';
 
 /// Returns the content of a snackbar in widget form. Typically contains text and sometimes an icon as well.

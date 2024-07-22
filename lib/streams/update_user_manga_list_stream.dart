@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:anime_list_app/global_files.dart';
+import 'package:anidb/global_files.dart';
 
 class UserMangaListStreamControllerClass{
   final MangaDataClass mangaData;

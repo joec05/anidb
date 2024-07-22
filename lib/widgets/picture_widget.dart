@@ -1,6 +1,6 @@
-import 'package:anime_list_app/constants/ui/screen_size/screen_size.dart';
-import 'package:anime_list_app/styles/default_values/default_values.dart';
-import 'package:anime_list_app/widgets/cached_image/cached_image_widget.dart';
+import 'package:anidb/constants/ui/screen_size/screen_size.dart';
+import 'package:anidb/styles/default_values/default_values.dart';
+import 'package:anidb/widgets/cached_image/cached_image_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 

@@ -1,4 +1,4 @@
-import 'package:anime_list_app/global_files.dart';
+import 'package:anidb/global_files.dart';
 
 class CharacterRepository {
   Future<APIResponseModel> fetchTopCharacters() async{

@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:anime_list_app/global_files.dart';
+import 'package:anidb/global_files.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class SecureStorageController {

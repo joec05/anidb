@@ -1,5 +1,5 @@
-import 'package:anime_list_app/constants/delay/functions.dart';
-import 'package:anime_list_app/styles/splash.dart';
+import 'package:anidb/constants/delay/functions.dart';
+import 'package:anidb/styles/splash.dart';
 import 'package:flutter/material.dart';
 
 class AppBarWidget extends StatelessWidget {

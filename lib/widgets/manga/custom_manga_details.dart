@@ -1,5 +1,5 @@
 import 'dart:math';
-import 'package:anime_list_app/global_files.dart';
+import 'package:anidb/global_files.dart';
 import 'package:flutter/material.dart';
 import 'package:vertical_barchart/vertical-barchartmodel.dart';
 import 'package:vertical_barchart/vertical-legend.dart';

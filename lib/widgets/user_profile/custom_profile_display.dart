@@ -1,4 +1,4 @@
-import 'package:anime_list_app/global_files.dart';
+import 'package:anidb/global_files.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 

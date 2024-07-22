@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:anime_list_app/global_files.dart';
+import 'package:anidb/global_files.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class UserAnimeController {

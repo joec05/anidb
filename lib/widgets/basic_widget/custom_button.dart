@@ -1,4 +1,4 @@
-import 'package:anime_list_app/styles/splash.dart';
+import 'package:anidb/styles/splash.dart';
 import 'package:flutter/material.dart';
 
 class CustomButton extends StatefulWidget {
